@@ -19,7 +19,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=3"
+        href="style.css?v=4"
     >
 
 </head>
@@ -31,7 +31,9 @@
     <main class="app">
 
 
-        <!-- HEADER -->
+        <!-- ==================================================
+             HEADER
+             ================================================== -->
 
         <header class="hero">
 
@@ -52,11 +54,10 @@
 
 
         <!-- ==================================================
-             HOME SCREEN
+             HOME
              ================================================== -->
 
         <section id="homeScreen">
-
 
             <section class="game-card">
 
@@ -92,9 +93,12 @@
                 </div>
 
 
+
                 <div class="game-section">
 
-                    <h2>Create a Game</h2>
+                    <h2>
+                        Create a Game
+                    </h2>
 
                     <p>
                         Start a new room and invite your friends.
@@ -117,9 +121,12 @@
                 </div>
 
 
+
                 <div class="game-section">
 
-                    <h2>Join a Game</h2>
+                    <h2>
+                        Join a Game
+                    </h2>
 
                     <p>
                         Enter the room code from the host.
@@ -152,14 +159,13 @@
 
 
         <!-- ==================================================
-             LOBBY SCREEN
+             LOBBY
              ================================================== -->
 
         <section
             id="lobbyScreen"
             class="hidden"
         >
-
 
             <section class="game-card lobby-card">
 
@@ -173,10 +179,13 @@
                         </p>
 
                         <h2>
+
                             Room
+
                             <span id="lobbyRoomCode">
                                 -----
                             </span>
+
                         </h2>
 
                     </div>
@@ -208,7 +217,10 @@
 
 
 
-                <h3>Players</h3>
+                <h3>
+                    Players
+                </h3>
+
 
                 <div
                     id="playerList"
@@ -243,7 +255,7 @@
 
 
         <!-- ==================================================
-             GAME SCREEN
+             GAME
              ================================================== -->
 
         <section
@@ -251,25 +263,27 @@
             class="hidden"
         >
 
-
             <section class="game-card lobby-card">
 
 
-                <!-- GAME HEADER -->
+                <!-- HEADER -->
 
                 <div class="lobby-header">
 
                     <div>
 
                         <p class="eyebrow">
-                            GAME IN PROGRESS
+                            RACE NIGHT
                         </p>
 
                         <h2>
+
                             Room
+
                             <span id="gameRoomCode">
                                 -----
                             </span>
+
                         </h2>
 
                     </div>
@@ -305,7 +319,9 @@
 
                 <!-- PLAYERS -->
 
-                <h3>Players</h3>
+                <h3>
+                    Players
+                </h3>
 
                 <div
                     id="gamePlayerList"
@@ -315,10 +331,22 @@
 
 
 
+                <!-- CHAMPIONSHIP -->
+
+                <div class="divider">
+                    <span>CHAMPIONSHIP</span>
+                </div>
+
+
+                <div id="liveStandings">
+                </div>
+
+
+
                 <!-- ROUND -->
 
                 <div class="divider">
-                    <span>ROUND</span>
+                    <span>CURRENT ROUND</span>
                 </div>
 
 
@@ -327,13 +355,15 @@
                     <div>
 
                         <p class="setup-label">
-                            CURRENT ROUND
+                            ROUND
                         </p>
 
                         <div class="round-number">
+
                             <span id="roundNumber">
                                 1
                             </span>
+
                         </div>
 
                     </div>
@@ -350,7 +380,7 @@
 
 
 
-                <!-- CURRENT CAR -->
+                <!-- CAR -->
 
                 <div class="setup-card">
 
@@ -373,7 +403,7 @@
 
 
 
-                <!-- CURRENT RACE -->
+                <!-- RACE -->
 
                 <div class="setup-card">
 
@@ -408,7 +438,7 @@
 
 
 
-                <!-- HOST CONTROLS -->
+                <!-- HOST SETUP CONTROLS -->
 
                 <div
                     id="hostGameControls"
@@ -441,6 +471,7 @@
                     </select>
 
 
+
                     <div class="button-grid">
 
                         <button
@@ -460,6 +491,7 @@
                         </button>
 
                     </div>
+
 
 
                     <button
@@ -483,14 +515,170 @@
 
 
 
-                <!-- STATUS -->
-
                 <p
                     id="gameNote"
                     class="lobby-note"
                 >
-                    Waiting for the host to set up Round 1.
+                    Waiting for the host.
                 </p>
+
+
+
+                <!-- ENTER RESULTS -->
+
+                <div
+                    id="raceCompleteControls"
+                    class="hidden"
+                >
+
+                    <button
+                        id="enterResultsBtn"
+                        class="primary-button wide-button"
+                        type="button"
+                    >
+                        Enter Race Results
+                    </button>
+
+                </div>
+
+
+
+                <!-- ==================================================
+                     RESULT ENTRY
+                     ================================================== -->
+
+                <section
+                    id="resultsEntryPanel"
+                    class="hidden"
+                >
+
+                    <div class="divider">
+                        <span>FINISHING ORDER</span>
+                    </div>
+
+
+                    <div class="setup-card">
+
+                        <h2>
+                            Round
+                            <span id="resultEntryRound">
+                                1
+                            </span>
+                            Results
+                        </h2>
+
+                        <p class="setup-detail">
+                            Assign each player a finishing position.
+                        </p>
+
+
+                        <div id="finishOrderInputs">
+                        </div>
+
+
+                        <p
+                            id="resultEntryMessage"
+                            class="message center-message"
+                        ></p>
+
+
+                        <button
+                            id="submitResultsBtn"
+                            class="primary-button wide-button"
+                            type="button"
+                        >
+                            Submit Results
+                        </button>
+
+
+                        <button
+                            id="cancelResultsBtn"
+                            class="dark-button wide-button"
+                            type="button"
+                        >
+                            Cancel
+                        </button>
+
+                    </div>
+
+                </section>
+
+
+
+                <!-- ==================================================
+                     ROUND RESULTS
+                     ================================================== -->
+
+                <section
+                    id="roundResultsPanel"
+                    class="hidden"
+                >
+
+                    <div class="divider">
+                        <span>RACE RESULTS</span>
+                    </div>
+
+
+                    <div class="results-title">
+
+                        <p class="setup-label">
+                            ROUND
+                        </p>
+
+                        <h2 id="resultsRoundNumber">
+                            1
+                        </h2>
+
+                    </div>
+
+
+                    <div id="roundResultsList">
+                    </div>
+
+
+                    <div class="divider">
+                        <span>UPGRADE REWARDS</span>
+                    </div>
+
+
+                    <div id="upgradeRewardList">
+                    </div>
+
+
+
+                    <div
+                        id="hostAfterRaceControls"
+                        class="hidden"
+                    >
+
+                        <button
+                            id="nextRoundBtn"
+                            class="primary-button wide-button"
+                            type="button"
+                        >
+                            Next Round
+                        </button>
+
+
+                        <button
+                            id="endRaceNightBtn"
+                            class="end-button wide-button"
+                            type="button"
+                        >
+                            End Race Night
+                        </button>
+
+                    </div>
+
+
+                    <p class="temporary-note">
+
+                        Upgrade rolls will be inserted between
+                        Results and Next Round in the next build.
+
+                    </p>
+
+                </section>
 
 
             </section>
@@ -499,7 +687,101 @@
 
 
 
-        <!-- FOOTER -->
+        <!-- ==================================================
+             FINAL RESULTS
+             ================================================== -->
+
+        <section
+            id="finalScreen"
+            class="hidden"
+        >
+
+            <section class="game-card lobby-card">
+
+
+                <div class="final-header">
+
+                    <p class="eyebrow">
+                        RACE NIGHT COMPLETE
+                    </p>
+
+                    <h2>
+                        FINAL RESULTS
+                    </h2>
+
+                </div>
+
+
+
+                <div class="champion-card">
+
+                    <p class="setup-label">
+                        RACE NIGHT CHAMPION
+                    </p>
+
+                    <div class="trophy">
+                        🏆
+                    </div>
+
+                    <h1 id="finalChampionName">
+                        Player
+                    </h1>
+
+                    <p id="finalChampionStats">
+                        0 Points
+                    </p>
+
+                </div>
+
+
+
+                <div class="divider">
+                    <span>FINAL STANDINGS</span>
+                </div>
+
+
+                <div id="finalStandings">
+                </div>
+
+
+
+                <div class="divider">
+                    <span>RACE HISTORY</span>
+                </div>
+
+
+                <div id="finalRaceHistory">
+                </div>
+
+
+
+                <p
+                    id="finalRaceCount"
+                    class="lobby-note"
+                >
+                    0 races completed.
+                </p>
+
+
+
+                <button
+                    id="leaveFinalBtn"
+                    class="primary-button wide-button"
+                    type="button"
+                >
+                    Back to Home
+                </button>
+
+
+            </section>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             FOOTER
+             ================================================== -->
 
         <footer>
             Just A Race Team
@@ -512,7 +794,7 @@
 
     <script
         type="module"
-        src="script.js?v=3"
+        src="script.js?v=4"
     ></script>
 
 

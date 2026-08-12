@@ -191,6 +191,27 @@ button:hover {
 }
 
 
+.end-button {
+    margin-top: 12px;
+
+    background: transparent;
+
+    color: #ff6b6b;
+
+    border: 1px solid #773333;
+}
+
+
+.end-button:hover {
+    background: #351515;
+}
+
+
+.wide-button {
+    max-width: none;
+}
+
+
 
 /* =========================================================
    INPUTS
@@ -291,13 +312,18 @@ select:focus {
 
 
 /* =========================================================
-   MESSAGES
+   GENERAL
    ========================================================= */
 
 .message {
     min-height: 20px;
 
     margin-bottom: 0;
+}
+
+
+.center-message {
+    text-align: center;
 }
 
 
@@ -469,7 +495,7 @@ select:focus {
 
 
 /* =========================================================
-   ROUND / GAME SETUP
+   ROUND
    ========================================================= */
 
 .round-header {
@@ -579,7 +605,7 @@ select:focus {
 
 
 /* =========================================================
-   HOST CONTROLS
+   HOST
    ========================================================= */
 
 .host-controls {
@@ -601,6 +627,299 @@ select:focus {
 
 .button-grid button {
     max-width: none;
+}
+
+
+
+/* =========================================================
+   STANDINGS
+   ========================================================= */
+
+.standings-table {
+    overflow: hidden;
+
+    border: 1px solid #303030;
+
+    border-radius: 12px;
+
+    background: #0c0c0c;
+}
+
+
+.standing-row {
+    display: grid;
+
+    grid-template-columns:
+        55px 1fr 80px 85px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 15px 18px;
+
+    border-bottom: 1px solid #242424;
+}
+
+
+.standing-row:last-child {
+    border-bottom: none;
+}
+
+
+.standing-header {
+    color: #777;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+
+.standing-position {
+    color: #ff4d30;
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+
+.standing-name {
+    font-weight: bold;
+}
+
+
+.standing-points {
+    text-align: right;
+
+    font-weight: bold;
+}
+
+
+.standing-wins {
+    text-align: right;
+
+    color: #aaa;
+}
+
+
+
+/* =========================================================
+   FINISH ORDER ENTRY
+   ========================================================= */
+
+.finish-entry-row {
+    display: grid;
+
+    grid-template-columns:
+        85px 1fr;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin: 15px 0;
+}
+
+
+.finish-place {
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: #ff4d30;
+}
+
+
+
+/* =========================================================
+   RESULTS
+   ========================================================= */
+
+.results-title {
+    text-align: center;
+
+    margin-bottom: 20px;
+}
+
+
+.results-title h2 {
+    margin: 0;
+
+    font-size: 40px;
+
+    color: #ff4d30;
+}
+
+
+.result-row,
+.reward-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    margin-bottom: 10px;
+
+    background: #0c0c0c;
+
+    border: 1px solid #303030;
+
+    border-radius: 10px;
+}
+
+
+.result-place {
+    min-width: 55px;
+
+    color: #ff4d30;
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+
+.result-name {
+    flex: 1;
+
+    font-size: 18px;
+
+    font-weight: bold;
+}
+
+
+.result-points {
+    color: #aaa;
+
+    font-weight: bold;
+}
+
+
+.reward-info {
+    flex: 1;
+}
+
+
+.reward-info strong {
+    display: block;
+
+    margin-bottom: 5px;
+}
+
+
+.reward-info span {
+    color: #999;
+}
+
+
+.temporary-note {
+    margin-top: 20px;
+
+    text-align: center;
+
+    color: #666;
+
+    font-size: 12px;
+}
+
+
+
+/* =========================================================
+   FINAL SCREEN
+   ========================================================= */
+
+.final-header {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+
+.final-header h2 {
+    margin: 0;
+
+    font-size: 38px;
+}
+
+
+.champion-card {
+    padding: 35px 20px;
+
+    text-align: center;
+
+    background: #0c0c0c;
+
+    border: 1px solid #47362a;
+
+    border-radius: 14px;
+}
+
+
+.trophy {
+    margin: 10px 0;
+
+    font-size: 55px;
+}
+
+
+.champion-card h1 {
+    margin: 5px 0;
+
+    font-size: 38px;
+
+    color: #ff4d30;
+}
+
+
+.champion-card p:last-child {
+    color: #aaa;
+
+    font-size: 18px;
+}
+
+
+.history-card {
+    padding: 18px;
+
+    margin-bottom: 12px;
+
+    background: #0c0c0c;
+
+    border: 1px solid #303030;
+
+    border-radius: 10px;
+}
+
+
+.history-card h3 {
+    margin: 0 0 12px;
+
+    color: #ff4d30;
+}
+
+
+.history-result {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 5px 0;
+
+    color: #aaa;
+}
+
+
+.history-result strong {
+    color: white;
 }
 
 
@@ -664,6 +983,28 @@ footer {
 
     .setup-card h2 {
         font-size: 22px;
+    }
+
+
+    .standing-row {
+        grid-template-columns:
+            35px 1fr 55px 65px;
+
+        padding: 13px 12px;
+
+        font-size: 13px;
+    }
+
+
+    .finish-entry-row {
+        grid-template-columns:
+            65px 1fr;
+    }
+
+
+    .result-row,
+    .reward-row {
+        padding: 14px;
     }
 
 }

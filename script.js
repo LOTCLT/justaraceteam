@@ -65,25 +65,19 @@ const database =
 
 
 /* =========================================================
-   CAR LIBRARY
+   CARS
    ========================================================= */
 
 const CAR_LIBRARY = [
 
     {
-        name:
-            "2024 Ford Mustang GT",
-
-        startingPI:
-            "A628"
+        name: "2024 Ford Mustang GT",
+        startingPI: "A628"
     },
 
     {
-        name:
-            "1986 Honda Civic Si",
-
-        startingPI:
-            "D253"
+        name: "1986 Honda Civic Si",
+        startingPI: "D253"
     }
 
 ];
@@ -91,378 +85,129 @@ const CAR_LIBRARY = [
 
 
 /* =========================================================
-   RACE DATABASE
-
-   TRACK_EQUAL behavior:
-   Every individual race has equal odds.
+   RACES
    ========================================================= */
 
 const RACE_POOL = [
 
-
     /* STREET */
 
-    {
-        type: "Street",
-        name: "Cedar Run Street Race",
-        distance: "4.2 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Daikoku Chase Street Race",
-        distance: "4.2 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Festival Chase Street Race",
-        distance: "4.1 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Hokubu Ascent Street Race",
-        distance: "4.2 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Kita Ine Street Race",
-        distance: "4.1 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Matsumi Climb Street Race",
-        distance: "4.6 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Minami Chase Street Race",
-        distance: "4.6 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Nachi Run Street Race",
-        distance: "3.9 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Norikura Descent Street Race",
-        distance: "3.6 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Okishinaimura Run Street Race",
-        distance: "3.2 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Rainbow Bridge Descent Street Race",
-        distance: "5.3 mi"
-    },
-
-    {
-        type: "Street",
-        name: "River Descent Street Race",
-        distance: "3.8 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Shimanoyama Charge Street Race",
-        distance: "5.2 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Sunflower Charge Street Race",
-        distance: "3.8 mi"
-    },
-
-    {
-        type: "Street",
-        name: "Tokyo City Docks Charge Street Race",
-        distance: "4.0 mi"
-    },
-
+    { type: "Street", name: "Cedar Run Street Race", distance: "4.2 mi" },
+    { type: "Street", name: "Daikoku Chase Street Race", distance: "4.2 mi" },
+    { type: "Street", name: "Festival Chase Street Race", distance: "4.1 mi" },
+    { type: "Street", name: "Hokubu Ascent Street Race", distance: "4.2 mi" },
+    { type: "Street", name: "Kita Ine Street Race", distance: "4.1 mi" },
+    { type: "Street", name: "Matsumi Climb Street Race", distance: "4.6 mi" },
+    { type: "Street", name: "Minami Chase Street Race", distance: "4.6 mi" },
+    { type: "Street", name: "Nachi Run Street Race", distance: "3.9 mi" },
+    { type: "Street", name: "Norikura Descent Street Race", distance: "3.6 mi" },
+    { type: "Street", name: "Okishinaimura Run Street Race", distance: "3.2 mi" },
+    { type: "Street", name: "Rainbow Bridge Descent Street Race", distance: "5.3 mi" },
+    { type: "Street", name: "River Descent Street Race", distance: "3.8 mi" },
+    { type: "Street", name: "Shimanoyama Charge Street Race", distance: "5.2 mi" },
+    { type: "Street", name: "Sunflower Charge Street Race", distance: "3.8 mi" },
+    { type: "Street", name: "Tokyo City Docks Charge Street Race", distance: "4.0 mi" },
 
 
     /* ROAD */
 
-    {
-        type: "Road",
-        name: "Coastline Sprint",
-        distance: "5.0 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Daikoku Circuit",
-        distance: "3.3 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Electric Town Circuit",
-        distance: "5.5 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Festival Sprint",
-        distance: "4.9 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Highway Circuit",
-        distance: "8.7 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Hokubu Circuit",
-        distance: "4.7 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Irokawa Circuit Road Race",
-        distance: "3.5 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Ito Sprint",
-        distance: "5.8 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Legend Island Circuit",
-        distance: "8.8 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Narai-Juku Circuit",
-        distance: "4.4 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Satta Sprint",
-        distance: "5.1 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Seaside Park Sprint",
-        distance: "4.5 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Shikisai Sprint",
-        distance: "4.8 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Shimanoyama Circuit",
-        distance: "3.4 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Shimanoyama Sprint",
-        distance: "4.0 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Shirakawa Circuit",
-        distance: "4.0 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Tateyama Kurobe Sprint",
-        distance: "3.8 mi"
-    },
-
-    {
-        type: "Road",
-        name: "The Colossus",
-        distance: "23.4 mi"
-    },
-
-    {
-        type: "Road",
-        name: "The Goliath",
-        distance: "53.1 mi"
-    },
-
-    {
-        type: "Road",
-        name: "Venus Sprint",
-        distance: "5.0 mi"
-    },
-
+    { type: "Road", name: "Coastline Sprint", distance: "5.0 mi" },
+    { type: "Road", name: "Daikoku Circuit", distance: "3.3 mi" },
+    { type: "Road", name: "Electric Town Circuit", distance: "5.5 mi" },
+    { type: "Road", name: "Festival Sprint", distance: "4.9 mi" },
+    { type: "Road", name: "Highway Circuit", distance: "8.7 mi" },
+    { type: "Road", name: "Hokubu Circuit", distance: "4.7 mi" },
+    { type: "Road", name: "Irokawa Circuit Road Race", distance: "3.5 mi" },
+    { type: "Road", name: "Ito Sprint", distance: "5.8 mi" },
+    { type: "Road", name: "Legend Island Circuit", distance: "8.8 mi" },
+    { type: "Road", name: "Narai-Juku Circuit", distance: "4.4 mi" },
+    { type: "Road", name: "Satta Sprint", distance: "5.1 mi" },
+    { type: "Road", name: "Seaside Park Sprint", distance: "4.5 mi" },
+    { type: "Road", name: "Shikisai Sprint", distance: "4.8 mi" },
+    { type: "Road", name: "Shimanoyama Circuit", distance: "3.4 mi" },
+    { type: "Road", name: "Shimanoyama Sprint", distance: "4.0 mi" },
+    { type: "Road", name: "Shirakawa Circuit", distance: "4.0 mi" },
+    { type: "Road", name: "Tateyama Kurobe Sprint", distance: "3.8 mi" },
+    { type: "Road", name: "The Colossus", distance: "23.4 mi" },
+    { type: "Road", name: "The Goliath", distance: "53.1 mi" },
+    { type: "Road", name: "Venus Sprint", distance: "5.0 mi" },
 
 
     /* DRAG */
 
-    {
-        type: "Drag",
-        name: "Horizon Festival Drag Strip",
-        distance: "0.6 mi"
-    },
-
-    {
-        type: "Drag",
-        name: "Irokawa Space Center Drag Strip",
-        distance: "0.2 mi"
-    },
-
-    {
-        type: "Drag",
-        name: "Ito Airfield Drag Strip",
-        distance: "0.5 mi"
-    },
-
+    { type: "Drag", name: "Horizon Festival Drag Strip", distance: "0.6 mi" },
+    { type: "Drag", name: "Irokawa Space Center Drag Strip", distance: "0.2 mi" },
+    { type: "Drag", name: "Ito Airfield Drag Strip", distance: "0.5 mi" },
 
 
     /* DIRT / RALLY */
 
-    {
-        type: "Dirt / Rally",
-        name: "Airfield Trail",
-        distance: "4.2 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Bamboo Forest Scramble",
-        distance: "9.3 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Cherry Field Trail",
-        distance: "4.5 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Chiheisen Scramble",
-        distance: "4.9 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Hirosaki Scramble",
-        distance: "5.1 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Hokubu Trail",
-        distance: "3.6 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Horizon Stadium Scramble",
-        distance: "7.3 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Ine Scramble",
-        distance: "5.7 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Ito Trail",
-        distance: "4.4 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Kawazu Nanadaru Scramble",
-        distance: "7.8 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Kinkaku-ji Trail",
-        distance: "3.4 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Legend Island Trail",
-        distance: "3.3 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Nukabira Trail",
-        distance: "5.0 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Oyashirazu Trail",
-        distance: "3.2 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Sekibe Scramble",
-        distance: "4.0 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Sotoyama Scramble",
-        distance: "5.5 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Sunflower Scramble",
-        distance: "5.3 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Taiyaki Scramble",
-        distance: "6.7 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "Takashiro Trail",
-        distance: "3.6 mi"
-    },
-
-    {
-        type: "Dirt / Rally",
-        name: "The Gauntlet",
-        distance: "18.7 mi"
-    }
+    { type: "Dirt / Rally", name: "Airfield Trail", distance: "4.2 mi" },
+    { type: "Dirt / Rally", name: "Bamboo Forest Scramble", distance: "9.3 mi" },
+    { type: "Dirt / Rally", name: "Cherry Field Trail", distance: "4.5 mi" },
+    { type: "Dirt / Rally", name: "Chiheisen Scramble", distance: "4.9 mi" },
+    { type: "Dirt / Rally", name: "Hirosaki Scramble", distance: "5.1 mi" },
+    { type: "Dirt / Rally", name: "Hokubu Trail", distance: "3.6 mi" },
+    { type: "Dirt / Rally", name: "Horizon Stadium Scramble", distance: "7.3 mi" },
+    { type: "Dirt / Rally", name: "Ine Scramble", distance: "5.7 mi" },
+    { type: "Dirt / Rally", name: "Ito Trail", distance: "4.4 mi" },
+    { type: "Dirt / Rally", name: "Kawazu Nanadaru Scramble", distance: "7.8 mi" },
+    { type: "Dirt / Rally", name: "Kinkaku-ji Trail", distance: "3.4 mi" },
+    { type: "Dirt / Rally", name: "Legend Island Trail", distance: "3.3 mi" },
+    { type: "Dirt / Rally", name: "Nukabira Trail", distance: "5.0 mi" },
+    { type: "Dirt / Rally", name: "Oyashirazu Trail", distance: "3.2 mi" },
+    { type: "Dirt / Rally", name: "Sekibe Scramble", distance: "4.0 mi" },
+    { type: "Dirt / Rally", name: "Sotoyama Scramble", distance: "5.5 mi" },
+    { type: "Dirt / Rally", name: "Sunflower Scramble", distance: "5.3 mi" },
+    { type: "Dirt / Rally", name: "Taiyaki Scramble", distance: "6.7 mi" },
+    { type: "Dirt / Rally", name: "Takashiro Trail", distance: "3.6 mi" },
+    { type: "Dirt / Rally", name: "The Gauntlet", distance: "18.7 mi" }
 
 ];
+
+
+
+/* =========================================================
+   SCORING / REWARDS
+   ========================================================= */
+
+const POINTS_BY_PLACE = {
+
+    1: 4,
+    2: 3,
+    3: 2,
+    4: 1
+
+};
+
+
+const REWARDS_BY_PLACE = {
+
+    1: {
+        rolls: 0,
+        keep: 0,
+        text: "No upgrade"
+    },
+
+    2: {
+        rolls: 1,
+        keep: 1,
+        text: "1 upgrade roll"
+    },
+
+    3: {
+        rolls: 2,
+        keep: 1,
+        text: "2 rolls — keep 1"
+    },
+
+    4: {
+        rolls: 2,
+        keep: 2,
+        text: "2 rolls — keep both"
+    }
+
+};
 
 
 
@@ -478,6 +223,9 @@ const lobbyScreen =
 
 const gameScreen =
     document.getElementById("gameScreen");
+
+const finalScreen =
+    document.getElementById("finalScreen");
 
 
 const playerNameInput =
@@ -496,14 +244,14 @@ const createGameButton =
 const joinGameButton =
     document.getElementById("joinGameBtn");
 
+const startGameButton =
+    document.getElementById("startGameBtn");
+
 const leaveGameButton =
     document.getElementById("leaveGameBtn");
 
 const leaveGameButtonGame =
     document.getElementById("leaveGameBtnGame");
-
-const startGameButton =
-    document.getElementById("startGameBtn");
 
 
 const lobbyRoomCode =
@@ -530,6 +278,9 @@ const gamePlayerList =
 
 const gameNote =
     document.getElementById("gameNote");
+
+const liveStandings =
+    document.getElementById("liveStandings");
 
 
 const roundNumber =
@@ -573,6 +324,73 @@ const generateRaceButton =
 
 const randomSetupButton =
     document.getElementById("randomSetupBtn");
+
+
+const raceCompleteControls =
+    document.getElementById("raceCompleteControls");
+
+const enterResultsButton =
+    document.getElementById("enterResultsBtn");
+
+
+const resultsEntryPanel =
+    document.getElementById("resultsEntryPanel");
+
+const resultEntryRound =
+    document.getElementById("resultEntryRound");
+
+const finishOrderInputs =
+    document.getElementById("finishOrderInputs");
+
+const resultEntryMessage =
+    document.getElementById("resultEntryMessage");
+
+const submitResultsButton =
+    document.getElementById("submitResultsBtn");
+
+const cancelResultsButton =
+    document.getElementById("cancelResultsBtn");
+
+
+const roundResultsPanel =
+    document.getElementById("roundResultsPanel");
+
+const resultsRoundNumber =
+    document.getElementById("resultsRoundNumber");
+
+const roundResultsList =
+    document.getElementById("roundResultsList");
+
+const upgradeRewardList =
+    document.getElementById("upgradeRewardList");
+
+const hostAfterRaceControls =
+    document.getElementById("hostAfterRaceControls");
+
+const nextRoundButton =
+    document.getElementById("nextRoundBtn");
+
+const endRaceNightButton =
+    document.getElementById("endRaceNightBtn");
+
+
+const finalChampionName =
+    document.getElementById("finalChampionName");
+
+const finalChampionStats =
+    document.getElementById("finalChampionStats");
+
+const finalStandings =
+    document.getElementById("finalStandings");
+
+const finalRaceHistory =
+    document.getElementById("finalRaceHistory");
+
+const finalRaceCount =
+    document.getElementById("finalRaceCount");
+
+const leaveFinalButton =
+    document.getElementById("leaveFinalBtn");
 
 
 
@@ -626,14 +444,12 @@ async function getCurrentPlayer() {
 
 function randomFromArray(array) {
 
-    const index =
+    return array[
         Math.floor(
             Math.random() *
             array.length
-        );
-
-
-    return array[index];
+        )
+    ];
 
 }
 
@@ -645,7 +461,7 @@ function generateRoomCode() {
         "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 
-    let roomCode =
+    let code =
         "";
 
 
@@ -655,7 +471,7 @@ function generateRoomCode() {
         i++
     ) {
 
-        roomCode +=
+        code +=
             characters[
                 Math.floor(
                     Math.random() *
@@ -666,7 +482,7 @@ function generateRoomCode() {
     }
 
 
-    return roomCode;
+    return code;
 
 }
 
@@ -708,8 +524,7 @@ function getPlayerName() {
 
 
     if (
-        playerName.length <
-        2
+        playerName.length < 2
     ) {
 
         showHomeMessage(
@@ -729,9 +544,41 @@ function getPlayerName() {
 
 
 
+function placeLabel(place) {
+
+    if (place === 1) return "1st";
+    if (place === 2) return "2nd";
+    if (place === 3) return "3rd";
+
+    return place + "th";
+
+}
+
+
+
 /* =========================================================
-   PLAYER DISPLAY
+   PLAYER LIST
    ========================================================= */
+
+function getSortedPlayers(players) {
+
+    return Object.entries(
+        players || {}
+    )
+    .sort(
+        function (a, b) {
+
+            return (
+                (a[1].joinedAt || 0) -
+                (b[1].joinedAt || 0)
+            );
+
+        }
+    );
+
+}
+
+
 
 function renderPlayers(
     targetElement,
@@ -743,19 +590,7 @@ function renderPlayers(
 
 
     const sortedPlayers =
-        Object.entries(
-            players || {}
-        )
-        .sort(
-            function (a, b) {
-
-                return (
-                    (a[1].joinedAt || 0) -
-                    (b[1].joinedAt || 0)
-                );
-
-            }
-        );
+        getSortedPlayers(players);
 
 
     sortedPlayers.forEach(
@@ -829,16 +664,325 @@ function renderPlayers(
 
 
 /* =========================================================
-   GAME SETUP DISPLAY
+   STANDINGS
+   ========================================================= */
+
+function calculateStandings(
+    players,
+    raceHistory
+) {
+
+    const standings = {};
+
+
+    Object.entries(
+        players || {}
+    )
+    .forEach(
+        function ([uid, player]) {
+
+            standings[uid] = {
+
+                uid:
+                    uid,
+
+                name:
+                    player.name,
+
+                points:
+                    0,
+
+                wins:
+                    0,
+
+                seconds:
+                    0,
+
+                thirds:
+                    0,
+
+                fourths:
+                    0,
+
+                races:
+                    0
+
+            };
+
+        }
+    );
+
+
+    Object.values(
+        raceHistory || {}
+    )
+    .forEach(
+        function (race) {
+
+
+            Object.entries(
+                race.finishOrder || {}
+            )
+            .forEach(
+                function ([placeString, result]) {
+
+
+                    const place =
+                        Number(
+                            placeString
+                        );
+
+
+                    if (
+                        !standings[
+                            result.uid
+                        ]
+                    ) {
+
+                        standings[
+                            result.uid
+                        ] = {
+
+                            uid:
+                                result.uid,
+
+                            name:
+                                result.name,
+
+                            points:
+                                0,
+
+                            wins:
+                                0,
+
+                            seconds:
+                                0,
+
+                            thirds:
+                                0,
+
+                            fourths:
+                                0,
+
+                            races:
+                                0
+
+                        };
+
+                    }
+
+
+                    const entry =
+                        standings[
+                            result.uid
+                        ];
+
+
+                    entry.points +=
+                        POINTS_BY_PLACE[
+                            place
+                        ] || 0;
+
+
+                    entry.races +=
+                        1;
+
+
+                    if (place === 1) {
+                        entry.wins += 1;
+                    }
+
+                    if (place === 2) {
+                        entry.seconds += 1;
+                    }
+
+                    if (place === 3) {
+                        entry.thirds += 1;
+                    }
+
+                    if (place === 4) {
+                        entry.fourths += 1;
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+    return Object.values(
+        standings
+    )
+    .sort(
+        function (a, b) {
+
+
+            if (
+                b.points !==
+                a.points
+            ) {
+
+                return (
+                    b.points -
+                    a.points
+                );
+
+            }
+
+
+            if (
+                b.wins !==
+                a.wins
+            ) {
+
+                return (
+                    b.wins -
+                    a.wins
+                );
+
+            }
+
+
+            if (
+                b.seconds !==
+                a.seconds
+            ) {
+
+                return (
+                    b.seconds -
+                    a.seconds
+                );
+
+            }
+
+
+            if (
+                b.thirds !==
+                a.thirds
+            ) {
+
+                return (
+                    b.thirds -
+                    a.thirds
+                );
+
+            }
+
+
+            return a.name.localeCompare(
+                b.name
+            );
+
+        }
+    );
+
+}
+
+
+
+function renderStandings(
+    target,
+    standings
+) {
+
+    target.innerHTML =
+        "";
+
+
+    const table =
+        document.createElement(
+            "div"
+        );
+
+
+    table.classList.add(
+        "standings-table"
+    );
+
+
+    const header =
+        document.createElement(
+            "div"
+        );
+
+
+    header.className =
+        "standing-row standing-header";
+
+
+    header.innerHTML =
+        `
+        <span>POS</span>
+        <span>PLAYER</span>
+        <span style="text-align:right">PTS</span>
+        <span style="text-align:right">WINS</span>
+        `;
+
+
+    table.appendChild(
+        header
+    );
+
+
+    standings.forEach(
+        function (player, index) {
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.classList.add(
+                "standing-row"
+            );
+
+
+            row.innerHTML =
+                `
+                <span class="standing-position">
+                    ${index + 1}
+                </span>
+
+                <span class="standing-name">
+                    ${player.name}
+                </span>
+
+                <span class="standing-points">
+                    ${player.points}
+                </span>
+
+                <span class="standing-wins">
+                    🏆 ${player.wins}
+                </span>
+                `;
+
+
+            table.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    target.appendChild(
+        table
+    );
+
+}
+
+
+
+/* =========================================================
+   GAME SETUP
    ========================================================= */
 
 function updateGameSetupDisplay(
     roomData
 ) {
-
-    currentRoomData =
-        roomData;
-
 
     const round =
         roomData.currentRound ||
@@ -920,8 +1064,6 @@ function updateGameSetupDisplay(
 
 
 
-    /* READY */
-
     const setupReady =
         Boolean(
             roomData.selectedCar &&
@@ -929,17 +1071,13 @@ function updateGameSetupDisplay(
         );
 
 
-    if (setupReady) {
+    if (
+        setupReady
+    ) {
 
         roundReadyBadge.classList.remove(
             "hidden"
         );
-
-
-        gameNote.textContent =
-            "Round " +
-            round +
-            " is ready. Head into Forza and run the race!";
 
     }
     else {
@@ -948,30 +1086,18 @@ function updateGameSetupDisplay(
             "hidden"
         );
 
-
-        if (
-            currentPlayerIsHost
-        ) {
-
-            gameNote.textContent =
-                "Choose a car and generate the race.";
-
-        }
-        else {
-
-            gameNote.textContent =
-                "Waiting for the host to finish the round setup.";
-
-        }
-
     }
 
 
 
-    /* HOST CONTROLS */
+    const isResultsPhase =
+        roomData.gamePhase ===
+        "results";
+
 
     if (
-        currentPlayerIsHost
+        currentPlayerIsHost &&
+        !isResultsPhase
     ) {
 
         hostGameControls.classList.remove(
@@ -986,6 +1112,614 @@ function updateGameSetupDisplay(
         );
 
     }
+
+
+
+    if (
+        setupReady &&
+        currentPlayerIsHost &&
+        !isResultsPhase
+    ) {
+
+        raceCompleteControls.classList.remove(
+            "hidden"
+        );
+
+    }
+    else {
+
+        raceCompleteControls.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+
+    if (
+        !isResultsPhase
+    ) {
+
+        roundResultsPanel.classList.add(
+            "hidden"
+        );
+
+
+        if (
+            setupReady
+        ) {
+
+            gameNote.textContent =
+                "Round " +
+                round +
+                " is ready. Run the race!";
+
+        }
+        else if (
+            currentPlayerIsHost
+        ) {
+
+            gameNote.textContent =
+                "Choose the car and generate the race.";
+
+        }
+        else {
+
+            gameNote.textContent =
+                "Waiting for the host to set up the race.";
+
+        }
+
+    }
+
+}
+
+
+
+/* =========================================================
+   RESULT ENTRY FORM
+   ========================================================= */
+
+function buildFinishOrderForm() {
+
+    finishOrderInputs.innerHTML =
+        "";
+
+
+    resultEntryMessage.textContent =
+        "";
+
+
+    const players =
+        getSortedPlayers(
+            currentRoomData.players
+        );
+
+
+    resultEntryRound.textContent =
+        currentRoomData.currentRound ||
+        1;
+
+
+    players.forEach(
+        function (
+            unused,
+            index
+        ) {
+
+
+            const place =
+                index + 1;
+
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.classList.add(
+                "finish-entry-row"
+            );
+
+
+            const label =
+                document.createElement(
+                    "div"
+                );
+
+
+            label.classList.add(
+                "finish-place"
+            );
+
+
+            label.textContent =
+                placeLabel(place);
+
+
+            const select =
+                document.createElement(
+                    "select"
+                );
+
+
+            select.dataset.place =
+                place;
+
+
+            const placeholder =
+                document.createElement(
+                    "option"
+                );
+
+
+            placeholder.value =
+                "";
+
+
+            placeholder.textContent =
+                "Choose player";
+
+
+            select.appendChild(
+                placeholder
+            );
+
+
+            players.forEach(
+                function ([uid, player]) {
+
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        uid;
+
+
+                    option.textContent =
+                        player.name;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+            row.appendChild(
+                label
+            );
+
+
+            row.appendChild(
+                select
+            );
+
+
+            finishOrderInputs.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================================================
+   ROUND RESULTS
+   ========================================================= */
+
+function renderRoundResults(
+    roomData
+) {
+
+    const round =
+        roomData.currentRound ||
+        1;
+
+
+    const race =
+        roomData.raceHistory
+            ? roomData.raceHistory[
+                "round_" + round
+            ]
+            : null;
+
+
+    if (
+        !race
+    ) {
+
+        return;
+
+    }
+
+
+    resultsRoundNumber.textContent =
+        round;
+
+
+    roundResultsList.innerHTML =
+        "";
+
+
+    upgradeRewardList.innerHTML =
+        "";
+
+
+    Object.entries(
+        race.finishOrder || {}
+    )
+    .sort(
+        function (a, b) {
+
+            return (
+                Number(a[0]) -
+                Number(b[0])
+            );
+
+        }
+    )
+    .forEach(
+        function ([placeString, result]) {
+
+
+            const place =
+                Number(
+                    placeString
+                );
+
+
+            const resultRow =
+                document.createElement(
+                    "div"
+                );
+
+
+            resultRow.classList.add(
+                "result-row"
+            );
+
+
+            resultRow.innerHTML =
+                `
+                <span class="result-place">
+                    ${placeLabel(place)}
+                </span>
+
+                <span class="result-name">
+                    ${result.name}
+                </span>
+
+                <span class="result-points">
+                    +${POINTS_BY_PLACE[place] || 0} pts
+                </span>
+                `;
+
+
+            roundResultsList.appendChild(
+                resultRow
+            );
+
+
+
+            const reward =
+                REWARDS_BY_PLACE[
+                    place
+                ];
+
+
+            if (
+                reward
+            ) {
+
+                const rewardRow =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                rewardRow.classList.add(
+                    "reward-row"
+                );
+
+
+                rewardRow.innerHTML =
+                    `
+                    <span class="result-place">
+                        ${placeLabel(place)}
+                    </span>
+
+                    <div class="reward-info">
+
+                        <strong>
+                            ${result.name}
+                        </strong>
+
+                        <span>
+                            ${reward.text}
+                        </span>
+
+                    </div>
+                    `;
+
+
+                upgradeRewardList.appendChild(
+                    rewardRow
+                );
+
+            }
+
+        }
+    );
+
+
+    roundResultsPanel.classList.remove(
+        "hidden"
+    );
+
+
+    resultsEntryPanel.classList.add(
+        "hidden"
+    );
+
+
+    raceCompleteControls.classList.add(
+        "hidden"
+    );
+
+
+    hostGameControls.classList.add(
+        "hidden"
+    );
+
+
+    if (
+        currentPlayerIsHost
+    ) {
+
+        hostAfterRaceControls.classList.remove(
+            "hidden"
+        );
+
+    }
+    else {
+
+        hostAfterRaceControls.classList.add(
+            "hidden"
+        );
+
+    }
+
+
+    gameNote.textContent =
+        "Round " +
+        round +
+        " complete.";
+
+}
+
+
+
+/* =========================================================
+   FINAL RESULTS
+   ========================================================= */
+
+function showFinalScreen(
+    roomData
+) {
+
+    homeScreen.classList.add(
+        "hidden"
+    );
+
+    lobbyScreen.classList.add(
+        "hidden"
+    );
+
+    gameScreen.classList.add(
+        "hidden"
+    );
+
+    finalScreen.classList.remove(
+        "hidden"
+    );
+
+
+    const standings =
+        calculateStandings(
+            roomData.players,
+            roomData.raceHistory
+        );
+
+
+    renderStandings(
+        finalStandings,
+        standings
+    );
+
+
+    const champion =
+        standings[0];
+
+
+    if (
+        champion
+    ) {
+
+        finalChampionName.textContent =
+            champion.name;
+
+
+        finalChampionStats.textContent =
+            champion.points +
+            " Points • " +
+            champion.wins +
+            (
+                champion.wins === 1
+                    ? " Win"
+                    : " Wins"
+            );
+
+    }
+
+
+    renderRaceHistory(
+        roomData.raceHistory
+    );
+
+
+    const raceCount =
+        Object.keys(
+            roomData.raceHistory ||
+            {}
+        ).length;
+
+
+    finalRaceCount.textContent =
+        raceCount +
+        (
+            raceCount === 1
+                ? " race completed."
+                : " races completed."
+        );
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+
+function renderRaceHistory(
+    raceHistory
+) {
+
+    finalRaceHistory.innerHTML =
+        "";
+
+
+    const races =
+        Object.values(
+            raceHistory || {}
+        )
+        .sort(
+            function (a, b) {
+
+                return (
+                    a.round -
+                    b.round
+                );
+
+            }
+        );
+
+
+    races.forEach(
+        function (race) {
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.classList.add(
+                "history-card"
+            );
+
+
+            const heading =
+                document.createElement(
+                    "h3"
+                );
+
+
+            heading.textContent =
+                "Round " +
+                race.round +
+                " — " +
+                (
+                    race.race
+                        ? race.race.name
+                        : "Race"
+                );
+
+
+            card.appendChild(
+                heading
+            );
+
+
+            Object.entries(
+                race.finishOrder || {}
+            )
+            .sort(
+                function (a, b) {
+
+                    return (
+                        Number(a[0]) -
+                        Number(b[0])
+                    );
+
+                }
+            )
+            .forEach(
+                function (
+                    [place, result]
+                ) {
+
+
+                    const line =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    line.classList.add(
+                        "history-result"
+                    );
+
+
+                    line.innerHTML =
+                        `
+                        <span>
+                            ${placeLabel(Number(place))}
+                        </span>
+
+                        <strong>
+                            ${result.name}
+                        </strong>
+                        `;
+
+
+                    card.appendChild(
+                        line
+                    );
+
+                }
+            );
+
+
+            finalRaceHistory.appendChild(
+                card
+            );
+
+        }
+    );
 
 }
 
@@ -1065,8 +1799,6 @@ function listenToRoom(
 
 
 
-                /* PLAYERS */
-
                 const playerCount =
                     renderPlayers(
                         playerList,
@@ -1081,7 +1813,35 @@ function listenToRoom(
 
 
 
-                /* LOBBY */
+                const standings =
+                    calculateStandings(
+                        roomData.players,
+                        roomData.raceHistory
+                    );
+
+
+                renderStandings(
+                    liveStandings,
+                    standings
+                );
+
+
+
+                if (
+                    roomData.status ===
+                    "finished"
+                ) {
+
+                    showFinalScreen(
+                        roomData
+                    );
+
+
+                    return;
+
+                }
+
+
 
                 if (
                     roomData.status ===
@@ -1093,8 +1853,7 @@ function listenToRoom(
                     ) {
 
                         if (
-                            playerCount ===
-                            1
+                            playerCount === 1
                         ) {
 
                             lobbyNote.textContent =
@@ -1118,8 +1877,6 @@ function listenToRoom(
 
 
 
-                /* PLAYING */
-
                 if (
                     roomData.status ===
                     "playing"
@@ -1132,6 +1889,18 @@ function listenToRoom(
                         roomData
                     );
 
+
+                    if (
+                        roomData.gamePhase ===
+                        "results"
+                    ) {
+
+                        renderRoundResults(
+                            roomData
+                        );
+
+                    }
+
                 }
 
             }
@@ -1142,7 +1911,7 @@ function listenToRoom(
 
 
 /* =========================================================
-   SCREEN CONTROL
+   SCREENS
    ========================================================= */
 
 function showLobby(
@@ -1164,6 +1933,7 @@ function showLobby(
     lobbyRoomCode.textContent =
         roomCode;
 
+
     lobbyPlayerName.textContent =
         playerName;
 
@@ -1175,10 +1945,6 @@ function showLobby(
         startGameButton.classList.remove(
             "hidden"
         );
-
-
-        lobbyNote.textContent =
-            "Share the room code with the other players.";
 
     }
     else {
@@ -1199,6 +1965,10 @@ function showLobby(
     );
 
     gameScreen.classList.add(
+        "hidden"
+    );
+
+    finalScreen.classList.add(
         "hidden"
     );
 
@@ -1232,14 +2002,9 @@ function showGameScreen() {
     }
 
 
-    const wasHidden =
-        gameScreen.classList.contains(
-            "hidden"
-        );
-
-
     gameRoomCode.textContent =
         currentRoomCode;
+
 
     gamePlayerName.textContent =
         currentPlayerName;
@@ -1253,21 +2018,13 @@ function showGameScreen() {
         "hidden"
     );
 
-    gameScreen.classList.remove(
+    finalScreen.classList.add(
         "hidden"
     );
 
-
-    if (
-        wasHidden
-    ) {
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-
-    }
+    gameScreen.classList.remove(
+        "hidden"
+    );
 
 }
 
@@ -1294,18 +2051,15 @@ function returnToHome(
         null;
 
 
-    playerList.innerHTML =
-        "";
-
-    gamePlayerList.innerHTML =
-        "";
-
-
     lobbyScreen.classList.add(
         "hidden"
     );
 
     gameScreen.classList.add(
+        "hidden"
+    );
+
+    finalScreen.classList.add(
         "hidden"
     );
 
@@ -1352,12 +2106,6 @@ createGameButton.addEventListener(
         }
 
 
-        showHomeMessage(
-            "",
-            ""
-        );
-
-
         try {
 
 
@@ -1366,9 +2114,7 @@ createGameButton.addEventListener(
 
 
             let newRoomCode;
-
             let roomReference;
-
             let roomSnapshot;
 
 
@@ -1442,13 +2188,12 @@ createGameButton.addEventListener(
         catch (error) {
 
             console.error(
-                "Could not create room:",
                 error
             );
 
 
             showHomeMessage(
-                "Could not create the room. Try again.",
+                "Could not create room.",
                 "error"
             );
 
@@ -1503,12 +2248,6 @@ joinGameButton.addEventListener(
             return;
 
         }
-
-
-        showHomeMessage(
-            "",
-            ""
-        );
 
 
         try {
@@ -1567,7 +2306,31 @@ joinGameButton.addEventListener(
             }
 
 
-            const playerReference =
+            const playerCount =
+                Object.keys(
+                    roomData.players ||
+                    {}
+                ).length;
+
+
+            if (
+                playerCount >=
+                4
+            ) {
+
+                showHomeMessage(
+                    "That room is full.",
+                    "error"
+                );
+
+
+                return;
+
+            }
+
+
+            await set(
+
                 ref(
                     database,
 
@@ -1575,11 +2338,7 @@ joinGameButton.addEventListener(
                     enteredCode +
                     "/players/" +
                     user.uid
-                );
-
-
-            await set(
-                playerReference,
+                ),
 
                 {
 
@@ -1593,6 +2352,7 @@ joinGameButton.addEventListener(
                         serverTimestamp()
 
                 }
+
             );
 
 
@@ -1606,13 +2366,12 @@ joinGameButton.addEventListener(
         catch (error) {
 
             console.error(
-                "Could not join room:",
                 error
             );
 
 
             showHomeMessage(
-                "Could not join the room. Try again.",
+                "Could not join room.",
                 "error"
             );
 
@@ -1634,7 +2393,6 @@ startGameButton.addEventListener(
 
 
         if (
-            !currentRoomCode ||
             !currentPlayerIsHost
         ) {
 
@@ -1643,50 +2401,31 @@ startGameButton.addEventListener(
         }
 
 
-        try {
+        await update(
 
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
 
-            const roomReference =
-                ref(
-                    database,
-                    "rooms/" +
-                    currentRoomCode
-                );
+            {
 
+                status:
+                    "playing",
 
-            await update(
-                roomReference,
+                gamePhase:
+                    "setup",
 
-                {
+                currentRound:
+                    1,
 
-                    status:
-                        "playing",
+                startedAt:
+                    serverTimestamp()
 
-                    gamePhase:
-                        "setup",
+            }
 
-                    currentRound:
-                        1,
-
-                    startedAt:
-                        serverTimestamp()
-
-                }
-            );
-
-        }
-        catch (error) {
-
-            console.error(
-                "Could not start game:",
-                error
-            );
-
-
-            lobbyNote.textContent =
-                "Could not start the game.";
-
-        }
+        );
 
     }
 );
@@ -1694,7 +2433,7 @@ startGameButton.addEventListener(
 
 
 /* =========================================================
-   SET CAR
+   CAR
    ========================================================= */
 
 async function saveSelectedCar(
@@ -1702,8 +2441,7 @@ async function saveSelectedCar(
 ) {
 
     if (
-        !currentPlayerIsHost ||
-        !currentRoomCode
+        !currentPlayerIsHost
     ) {
 
         return;
@@ -1711,20 +2449,19 @@ async function saveSelectedCar(
     }
 
 
-    const roomReference =
+    await update(
+
         ref(
             database,
             "rooms/" +
             currentRoomCode
-        );
-
-
-    await update(
-        roomReference,
+        ),
 
         {
-            selectedCar: car
+            selectedCar:
+                car
         }
+
     );
 
 }
@@ -1746,26 +2483,11 @@ setCarButton.addEventListener(
 
 
         if (
-            !car
+            car
         ) {
-
-            return;
-
-        }
-
-
-        try {
 
             await saveSelectedCar(
                 car
-            );
-
-        }
-        catch (error) {
-
-            console.error(
-                "Could not set car:",
-                error
             );
 
         }
@@ -1781,32 +2503,19 @@ randomCarButton.addEventListener(
     async function () {
 
 
-        try {
-
-
-            const car =
-                randomFromArray(
-                    CAR_LIBRARY
-                );
-
-
-            carSelect.value =
-                car.name;
-
-
-            await saveSelectedCar(
-                car
+        const car =
+            randomFromArray(
+                CAR_LIBRARY
             );
 
-        }
-        catch (error) {
 
-            console.error(
-                "Could not randomize car:",
-                error
-            );
+        carSelect.value =
+            car.name;
 
-        }
+
+        await saveSelectedCar(
+            car
+        );
 
     }
 );
@@ -1814,7 +2523,7 @@ randomCarButton.addEventListener(
 
 
 /* =========================================================
-   GENERATE RACE
+   RACE
    ========================================================= */
 
 generateRaceButton.addEventListener(
@@ -1824,8 +2533,7 @@ generateRaceButton.addEventListener(
 
 
         if (
-            !currentPlayerIsHost ||
-            !currentRoomCode
+            !currentPlayerIsHost
         ) {
 
             return;
@@ -1833,81 +2541,59 @@ generateRaceButton.addEventListener(
         }
 
 
-        try {
+        let race =
+            randomFromArray(
+                RACE_POOL
+            );
 
 
-            let race =
-                randomFromArray(
-                    RACE_POOL
-                );
+        if (
+            currentRoomData.currentRace &&
+            RACE_POOL.length > 1
+        ) {
 
-
-            /*
-                Try to avoid generating the
-                exact same race twice in a row.
-            */
-
-            if (
-                currentRoomData &&
-                currentRoomData.currentRace &&
-                RACE_POOL.length > 1
+            while (
+                race.name ===
+                currentRoomData.currentRace.name
             ) {
 
-                while (
-                    race.name ===
-                    currentRoomData.currentRace.name
-                ) {
-
-                    race =
-                        randomFromArray(
-                            RACE_POOL
-                        );
-
-                }
+                race =
+                    randomFromArray(
+                        RACE_POOL
+                    );
 
             }
 
-
-            const roomReference =
-                ref(
-                    database,
-                    "rooms/" +
-                    currentRoomCode
-                );
-
-
-            await update(
-                roomReference,
-
-                {
-
-                    currentRace:
-                        race,
-
-                    raceGeneratedAt:
-                        serverTimestamp()
-
-                }
-            );
-
         }
-        catch (error) {
 
-            console.error(
-                "Could not generate race:",
-                error
-            );
 
-        }
+        await update(
+
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
+
+            {
+
+                currentRace:
+                    race,
+
+                gamePhase:
+                    "racing",
+
+                raceGeneratedAt:
+                    serverTimestamp()
+
+            }
+
+        );
 
     }
 );
 
 
-
-/* =========================================================
-   RANDOMIZE FULL SETUP
-   ========================================================= */
 
 randomSetupButton.addEventListener(
     "click",
@@ -1916,8 +2602,7 @@ randomSetupButton.addEventListener(
 
 
         if (
-            !currentPlayerIsHost ||
-            !currentRoomCode
+            !currentPlayerIsHost
         ) {
 
             return;
@@ -1925,59 +2610,44 @@ randomSetupButton.addEventListener(
         }
 
 
-        try {
-
-
-            const car =
-                randomFromArray(
-                    CAR_LIBRARY
-                );
-
-
-            const race =
-                randomFromArray(
-                    RACE_POOL
-                );
-
-
-            carSelect.value =
-                car.name;
-
-
-            const roomReference =
-                ref(
-                    database,
-                    "rooms/" +
-                    currentRoomCode
-                );
-
-
-            await update(
-                roomReference,
-
-                {
-
-                    selectedCar:
-                        car,
-
-                    currentRace:
-                        race,
-
-                    setupGeneratedAt:
-                        serverTimestamp()
-
-                }
+        const car =
+            randomFromArray(
+                CAR_LIBRARY
             );
 
-        }
-        catch (error) {
 
-            console.error(
-                "Could not randomize setup:",
-                error
+        const race =
+            randomFromArray(
+                RACE_POOL
             );
 
-        }
+
+        carSelect.value =
+            car.name;
+
+
+        await update(
+
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
+
+            {
+
+                selectedCar:
+                    car,
+
+                currentRace:
+                    race,
+
+                gamePhase:
+                    "racing"
+
+            }
+
+        );
 
     }
 );
@@ -1985,7 +2655,417 @@ randomSetupButton.addEventListener(
 
 
 /* =========================================================
-   LEAVE GAME
+   ENTER RESULTS
+   ========================================================= */
+
+enterResultsButton.addEventListener(
+    "click",
+
+    function () {
+
+
+        buildFinishOrderForm();
+
+
+        resultsEntryPanel.classList.remove(
+            "hidden"
+        );
+
+
+        raceCompleteControls.classList.add(
+            "hidden"
+        );
+
+
+        resultsEntryPanel.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+
+cancelResultsButton.addEventListener(
+    "click",
+
+    function () {
+
+
+        resultsEntryPanel.classList.add(
+            "hidden"
+        );
+
+
+        raceCompleteControls.classList.remove(
+            "hidden"
+        );
+
+    }
+);
+
+
+
+/* =========================================================
+   SUBMIT RESULTS
+   ========================================================= */
+
+submitResultsButton.addEventListener(
+    "click",
+
+    async function () {
+
+
+        if (
+            !currentPlayerIsHost ||
+            !currentRoomData
+        ) {
+
+            return;
+
+        }
+
+
+        const selects =
+            Array.from(
+                finishOrderInputs
+                    .querySelectorAll(
+                        "select"
+                    )
+            );
+
+
+        const selectedUids =
+            selects.map(
+                select =>
+                    select.value
+            );
+
+
+        if (
+            selectedUids.some(
+                uid =>
+                    !uid
+            )
+        ) {
+
+            resultEntryMessage.textContent =
+                "Assign every finishing position.";
+
+
+            resultEntryMessage.className =
+                "message center-message error";
+
+
+            return;
+
+        }
+
+
+        const uniqueUids =
+            new Set(
+                selectedUids
+            );
+
+
+        if (
+            uniqueUids.size !==
+            selectedUids.length
+        ) {
+
+            resultEntryMessage.textContent =
+                "A player cannot finish in two positions.";
+
+
+            resultEntryMessage.className =
+                "message center-message error";
+
+
+            return;
+
+        }
+
+
+        const round =
+            currentRoomData.currentRound ||
+            1;
+
+
+        const historyReference =
+            ref(
+                database,
+
+                "rooms/" +
+                currentRoomCode +
+                "/raceHistory/round_" +
+                round
+            );
+
+
+        const existingResult =
+            await get(
+                historyReference
+            );
+
+
+        if (
+            existingResult.exists()
+        ) {
+
+            resultEntryMessage.textContent =
+                "Results for this round were already submitted.";
+
+
+            resultEntryMessage.className =
+                "message center-message error";
+
+
+            return;
+
+        }
+
+
+        const finishOrder =
+            {};
+
+
+        selects.forEach(
+            function (
+                select,
+                index
+            ) {
+
+
+                const place =
+                    index + 1;
+
+
+                const uid =
+                    select.value;
+
+
+                const player =
+                    currentRoomData
+                        .players[
+                            uid
+                        ];
+
+
+                const reward =
+                    REWARDS_BY_PLACE[
+                        place
+                    ];
+
+
+                finishOrder[
+                    place
+                ] = {
+
+                    uid:
+                        uid,
+
+                    name:
+                        player.name,
+
+                    points:
+                        POINTS_BY_PLACE[
+                            place
+                        ] || 0,
+
+                    upgradeRolls:
+                        reward
+                            ? reward.rolls
+                            : 0,
+
+                    upgradesKept:
+                        reward
+                            ? reward.keep
+                            : 0,
+
+                    rewardText:
+                        reward
+                            ? reward.text
+                            : ""
+
+                };
+
+            }
+        );
+
+
+        const raceResult = {
+
+            round:
+                round,
+
+            car:
+                currentRoomData.selectedCar,
+
+            race:
+                currentRoomData.currentRace,
+
+            finishOrder:
+                finishOrder,
+
+            completedAt:
+                Date.now()
+
+        };
+
+
+        const roomReference =
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            );
+
+
+        const updates =
+            {};
+
+
+        updates[
+            "raceHistory/round_" +
+            round
+        ] =
+            raceResult;
+
+
+        updates.gamePhase =
+            "results";
+
+
+        await update(
+            roomReference,
+            updates
+        );
+
+    }
+);
+
+
+
+/* =========================================================
+   NEXT ROUND
+   ========================================================= */
+
+nextRoundButton.addEventListener(
+    "click",
+
+    async function () {
+
+
+        if (
+            !currentPlayerIsHost ||
+            !currentRoomData
+        ) {
+
+            return;
+
+        }
+
+
+        const nextRound =
+            (
+                currentRoomData.currentRound ||
+                1
+            ) + 1;
+
+
+        resultsEntryPanel.classList.add(
+            "hidden"
+        );
+
+
+        roundResultsPanel.classList.add(
+            "hidden"
+        );
+
+
+        await update(
+
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
+
+            {
+
+                currentRound:
+                    nextRound,
+
+                gamePhase:
+                    "setup",
+
+                currentRace:
+                    null,
+
+                raceGeneratedAt:
+                    null
+
+            }
+
+        );
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+
+/* =========================================================
+   END RACE NIGHT
+   ========================================================= */
+
+endRaceNightButton.addEventListener(
+    "click",
+
+    async function () {
+
+
+        if (
+            !currentPlayerIsHost
+        ) {
+
+            return;
+
+        }
+
+
+        await update(
+
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
+
+            {
+
+                status:
+                    "finished",
+
+                finishedAt:
+                    serverTimestamp()
+
+            }
+
+        );
+
+    }
+);
+
+
+
+/* =========================================================
+   LEAVE
    ========================================================= */
 
 async function leaveCurrentRoom() {
@@ -1994,6 +3074,28 @@ async function leaveCurrentRoom() {
     if (
         !currentRoomCode
     ) {
+
+        return;
+
+    }
+
+
+    /*
+        On the finished screen, don't destroy the room.
+        Everyone gets time to view final results.
+    */
+
+    if (
+        currentRoomData &&
+        currentRoomData.status ===
+        "finished"
+    ) {
+
+        returnToHome(
+            "Race night complete!",
+            "success"
+        );
+
 
         return;
 
@@ -2022,16 +3124,14 @@ async function leaveCurrentRoom() {
             wasHost
         ) {
 
-            const roomReference =
+            await remove(
+
                 ref(
                     database,
                     "rooms/" +
                     roomCode
-                );
+                )
 
-
-            await remove(
-                roomReference
             );
 
 
@@ -2043,7 +3143,8 @@ async function leaveCurrentRoom() {
         }
         else {
 
-            const playerReference =
+            await remove(
+
                 ref(
                     database,
 
@@ -2051,11 +3152,8 @@ async function leaveCurrentRoom() {
                     roomCode +
                     "/players/" +
                     user.uid
-                );
+                )
 
-
-            await remove(
-                playerReference
             );
 
 
@@ -2070,15 +3168,11 @@ async function leaveCurrentRoom() {
     catch (error) {
 
         console.error(
-            "Could not leave room:",
             error
         );
 
 
-        returnToHome(
-            "You left the game.",
-            ""
-        );
+        returnToHome();
 
     }
 
@@ -2098,9 +3192,23 @@ leaveGameButtonGame.addEventListener(
 );
 
 
+leaveFinalButton.addEventListener(
+    "click",
+
+    function () {
+
+        returnToHome(
+            "Race night complete!",
+            "success"
+        );
+
+    }
+);
+
+
 
 /* =========================================================
-   INPUT HELPERS
+   INPUT
    ========================================================= */
 
 roomCodeInput.addEventListener(
