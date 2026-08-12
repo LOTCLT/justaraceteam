@@ -2,17 +2,38 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Just A Race Team - Random Upgrade Racing"
+    >
 
     <title>Just A Race Team</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
+
     <main class="app">
+
+
+        <!-- ==================================================
+             HEADER / LOGO AREA
+             ================================================== -->
 
         <header class="hero">
 
@@ -20,7 +41,9 @@
                 RANDOM UPGRADE RACING
             </p>
 
-            <h1>JUST A RACE TEAM</h1>
+            <h1>
+                JUST A RACE TEAM
+            </h1>
 
             <p class="subtitle">
                 Race. Finish. Upgrade. Repeat.
@@ -29,11 +52,18 @@
         </header>
 
 
-        <!-- HOME SCREEN -->
+
+        <!-- ==================================================
+             HOME SCREEN
+             ================================================== -->
 
         <section id="homeScreen">
 
+
             <section class="game-card">
+
+
+                <!-- PLAYER NAME -->
 
                 <div class="game-section">
 
@@ -44,6 +74,7 @@
                         YOUR NAME
                     </label>
 
+
                     <input
                         id="playerNameInput"
                         type="text"
@@ -51,6 +82,7 @@
                         placeholder="PLAYER NAME"
                         autocomplete="off"
                     >
+
 
                     <p
                         id="homeMessage"
@@ -60,22 +92,34 @@
                 </div>
 
 
+
+                <!-- CREATE GAME -->
+
                 <div class="divider">
-                    <span>CREATE</span>
+
+                    <span>
+                        CREATE
+                    </span>
+
                 </div>
 
 
                 <div class="game-section">
 
-                    <h2>Create a Game</h2>
+                    <h2>
+                        Create a Game
+                    </h2>
+
 
                     <p>
                         Start a new room and invite your friends.
                     </p>
 
+
                     <button
                         id="createGameBtn"
                         class="primary-button"
+                        type="button"
                     >
                         Create Game
                     </button>
@@ -83,18 +127,29 @@
                 </div>
 
 
+
+                <!-- JOIN GAME -->
+
                 <div class="divider">
-                    <span>OR</span>
+
+                    <span>
+                        OR
+                    </span>
+
                 </div>
 
 
                 <div class="game-section">
 
-                    <h2>Join a Game</h2>
+                    <h2>
+                        Join a Game
+                    </h2>
+
 
                     <p>
                         Enter the room code from the host.
                     </p>
+
 
                     <input
                         id="roomCodeInput"
@@ -102,32 +157,44 @@
                         maxlength="5"
                         placeholder="ROOM CODE"
                         autocomplete="off"
+                        spellcheck="false"
                     >
+
 
                     <button
                         id="joinGameBtn"
                         class="secondary-button"
+                        type="button"
                     >
                         Join Game
                     </button>
 
                 </div>
 
+
             </section>
 
         </section>
 
 
-        <!-- LOBBY SCREEN -->
+
+        <!-- ==================================================
+             LOBBY SCREEN
+             ================================================== -->
 
         <section
             id="lobbyScreen"
             class="hidden"
         >
 
+
             <section class="game-card lobby-card">
 
+
+                <!-- LOBBY HEADER -->
+
                 <div class="lobby-header">
+
 
                     <div>
 
@@ -135,29 +202,42 @@
                             GAME LOBBY
                         </p>
 
+
                         <h2>
+
                             Room
+
                             <span id="lobbyRoomCode">
                                 -----
                             </span>
+
                         </h2>
 
                     </div>
 
 
+
                     <button
                         id="leaveGameBtn"
                         class="small-button"
+                        type="button"
                     >
                         Leave
                     </button>
 
+
                 </div>
 
 
+
+                <!-- CURRENT PLAYER -->
+
                 <div class="lobby-meta">
 
-                    <span>YOU ARE PLAYING AS</span>
+                    <span>
+                        YOU ARE PLAYING AS
+                    </span>
+
 
                     <strong id="lobbyPlayerName">
                         Player
@@ -166,28 +246,27 @@
                 </div>
 
 
-                <h3>Players</h3>
+
+                <!-- PLAYER LIST -->
+
+                <div class="lobby-section">
+
+                    <h3>
+                        Players
+                    </h3>
 
 
-                <div class="player-list">
-
-                    <div class="player-row">
-
-                        <span id="playerListName">
-                            Player
-                        </span>
-
-                        <span
-                            id="hostBadge"
-                            class="host-badge"
-                        >
-                            HOST
-                        </span>
-
+                    <div
+                        id="playerList"
+                        class="player-list"
+                    >
                     </div>
 
                 </div>
 
+
+
+                <!-- LOBBY STATUS -->
 
                 <p
                     id="lobbyNote"
@@ -197,26 +276,48 @@
                 </p>
 
 
+
+                <!-- START GAME -->
+
                 <button
                     id="startGameBtn"
                     class="primary-button"
+                    type="button"
                 >
                     Start Game
                 </button>
+
 
             </section>
 
         </section>
 
 
+
+        <!-- ==================================================
+             FOOTER
+             ================================================== -->
+
         <footer>
+
             Just A Race Team
+
         </footer>
+
 
     </main>
 
 
-    <script type="module" src="script.js"></script>
+
+    <!-- ======================================================
+         JAVASCRIPT
+         ====================================================== -->
+
+    <script
+        type="module"
+        src="script.js"
+    ></script>
+
 
 </body>
 
