@@ -30,7 +30,7 @@ import {
     getRandomUpgradeRoll,
     randomFromArray
 }
-    from "./game-data.js?v=5";
+    from "./game-data.js?v=6";
 
 
 /* =========================================================
@@ -144,6 +144,24 @@ const gameNote =
 const liveStandings =
     document.getElementById("liveStandings");
 
+const raceNightTabButton =
+    document.getElementById("raceNightTabBtn");
+
+const buildsTabButton =
+    document.getElementById("buildsTabBtn");
+
+const raceNightView =
+    document.getElementById("raceNightView");
+
+const buildComparisonView =
+    document.getElementById("buildComparisonView");
+
+const buildComparisonCarName =
+    document.getElementById("buildComparisonCarName");
+
+const buildComparisonTable =
+    document.getElementById("buildComparisonTable");
+
 
 const roundNumber =
     document.getElementById("roundNumber");
@@ -161,6 +179,9 @@ const selectedCarPI =
 
 const raceTypeBadge =
     document.getElementById("raceTypeBadge");
+
+const currentRaceCard =
+    document.getElementById("currentRaceCard");
 
 const raceName =
     document.getElementById("raceName");
@@ -308,6 +329,9 @@ let currentRoomData =
 let stopRoomListener =
     null;
 
+let activeGameTab =
+    "race";
+
 
 /* =========================================================
    STARTUP
@@ -346,6 +370,701 @@ function populateCarSelect() {
             );
 
         }
+    );
+
+}
+
+
+/* =========================================================
+   GAME TABS
+   ========================================================= */
+
+function setActiveGameTab(tabName) {
+
+    activeGameTab =
+        tabName === "builds"
+            ? "builds"
+            : "race";
+
+
+    const showingBuilds =
+        activeGameTab ===
+        "builds";
+
+
+    raceNightView.classList.toggle(
+        "hidden",
+        showingBuilds
+    );
+
+
+    buildComparisonView.classList.toggle(
+        "hidden",
+        !showingBuilds
+    );
+
+
+    raceNightTabButton.classList.toggle(
+        "active",
+        !showingBuilds
+    );
+
+
+    buildsTabButton.classList.toggle(
+        "active",
+        showingBuilds
+    );
+
+
+    raceNightTabButton.setAttribute(
+        "aria-selected",
+        String(!showingBuilds)
+    );
+
+
+    buildsTabButton.setAttribute(
+        "aria-selected",
+        String(showingBuilds)
+    );
+
+
+    if (
+        showingBuilds &&
+        currentRoomData
+    ) {
+
+        renderBuildComparison(
+            currentRoomData
+        );
+
+    }
+
+}
+
+
+raceNightTabButton.addEventListener(
+    "click",
+    function () {
+
+        setActiveGameTab(
+            "race"
+        );
+
+    }
+);
+
+
+buildsTabButton.addEventListener(
+    "click",
+    function () {
+
+        setActiveGameTab(
+            "builds"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RACE TYPE COLORS
+   ========================================================= */
+
+const RACE_THEME_CLASSES = [
+    "race-street",
+    "race-road",
+    "race-drag",
+    "race-dirt",
+    "race-rally",
+    "race-cross-country",
+    "race-touge"
+];
+
+
+function getRaceThemeClass(type) {
+
+    const value =
+        String(type || "")
+            .trim()
+            .toLowerCase();
+
+
+    if (value.includes("street")) {
+        return "race-street";
+    }
+
+
+    if (value.includes("drag")) {
+        return "race-drag";
+    }
+
+
+    if (
+        value.includes("cross") &&
+        value.includes("country")
+    ) {
+        return "race-cross-country";
+    }
+
+
+    if (value.includes("touge")) {
+        return "race-touge";
+    }
+
+
+    if (value.includes("rally")) {
+        return "race-rally";
+    }
+
+
+    if (value.includes("dirt")) {
+        return "race-dirt";
+    }
+
+
+    return "race-road";
+
+}
+
+
+function applyRaceTheme(type) {
+
+    RACE_THEME_CLASSES.forEach(
+        function (className) {
+
+            currentRaceCard.classList.remove(
+                className
+            );
+
+            raceTypeBadge.classList.remove(
+                className
+            );
+
+        }
+    );
+
+
+    if (!type) {
+        return;
+    }
+
+
+    const className =
+        getRaceThemeClass(
+            type
+        );
+
+
+    currentRaceCard.classList.add(
+        className
+    );
+
+
+    raceTypeBadge.classList.add(
+        className
+    );
+
+}
+
+
+/* =========================================================
+   BUILD COMPARISON COLORS / TABLE
+   ========================================================= */
+
+function getBuildValueClass(
+    upgrade,
+    optionName
+) {
+
+    const value =
+        String(optionName || "")
+            .trim()
+            .toLowerCase();
+
+
+    const stock =
+        getStockForUpgrade(
+            upgrade
+        );
+
+
+    if (
+        stock &&
+        String(stock.name) ===
+            String(optionName)
+    ) {
+        return "build-stock";
+    }
+
+
+    if (value.includes("rally")) {
+        return "build-rally";
+    }
+
+
+    if (
+        value.includes("offroad") ||
+        value.includes("off-road")
+    ) {
+        return "build-offroad";
+    }
+
+
+    if (value.includes("drift")) {
+        return "build-drift";
+    }
+
+
+    if (value.includes("snow")) {
+        return "build-snow";
+    }
+
+
+    if (value.includes("drag")) {
+        return "build-drag";
+    }
+
+
+    if (
+        value.includes("semi-slick") ||
+        value.includes("semi slick")
+    ) {
+        return "build-semislick";
+    }
+
+
+    if (value.includes("street")) {
+        return "build-street";
+    }
+
+
+    if (value.includes("sport")) {
+        return "build-sport";
+    }
+
+
+    if (
+        value.includes("race") ||
+        value === "slick tires"
+    ) {
+        return "build-race";
+    }
+
+
+    if (value.includes("turbo")) {
+        return "build-turbo";
+    }
+
+
+    if (value.includes("supercharger")) {
+        return "build-supercharger";
+    }
+
+
+    if (value === "awd") {
+        return "build-awd";
+    }
+
+
+    if (value === "rwd") {
+        return "build-rwd";
+    }
+
+
+    const option =
+        upgrade && upgrade.options
+            ? upgrade.options.find(
+                item =>
+                    item.name ===
+                    optionName
+            )
+            : null;
+
+
+    const tier =
+        option
+            ? Number(option.tier || 0)
+            : 0;
+
+
+    if (tier <= 0) {
+        return "build-stock";
+    }
+
+
+    if (tier === 1) {
+        return "build-street";
+    }
+
+
+    if (tier === 2) {
+        return "build-sport";
+    }
+
+
+    if (tier >= 3) {
+        return "build-race";
+    }
+
+
+    return "build-other";
+
+}
+
+
+function createBuildCell(
+    upgrade,
+    optionName,
+    changedFromStock
+) {
+
+    const cell =
+        document.createElement(
+            "td"
+        );
+
+
+    cell.classList.add(
+        "build-value",
+        getBuildValueClass(
+            upgrade,
+            optionName
+        )
+    );
+
+
+    if (changedFromStock) {
+
+        cell.classList.add(
+            "build-changed"
+        );
+
+    }
+
+
+    cell.textContent =
+        optionName;
+
+
+    return cell;
+
+}
+
+
+function renderBuildComparison(
+    roomData
+) {
+
+    buildComparisonTable.innerHTML =
+        "";
+
+
+    const car =
+        getSelectedCarDefinition(
+            roomData
+        );
+
+
+    if (!car) {
+
+        buildComparisonCarName.textContent =
+            "Waiting for host...";
+
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.classList.add(
+            "build-empty-message"
+        );
+
+
+        empty.textContent =
+            "Choose the race-night car first.";
+
+
+        buildComparisonTable.appendChild(
+            empty
+        );
+
+
+        return;
+
+    }
+
+
+    buildComparisonCarName.textContent =
+        car.name +
+        " — " +
+        car.startingPI;
+
+
+    const players =
+        getSortedPlayers(
+            roomData.players
+        );
+
+
+    const table =
+        document.createElement(
+            "table"
+        );
+
+
+    table.classList.add(
+        "build-table"
+    );
+
+
+    const thead =
+        document.createElement(
+            "thead"
+        );
+
+
+    const headerRow =
+        document.createElement(
+            "tr"
+        );
+
+
+    const modHeader =
+        document.createElement(
+            "th"
+        );
+
+
+    modHeader.classList.add(
+        "build-mod-column"
+    );
+
+
+    modHeader.textContent =
+        "MOD";
+
+
+    headerRow.appendChild(
+        modHeader
+    );
+
+
+    const stockHeader =
+        document.createElement(
+            "th"
+        );
+
+
+    stockHeader.textContent =
+        "STOCK";
+
+
+    headerRow.appendChild(
+        stockHeader
+    );
+
+
+    players.forEach(
+        function ([uid, player]) {
+
+            const th =
+                document.createElement(
+                    "th"
+                );
+
+
+            th.textContent =
+                player.name;
+
+
+            if (
+                uid ===
+                currentUserUid
+            ) {
+
+                th.textContent +=
+                    " (YOU)";
+
+            }
+
+
+            headerRow.appendChild(
+                th
+            );
+
+        }
+    );
+
+
+    thead.appendChild(
+        headerRow
+    );
+
+
+    table.appendChild(
+        thead
+    );
+
+
+    const tbody =
+        document.createElement(
+            "tbody"
+        );
+
+
+    let lastCategory =
+        null;
+
+
+    car.upgrades.forEach(
+        function (upgrade) {
+
+            if (
+                upgrade.category !==
+                lastCategory
+            ) {
+
+                const categoryRow =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                categoryRow.classList.add(
+                    "build-category-row"
+                );
+
+
+                const categoryCell =
+                    document.createElement(
+                        "th"
+                    );
+
+
+                categoryCell.colSpan =
+                    2 +
+                    players.length;
+
+
+                categoryCell.textContent =
+                    upgrade.category;
+
+
+                categoryRow.appendChild(
+                    categoryCell
+                );
+
+
+                tbody.appendChild(
+                    categoryRow
+                );
+
+
+                lastCategory =
+                    upgrade.category;
+
+            }
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const modCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            modCell.classList.add(
+                "build-mod-column"
+            );
+
+
+            modCell.textContent =
+                upgrade.mod;
+
+
+            row.appendChild(
+                modCell
+            );
+
+
+            const stock =
+                getStockForUpgrade(
+                    upgrade
+                );
+
+
+            const stockName =
+                stock
+                    ? stock.name
+                    : "—";
+
+
+            row.appendChild(
+                createBuildCell(
+                    upgrade,
+                    stockName,
+                    false
+                )
+            );
+
+
+            players.forEach(
+                function ([uid]) {
+
+                    const garage =
+                        roomData.garages &&
+                        roomData.garages[uid]
+                            ? roomData.garages[uid]
+                            : {};
+
+
+                    const installed =
+                        garage[
+                            upgrade.id
+                        ];
+
+
+                    const optionName =
+                        installed
+                            ? installed.option
+                            : stockName;
+
+
+                    row.appendChild(
+                        createBuildCell(
+                            upgrade,
+                            optionName,
+                            optionName !==
+                                stockName
+                        )
+                    );
+
+                }
+            );
+
+
+            tbody.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    table.appendChild(
+        tbody
+    );
+
+
+    buildComparisonTable.appendChild(
+        table
     );
 
 }
@@ -1356,11 +2075,8 @@ function buildUpgradePackage(
         keepCount:
             reward.keep,
 
-        choiceRequired:
-            (
-                reward.rolls === 2 &&
-                reward.keep === 1
-            ),
+        decisionRequired:
+            reward.rolls > 0,
 
         resolved:
             false
@@ -1385,80 +2101,36 @@ function buildUpgradePackage(
         [];
 
 
-    if (
-        packageData.choiceRequired
+    /*
+        Every roll is previewed against the
+        player's build at the start of the
+        upgrade phase. The player can then
+        Apply or Pass each eligible roll.
+    */
+
+    for (
+        let i = 0;
+        i < reward.rolls;
+        i++
     ) {
 
-        /*
-            Both choices are compared against
-            the same current garage because the
-            player will keep only one.
-        */
-
-        for (
-            let i = 0;
-            i < reward.rolls;
-            i++
-        ) {
-
-            const baseRoll =
-                getRandomUpgradeRoll(
-                    car
-                );
-
-
-            rolls.push(
-                buildPreviewRoll(
-                    car,
-                    cloneObject(
-                        originalGarage
-                    ),
-                    baseRoll,
-                    round,
-                    false
-                )
-            );
-
-        }
-
-    }
-    else {
-
-        /*
-            Auto-kept rolls are previewed in
-            sequence. This matters when both
-            rolls hit the same mod.
-        */
-
-        const tempGarage =
-            cloneObject(
-                originalGarage
+        const baseRoll =
+            getRandomUpgradeRoll(
+                car
             );
 
 
-        for (
-            let i = 0;
-            i < reward.rolls;
-            i++
-        ) {
-
-            const baseRoll =
-                getRandomUpgradeRoll(
-                    car
-                );
-
-
-            rolls.push(
-                buildPreviewRoll(
-                    car,
-                    tempGarage,
-                    baseRoll,
-                    round,
-                    true
-                )
-            );
-
-        }
+        rolls.push(
+            buildPreviewRoll(
+                car,
+                cloneObject(
+                    originalGarage
+                ),
+                baseRoll,
+                round,
+                false
+            )
+        );
 
     }
 
@@ -1471,8 +2143,87 @@ function buildUpgradePackage(
 
 }
 
+function getDecisionKey(
+    rollIndex
+) {
 
-function getSelectedRollIndices(
+    return (
+        "roll_" +
+        (
+            rollIndex +
+            1
+        )
+    );
+
+}
+
+
+function getRollDecision(
+    packageData,
+    rollIndex
+) {
+
+    const key =
+        getDecisionKey(
+            rollIndex
+        );
+
+
+    return (
+        packageData.decisions &&
+        packageData.decisions[key]
+            ? packageData.decisions[key]
+            : null
+    );
+
+}
+
+
+function getAppliedRollIndices(
+    packageData
+) {
+
+    const rolls =
+        normalizeRolls(
+            packageData.rolls
+        );
+
+
+    return rolls
+        .map(
+            function (unused, index) {
+
+                return index;
+
+            }
+        )
+        .filter(
+            function (index) {
+
+                return (
+                    getRollDecision(
+                        packageData,
+                        index
+                    ) ===
+                    "apply"
+                );
+
+            }
+        )
+        .slice(
+            0,
+            Math.max(
+                0,
+                Number(
+                    packageData.keepCount ||
+                    0
+                )
+            )
+        );
+
+}
+
+function packageDecisionsReady(
     packageData
 ) {
 
@@ -1483,48 +2234,59 @@ function getSelectedRollIndices(
 
 
     if (
-        packageData.place === 2
+        rolls.length === 0
     ) {
 
-        return rolls.length
-            ? [0]
-            : [];
+        return true;
 
     }
 
 
-    if (
-        packageData.place === 4
-    ) {
+    const decisions =
+        rolls.map(
+            function (unused, index) {
 
-        return rolls.map(
-            (unused, index) =>
-                index
+                return getRollDecision(
+                    packageData,
+                    index
+                );
+
+            }
         );
 
-    }
-
 
     if (
-        packageData.choiceRequired &&
-        Number.isInteger(
-            packageData.choiceIndex
+        decisions.some(
+            decision =>
+                decision !== "apply" &&
+                decision !== "pass"
         )
     ) {
 
-        return [
-            packageData.choiceIndex
-        ];
+        return false;
 
     }
 
 
-    return [];
+    const applyCount =
+        decisions.filter(
+            decision =>
+                decision === "apply"
+        ).length;
+
+
+    return (
+        applyCount <=
+        Number(
+            packageData.keepCount ||
+            0
+        )
+    );
 
 }
 
 
-function allUpgradeChoicesReady(
+function allUpgradeDecisionsReady(
     upgradeRound
 ) {
 
@@ -1542,36 +2304,10 @@ function allUpgradeChoicesReady(
         upgradeRound.players
     )
     .every(
-        function (packageData) {
-
-            if (
-                !packageData.choiceRequired
-            ) {
-
-                return true;
-
-            }
-
-
-            const rolls =
-                normalizeRolls(
-                    packageData.rolls
-                );
-
-
-            return (
-                Number.isInteger(
-                    packageData.choiceIndex
-                ) &&
-                packageData.choiceIndex >= 0 &&
-                packageData.choiceIndex < rolls.length
-            );
-
-        }
+        packageDecisionsReady
     );
 
 }
-
 
 /* =========================================================
    GAME SETUP DISPLAY
@@ -1653,6 +2389,11 @@ function updateGameSetupDisplay(
             "hidden"
         );
 
+
+        applyRaceTheme(
+            roomData.currentRace.type
+        );
+
     }
     else {
 
@@ -1666,6 +2407,11 @@ function updateGameSetupDisplay(
 
         raceTypeBadge.classList.add(
             "hidden"
+        );
+
+
+        applyRaceTheme(
+            null
         );
 
     }
@@ -2278,16 +3024,16 @@ function createRollCard(
     );
 
 
-    const selectedIndices =
-        getSelectedRollIndices(
-            packageData
+    const decision =
+        getRollDecision(
+            packageData,
+            rollIndex
         );
 
 
     if (
-        selectedIndices.includes(
-            rollIndex
-        )
+        decision ===
+        "apply"
     ) {
 
         card.classList.add(
@@ -2353,7 +3099,16 @@ function createRollCard(
 
 
     option.classList.add(
-        "roll-option"
+        "roll-option",
+        getBuildValueClass(
+            getUpgradeById(
+                getSelectedCarDefinition(
+                    roomData
+                ),
+                roll.modId
+            ),
+            roll.option
+        )
     );
 
 
@@ -2405,54 +3160,152 @@ function createRollCard(
     );
 
 
-    const canChoose =
+    if (decision) {
+
+        const decisionBadge =
+            document.createElement(
+                "div"
+            );
+
+
+        decisionBadge.classList.add(
+            "roll-decision-badge",
+            decision === "apply"
+                ? "roll-decision-apply"
+                : "roll-decision-pass"
+        );
+
+
+        decisionBadge.textContent =
+            decision === "apply"
+                ? "APPLY"
+                : "PASS";
+
+
+        card.appendChild(
+            decisionBadge
+        );
+
+    }
+
+
+    const canDecide =
         (
-            packageData.choiceRequired &&
-            packageData.uid === currentUserUid &&
-            roomData.gamePhase === "upgrades" &&
+            packageData.uid ===
+                currentUserUid &&
+            roomData.gamePhase ===
+                "upgrades" &&
             !packageData.resolved
         );
 
 
-    if (canChoose) {
+    if (canDecide) {
 
-        const chooseButton =
+        const controls =
+            document.createElement(
+                "div"
+            );
+
+
+        controls.classList.add(
+            "roll-decision-controls"
+        );
+
+
+        const applyButton =
             document.createElement(
                 "button"
             );
 
 
-        chooseButton.className =
-            "secondary-button choose-upgrade-button";
-
-
-        chooseButton.type =
+        applyButton.type =
             "button";
 
 
-        chooseButton.textContent =
-            (
-                packageData.choiceIndex ===
-                rollIndex
-            )
-                ? "Selected"
-                : "Choose This Roll";
+        applyButton.className =
+            "apply-roll-button";
 
 
-        chooseButton.addEventListener(
+        applyButton.textContent =
+            "Apply";
+
+
+        if (
+            decision ===
+            "apply"
+        ) {
+
+            applyButton.classList.add(
+                "selected-decision"
+            );
+
+        }
+
+
+        applyButton.addEventListener(
             "click",
             function () {
 
-                saveUpgradeChoice(
-                    rollIndex
+                saveUpgradeDecision(
+                    rollIndex,
+                    "apply"
                 );
 
             }
         );
 
 
+        const passButton =
+            document.createElement(
+                "button"
+            );
+
+
+        passButton.type =
+            "button";
+
+
+        passButton.className =
+            "pass-roll-button";
+
+
+        passButton.textContent =
+            "Pass";
+
+
+        if (
+            decision ===
+            "pass"
+        ) {
+
+            passButton.classList.add(
+                "selected-decision"
+            );
+
+        }
+
+
+        passButton.addEventListener(
+            "click",
+            function () {
+
+                saveUpgradeDecision(
+                    rollIndex,
+                    "pass"
+                );
+
+            }
+        );
+
+
+        controls.append(
+            applyButton,
+            passButton
+        );
+
+
         card.appendChild(
-            chooseButton
+            controls
         );
 
     }
@@ -2461,7 +3314,6 @@ function createRollCard(
     return card;
 
 }
-
 
 function renderUpgradePanel(
     roomData
@@ -2538,7 +3390,7 @@ function renderUpgradePanel(
         );
 
 
-    let currentPlayerNeedsChoice =
+    let currentPlayerNeedsDecision =
         false;
 
 
@@ -2699,7 +3551,7 @@ function renderUpgradePanel(
 
 
             if (
-                packageData.choiceRequired
+                rolls.length > 0
             ) {
 
                 const choiceStatus =
@@ -2713,16 +3565,28 @@ function renderUpgradePanel(
                 );
 
 
+                const ready =
+                    packageDecisionsReady(
+                        packageData
+                    );
+
+
                 if (
-                    Number.isInteger(
-                        packageData.choiceIndex
-                    )
+                    packageData.resolved
                 ) {
 
                     choiceStatus.textContent =
-                        packageData.resolved
-                            ? "Choice applied."
-                            : "Choice locked in — waiting for host.";
+                        "Upgrade decisions applied.";
+
+                }
+                else if (
+                    ready
+                ) {
+
+                    choiceStatus.textContent =
+                        packageData.uid === currentUserUid
+                            ? "Your Apply / Pass decisions are locked in."
+                            : packageData.name + " is ready.";
 
                 }
                 else if (
@@ -2731,10 +3595,12 @@ function renderUpgradePanel(
                 ) {
 
                     choiceStatus.textContent =
-                        "Choose one of your two rolls.";
+                        packageData.keepCount === 1 && rolls.length > 1
+                            ? "Apply at most one roll, or pass on both."
+                            : "Choose Apply or Pass for each roll.";
 
 
-                    currentPlayerNeedsChoice =
+                    currentPlayerNeedsDecision =
                         true;
 
                 }
@@ -2743,7 +3609,7 @@ function renderUpgradePanel(
                     choiceStatus.textContent =
                         "Waiting for " +
                         packageData.name +
-                        " to choose.";
+                        " to decide.";
 
                 }
 
@@ -2764,7 +3630,7 @@ function renderUpgradePanel(
 
 
     const choicesReady =
-        allUpgradeChoicesReady(
+        allUpgradeDecisionsReady(
             upgradeRound
         );
 
@@ -2794,8 +3660,8 @@ function renderUpgradePanel(
 
             upgradeStatusMessage.textContent =
                 choicesReady
-                    ? "All choices are ready. Apply the upgrades."
-                    : "Waiting for the keep-one upgrade choice.";
+                    ? "Everyone has chosen Apply or Pass. Apply the selected upgrades."
+                    : "Waiting for player Apply / Pass decisions.";
 
         }
         else {
@@ -2806,9 +3672,9 @@ function renderUpgradePanel(
 
 
             upgradeStatusMessage.textContent =
-                currentPlayerNeedsChoice
-                    ? "Pick the upgrade you want to keep."
-                    : "Waiting for the host to apply the upgrades.";
+                currentPlayerNeedsDecision
+                    ? "Choose Apply or Pass for your upgrade roll(s)."
+                    : "Waiting for the other players or the host.";
 
         }
 
@@ -3289,6 +4155,11 @@ function listenToRoom(
                 );
 
 
+                renderBuildComparison(
+                    roomData
+                );
+
+
                 if (
                     roomData.status ===
                     "finished"
@@ -3393,6 +4264,11 @@ function showLobby(
 
     currentPlayerIsHost =
         isHost;
+
+
+    setActiveGameTab(
+        "race"
+    );
 
 
     lobbyRoomCode.textContent =
@@ -3517,6 +4393,11 @@ function returnToHome(
 
     currentRoomData =
         null;
+
+
+    setActiveGameTab(
+        "race"
+    );
 
 
     lobbyScreen.classList.add(
@@ -4612,18 +5493,49 @@ goToUpgradesButton.addEventListener(
 
 
 /* =========================================================
-   PLAYER UPGRADE CHOICE
+   PLAYER APPLY / PASS DECISIONS
    ========================================================= */
 
-async function saveUpgradeChoice(
-    rollIndex
+async function setUpgradeDecisionValue(
+    roundKey,
+    rollIndex,
+    decision
+) {
+
+    await set(
+        ref(
+            database,
+            "rooms/" +
+            currentRoomCode +
+            "/upgradeRounds/" +
+            roundKey +
+            "/players/" +
+            currentUserUid +
+            "/decisions/" +
+            getDecisionKey(
+                rollIndex
+            )
+        ),
+        decision
+    );
+
+}
+
+
+async function saveUpgradeDecision(
+    rollIndex,
+    decision
 ) {
 
     if (
         !currentRoomData ||
         currentRoomData.gamePhase !==
             "upgrades" ||
-        !currentUserUid
+        !currentUserUid ||
+        (
+            decision !== "apply" &&
+            decision !== "pass"
+        )
     ) {
 
         return;
@@ -4660,7 +5572,6 @@ async function saveUpgradeChoice(
 
     if (
         !packageData ||
-        !packageData.choiceRequired ||
         packageData.resolved
     ) {
 
@@ -4687,31 +5598,73 @@ async function saveUpgradeChoice(
 
     try {
 
-        await set(
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode +
-                "/upgradeRounds/" +
-                roundKey +
-                "/players/" +
-                currentUserUid +
-                "/choiceIndex"
-            ),
-            rollIndex
+        const tasks =
+            [];
+
+
+        tasks.push(
+            setUpgradeDecisionValue(
+                roundKey,
+                rollIndex,
+                decision
+            )
+        );
+
+
+        /*
+            Third place may keep at most one.
+            Applying one roll automatically
+            passes the other roll(s).
+        */
+
+        if (
+            decision === "apply" &&
+            Number(
+                packageData.keepCount ||
+                0
+            ) === 1 &&
+            rolls.length > 1
+        ) {
+
+            rolls.forEach(
+                function (unused, index) {
+
+                    if (
+                        index !==
+                        rollIndex
+                    ) {
+
+                        tasks.push(
+                            setUpgradeDecisionValue(
+                                roundKey,
+                                index,
+                                "pass"
+                            )
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        await Promise.all(
+            tasks
         );
 
     }
     catch (error) {
 
         console.error(
-            "Could not save upgrade choice:",
+            "Could not save upgrade decision:",
             error
         );
 
 
         upgradeStatusMessage.textContent =
-            "Could not save your choice. Check the Firebase rules.";
+            "Could not save your Apply / Pass decision. Check the Firebase rules.";
 
     }
 
@@ -4759,7 +5712,7 @@ applyUpgradesButton.addEventListener(
 
         if (
             !upgradeRound ||
-            !allUpgradeChoicesReady(
+            !allUpgradeDecisionsReady(
                 upgradeRound
             )
         ) {
@@ -4813,7 +5766,7 @@ applyUpgradesButton.addEventListener(
 
 
                 const selectedIndices =
-                    getSelectedRollIndices(
+                    getAppliedRollIndices(
                         packageData
                     );
 

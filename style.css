@@ -983,3 +983,464 @@ footer {
     }
 
 }
+
+
+/* =========================================================
+   VERSION 6 — GAME TABS
+   ========================================================= */
+
+.game-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 0 0 30px;
+    padding: 6px;
+    background: #0b0b0b;
+    border: 1px solid #303030;
+    border-radius: 12px;
+}
+
+.game-tab {
+    max-width: none;
+    padding: 12px 16px;
+    background: transparent;
+    color: #8d8d8d;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.game-tab:hover {
+    transform: none;
+    color: white;
+    background: #181818;
+}
+
+.game-tab.active {
+    color: white;
+    background: #252525;
+    border-color: #444;
+}
+
+
+/* =========================================================
+   VERSION 6 — FORZA-STYLE RACE COLORS
+   ========================================================= */
+
+.race-theme-card {
+    border-left-width: 5px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.race-type-badge {
+    border: 1px solid transparent;
+}
+
+.race-street {
+    border-left-color: #69d8f5;
+    box-shadow: inset 4px 0 18px rgba(105, 216, 245, 0.08);
+}
+
+.race-street .race-type-badge,
+.race-type-badge.race-street {
+    background: rgba(105, 216, 245, 0.16);
+    border-color: rgba(105, 216, 245, 0.6);
+    color: #9ceaff;
+}
+
+.race-road {
+    border-left-color: #3f79ff;
+    box-shadow: inset 4px 0 18px rgba(63, 121, 255, 0.08);
+}
+
+.race-road .race-type-badge,
+.race-type-badge.race-road {
+    background: rgba(63, 121, 255, 0.16);
+    border-color: rgba(63, 121, 255, 0.6);
+    color: #8bacff;
+}
+
+.race-drag {
+    border-left-color: #ff4fa3;
+    box-shadow: inset 4px 0 18px rgba(255, 79, 163, 0.08);
+}
+
+.race-drag .race-type-badge,
+.race-type-badge.race-drag {
+    background: rgba(255, 79, 163, 0.16);
+    border-color: rgba(255, 79, 163, 0.62);
+    color: #ff94c6;
+}
+
+.race-dirt,
+.race-rally {
+    border-left-color: #f2a52b;
+    box-shadow: inset 4px 0 18px rgba(242, 165, 43, 0.08);
+}
+
+.race-dirt .race-type-badge,
+.race-rally .race-type-badge,
+.race-type-badge.race-dirt,
+.race-type-badge.race-rally {
+    background: rgba(242, 165, 43, 0.16);
+    border-color: rgba(242, 165, 43, 0.62);
+    color: #ffc768;
+}
+
+.race-cross-country {
+    border-left-color: #51c878;
+    box-shadow: inset 4px 0 18px rgba(81, 200, 120, 0.08);
+}
+
+.race-cross-country .race-type-badge,
+.race-type-badge.race-cross-country {
+    background: rgba(81, 200, 120, 0.16);
+    border-color: rgba(81, 200, 120, 0.62);
+    color: #83e2a3;
+}
+
+.race-touge {
+    border-left-color: #a777ff;
+    box-shadow: inset 4px 0 18px rgba(167, 119, 255, 0.08);
+}
+
+.race-touge .race-type-badge,
+.race-type-badge.race-touge {
+    background: rgba(167, 119, 255, 0.16);
+    border-color: rgba(167, 119, 255, 0.62);
+    color: #c6a8ff;
+}
+
+
+/* =========================================================
+   VERSION 6 — APPLY / PASS DECISIONS
+   ========================================================= */
+
+.roll-decision-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.roll-decision-controls button {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 11px 12px;
+    font-size: 13px;
+}
+
+.apply-roll-button {
+    background: #1f6d42;
+    color: white;
+    border: 1px solid #338e5b;
+}
+
+.apply-roll-button:hover {
+    background: #287c4d;
+}
+
+.pass-roll-button {
+    background: #292929;
+    color: #bbb;
+    border: 1px solid #4b4b4b;
+}
+
+.pass-roll-button:hover {
+    color: white;
+    background: #333;
+}
+
+.apply-roll-button.selected-decision {
+    border-color: #72e5a3;
+    box-shadow: 0 0 0 2px rgba(114, 229, 163, 0.18);
+}
+
+.pass-roll-button.selected-decision {
+    border-color: #aaa;
+    color: white;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.roll-decision-badge {
+    margin-top: 12px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.roll-decision-apply {
+    color: #88efb2;
+    background: rgba(45, 150, 91, 0.13);
+    border: 1px solid rgba(67, 191, 116, 0.38);
+}
+
+.roll-decision-pass {
+    color: #aaa;
+    background: #202020;
+    border: 1px solid #3a3a3a;
+}
+
+
+/* =========================================================
+   VERSION 6 — BUILD COMPARISON TABLE
+   ========================================================= */
+
+.build-comparison-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.build-comparison-heading h2 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.build-comparison-heading .setup-detail {
+    max-width: 380px;
+    margin: 0;
+    text-align: right;
+}
+
+.build-color-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 18px;
+}
+
+.legend-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.6px;
+}
+
+.build-comparison-scroll {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #303030;
+    border-radius: 12px;
+    background: #090909;
+}
+
+.build-table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+}
+
+.build-table th,
+.build-table td {
+    min-width: 165px;
+    padding: 11px 12px;
+    border-right: 1px solid #292929;
+    border-bottom: 1px solid #292929;
+    vertical-align: middle;
+}
+
+.build-table th:last-child,
+.build-table td:last-child {
+    border-right: none;
+}
+
+.build-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #151515;
+    color: #aaa;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.build-table .build-mod-column {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    min-width: 235px;
+    max-width: 235px;
+    background: #111;
+    color: white;
+    font-weight: bold;
+}
+
+.build-table thead .build-mod-column {
+    z-index: 4;
+    background: #181818;
+}
+
+.build-category-row th {
+    padding: 9px 12px;
+    background: #202020;
+    color: #ff8a74;
+    border-bottom: 1px solid #393939;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.build-value {
+    font-weight: bold;
+    line-height: 1.25;
+}
+
+.build-changed {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.build-stock {
+    background: #343434;
+    color: #e1e1e1;
+}
+
+.build-street {
+    background: #1e5e8d;
+    color: #d9f2ff;
+}
+
+.build-sport {
+    background: #286d42;
+    color: #dcffe8;
+}
+
+.build-race {
+    background: #8a2f35;
+    color: #ffe3e5;
+}
+
+.build-offroad {
+    background: #704b2d;
+    color: #ffe9cd;
+}
+
+.build-rally {
+    background: #807018;
+    color: #fff6ad;
+}
+
+.build-drift {
+    background: #633a88;
+    color: #f0ddff;
+}
+
+.build-snow {
+    background: #316f86;
+    color: #def8ff;
+}
+
+.build-drag {
+    background: #8d315f;
+    color: #ffe0ef;
+}
+
+.build-semislick {
+    background: #875126;
+    color: #ffe6c9;
+}
+
+.build-turbo {
+    background: #7d4a20;
+    color: #ffe2bf;
+}
+
+.build-supercharger {
+    background: #533f86;
+    color: #eee6ff;
+}
+
+.build-awd {
+    background: #276a70;
+    color: #d9fcff;
+}
+
+.build-rwd {
+    background: #745d25;
+    color: #fff0c7;
+}
+
+.build-other {
+    background: #303744;
+    color: #e4ebf7;
+}
+
+.build-empty-message {
+    padding: 30px 20px;
+    color: #888;
+    text-align: center;
+}
+
+
+@media (max-width: 600px) {
+
+    .game-tabs {
+        margin-bottom: 22px;
+    }
+
+    .game-tab {
+        padding: 11px 8px;
+        font-size: 12px;
+    }
+
+    .roll-decision-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .build-comparison-heading {
+        display: block;
+    }
+
+    .build-comparison-heading .setup-detail {
+        max-width: none;
+        margin-top: 8px;
+        text-align: left;
+    }
+
+    .build-table th,
+    .build-table td {
+        min-width: 150px;
+        padding: 10px;
+    }
+
+    .build-table .build-mod-column {
+        min-width: 190px;
+        max-width: 190px;
+    }
+
+}
+
+.roll-option.build-stock,
+.roll-option.build-street,
+.roll-option.build-sport,
+.roll-option.build-race,
+.roll-option.build-offroad,
+.roll-option.build-rally,
+.roll-option.build-drift,
+.roll-option.build-snow,
+.roll-option.build-drag,
+.roll-option.build-semislick,
+.roll-option.build-turbo,
+.roll-option.build-supercharger,
+.roll-option.build-awd,
+.roll-option.build-rwd,
+.roll-option.build-other {
+    padding: 8px 10px;
+    border-radius: 8px;
+}

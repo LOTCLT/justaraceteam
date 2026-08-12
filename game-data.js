@@ -1,6 +1,6 @@
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
-   Version 5
+   Version 6
 
    Add future cars here.
    script.js automatically builds the car dropdown from this file.

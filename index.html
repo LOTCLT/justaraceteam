@@ -18,7 +18,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=5"
+        href="style.css?v=6"
     >
 </head>
 
@@ -242,6 +242,39 @@
                     </strong>
                 </div>
 
+                <!-- GAME TABS -->
+
+                <div
+                    class="game-tabs"
+                    role="tablist"
+                    aria-label="Race night views"
+                >
+                    <button
+                        id="raceNightTabBtn"
+                        class="game-tab active"
+                        type="button"
+                        role="tab"
+                        aria-selected="true"
+                    >
+                        Race Night
+                    </button>
+
+                    <button
+                        id="buildsTabBtn"
+                        class="game-tab"
+                        type="button"
+                        role="tab"
+                        aria-selected="false"
+                    >
+                        Build Comparison
+                    </button>
+                </div>
+
+
+                <!-- RACE NIGHT TAB -->
+
+                <div id="raceNightView">
+
                 <h3>Players</h3>
 
                 <div
@@ -309,7 +342,10 @@
 
                 <!-- RACE -->
 
-                <div class="setup-card">
+                <div
+                    id="currentRaceCard"
+                    class="setup-card race-theme-card"
+                >
                     <div class="race-heading">
                         <p class="setup-label">
                             CURRENT RACE
@@ -562,7 +598,7 @@
                             class="primary-button wide-button"
                             type="button"
                         >
-                            Apply Upgrades
+                            Apply Selected Upgrades
                         </button>
                     </div>
 
@@ -599,6 +635,55 @@
                         </button>
                     </div>
 
+                </section>
+
+                </div>
+
+
+                <!-- ==================================================
+                     BUILD COMPARISON TAB
+                     ================================================== -->
+
+                <section
+                    id="buildComparisonView"
+                    class="hidden"
+                >
+                    <div class="divider">
+                        <span>BUILD COMPARISON</span>
+                    </div>
+
+                    <div class="build-comparison-heading">
+                        <div>
+                            <p class="setup-label">
+                                CURRENT CAR
+                            </p>
+
+                            <h2 id="buildComparisonCarName">
+                                Waiting for host...
+                            </h2>
+                        </div>
+
+                        <p class="setup-detail">
+                            Compare every player's installed build against stock.
+                        </p>
+                    </div>
+
+                    <div class="build-color-legend" aria-label="Build color legend">
+                        <span class="legend-chip build-stock">Stock</span>
+                        <span class="legend-chip build-street">Street / Tier 1</span>
+                        <span class="legend-chip build-sport">Sport / Tier 2</span>
+                        <span class="legend-chip build-race">Race / Tier 3+</span>
+                        <span class="legend-chip build-rally">Rally</span>
+                        <span class="legend-chip build-offroad">Offroad</span>
+                        <span class="legend-chip build-drift">Drift</span>
+                        <span class="legend-chip build-snow">Snow</span>
+                        <span class="legend-chip build-drag">Drag</span>
+                    </div>
+
+                    <div
+                        id="buildComparisonTable"
+                        class="build-comparison-scroll"
+                    ></div>
                 </section>
 
             </section>
@@ -679,7 +764,7 @@
 
     <script
         type="module"
-        src="script.js?v=5"
+        src="script.js?v=6"
     ></script>
 
 </body>
