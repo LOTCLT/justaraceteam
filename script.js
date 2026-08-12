@@ -1,13 +1,11 @@
 import { initializeApp }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 
-
 import {
     getAuth,
     signInAnonymously
 }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
-
 
 import {
     getDatabase,
@@ -21,6 +19,18 @@ import {
 }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
+import {
+    CAR_LIBRARY,
+    RACE_POOL,
+    POINTS_BY_PLACE,
+    REWARDS_BY_PLACE,
+    getCarByName,
+    getUpgradeById,
+    getStockForUpgrade,
+    getRandomUpgradeRoll,
+    randomFromArray
+}
+    from "./game-data.js?v=5";
 
 
 /* =========================================================
@@ -61,154 +71,6 @@ const auth =
 
 const database =
     getDatabase(app);
-
-
-
-/* =========================================================
-   CARS
-   ========================================================= */
-
-const CAR_LIBRARY = [
-
-    {
-        name: "2024 Ford Mustang GT",
-        startingPI: "A628"
-    },
-
-    {
-        name: "1986 Honda Civic Si",
-        startingPI: "D253"
-    }
-
-];
-
-
-
-/* =========================================================
-   RACES
-   ========================================================= */
-
-const RACE_POOL = [
-
-    /* STREET */
-
-    { type: "Street", name: "Cedar Run Street Race", distance: "4.2 mi" },
-    { type: "Street", name: "Daikoku Chase Street Race", distance: "4.2 mi" },
-    { type: "Street", name: "Festival Chase Street Race", distance: "4.1 mi" },
-    { type: "Street", name: "Hokubu Ascent Street Race", distance: "4.2 mi" },
-    { type: "Street", name: "Kita Ine Street Race", distance: "4.1 mi" },
-    { type: "Street", name: "Matsumi Climb Street Race", distance: "4.6 mi" },
-    { type: "Street", name: "Minami Chase Street Race", distance: "4.6 mi" },
-    { type: "Street", name: "Nachi Run Street Race", distance: "3.9 mi" },
-    { type: "Street", name: "Norikura Descent Street Race", distance: "3.6 mi" },
-    { type: "Street", name: "Okishinaimura Run Street Race", distance: "3.2 mi" },
-    { type: "Street", name: "Rainbow Bridge Descent Street Race", distance: "5.3 mi" },
-    { type: "Street", name: "River Descent Street Race", distance: "3.8 mi" },
-    { type: "Street", name: "Shimanoyama Charge Street Race", distance: "5.2 mi" },
-    { type: "Street", name: "Sunflower Charge Street Race", distance: "3.8 mi" },
-    { type: "Street", name: "Tokyo City Docks Charge Street Race", distance: "4.0 mi" },
-
-
-    /* ROAD */
-
-    { type: "Road", name: "Coastline Sprint", distance: "5.0 mi" },
-    { type: "Road", name: "Daikoku Circuit", distance: "3.3 mi" },
-    { type: "Road", name: "Electric Town Circuit", distance: "5.5 mi" },
-    { type: "Road", name: "Festival Sprint", distance: "4.9 mi" },
-    { type: "Road", name: "Highway Circuit", distance: "8.7 mi" },
-    { type: "Road", name: "Hokubu Circuit", distance: "4.7 mi" },
-    { type: "Road", name: "Irokawa Circuit Road Race", distance: "3.5 mi" },
-    { type: "Road", name: "Ito Sprint", distance: "5.8 mi" },
-    { type: "Road", name: "Legend Island Circuit", distance: "8.8 mi" },
-    { type: "Road", name: "Narai-Juku Circuit", distance: "4.4 mi" },
-    { type: "Road", name: "Satta Sprint", distance: "5.1 mi" },
-    { type: "Road", name: "Seaside Park Sprint", distance: "4.5 mi" },
-    { type: "Road", name: "Shikisai Sprint", distance: "4.8 mi" },
-    { type: "Road", name: "Shimanoyama Circuit", distance: "3.4 mi" },
-    { type: "Road", name: "Shimanoyama Sprint", distance: "4.0 mi" },
-    { type: "Road", name: "Shirakawa Circuit", distance: "4.0 mi" },
-    { type: "Road", name: "Tateyama Kurobe Sprint", distance: "3.8 mi" },
-    { type: "Road", name: "The Colossus", distance: "23.4 mi" },
-    { type: "Road", name: "The Goliath", distance: "53.1 mi" },
-    { type: "Road", name: "Venus Sprint", distance: "5.0 mi" },
-
-
-    /* DRAG */
-
-    { type: "Drag", name: "Horizon Festival Drag Strip", distance: "0.6 mi" },
-    { type: "Drag", name: "Irokawa Space Center Drag Strip", distance: "0.2 mi" },
-    { type: "Drag", name: "Ito Airfield Drag Strip", distance: "0.5 mi" },
-
-
-    /* DIRT / RALLY */
-
-    { type: "Dirt / Rally", name: "Airfield Trail", distance: "4.2 mi" },
-    { type: "Dirt / Rally", name: "Bamboo Forest Scramble", distance: "9.3 mi" },
-    { type: "Dirt / Rally", name: "Cherry Field Trail", distance: "4.5 mi" },
-    { type: "Dirt / Rally", name: "Chiheisen Scramble", distance: "4.9 mi" },
-    { type: "Dirt / Rally", name: "Hirosaki Scramble", distance: "5.1 mi" },
-    { type: "Dirt / Rally", name: "Hokubu Trail", distance: "3.6 mi" },
-    { type: "Dirt / Rally", name: "Horizon Stadium Scramble", distance: "7.3 mi" },
-    { type: "Dirt / Rally", name: "Ine Scramble", distance: "5.7 mi" },
-    { type: "Dirt / Rally", name: "Ito Trail", distance: "4.4 mi" },
-    { type: "Dirt / Rally", name: "Kawazu Nanadaru Scramble", distance: "7.8 mi" },
-    { type: "Dirt / Rally", name: "Kinkaku-ji Trail", distance: "3.4 mi" },
-    { type: "Dirt / Rally", name: "Legend Island Trail", distance: "3.3 mi" },
-    { type: "Dirt / Rally", name: "Nukabira Trail", distance: "5.0 mi" },
-    { type: "Dirt / Rally", name: "Oyashirazu Trail", distance: "3.2 mi" },
-    { type: "Dirt / Rally", name: "Sekibe Scramble", distance: "4.0 mi" },
-    { type: "Dirt / Rally", name: "Sotoyama Scramble", distance: "5.5 mi" },
-    { type: "Dirt / Rally", name: "Sunflower Scramble", distance: "5.3 mi" },
-    { type: "Dirt / Rally", name: "Taiyaki Scramble", distance: "6.7 mi" },
-    { type: "Dirt / Rally", name: "Takashiro Trail", distance: "3.6 mi" },
-    { type: "Dirt / Rally", name: "The Gauntlet", distance: "18.7 mi" }
-
-];
-
-
-
-/* =========================================================
-   SCORING / REWARDS
-   ========================================================= */
-
-const POINTS_BY_PLACE = {
-
-    1: 4,
-    2: 3,
-    3: 2,
-    4: 1
-
-};
-
-
-const REWARDS_BY_PLACE = {
-
-    1: {
-        rolls: 0,
-        keep: 0,
-        text: "No upgrade"
-    },
-
-    2: {
-        rolls: 1,
-        keep: 1,
-        text: "1 upgrade roll"
-    },
-
-    3: {
-        rolls: 2,
-        keep: 1,
-        text: "2 rolls — keep 1"
-    },
-
-    4: {
-        rolls: 2,
-        keep: 2,
-        text: "2 rolls — keep both"
-    }
-
-};
-
 
 
 /* =========================================================
@@ -310,6 +172,9 @@ const raceDistance =
 const hostGameControls =
     document.getElementById("hostGameControls");
 
+const carSetupControls =
+    document.getElementById("carSetupControls");
+
 const carSelect =
     document.getElementById("carSelect");
 
@@ -364,8 +229,39 @@ const roundResultsList =
 const upgradeRewardList =
     document.getElementById("upgradeRewardList");
 
-const hostAfterRaceControls =
-    document.getElementById("hostAfterRaceControls");
+const hostResultsControls =
+    document.getElementById("hostResultsControls");
+
+const goToUpgradesButton =
+    document.getElementById("goToUpgradesBtn");
+
+const endRaceNightFromResultsButton =
+    document.getElementById("endRaceNightFromResultsBtn");
+
+
+const upgradePanel =
+    document.getElementById("upgradePanel");
+
+const upgradeRoundNumber =
+    document.getElementById("upgradeRoundNumber");
+
+const upgradeStatusMessage =
+    document.getElementById("upgradeStatusMessage");
+
+const upgradeRollsList =
+    document.getElementById("upgradeRollsList");
+
+const hostApplyUpgradesControls =
+    document.getElementById("hostApplyUpgradesControls");
+
+const applyUpgradesButton =
+    document.getElementById("applyUpgradesBtn");
+
+const playerGarages =
+    document.getElementById("playerGarages");
+
+const hostAfterUpgradesControls =
+    document.getElementById("hostAfterUpgradesControls");
 
 const nextRoundButton =
     document.getElementById("nextRoundBtn");
@@ -383,15 +279,11 @@ const finalChampionStats =
 const finalStandings =
     document.getElementById("finalStandings");
 
-const finalRaceHistory =
-    document.getElementById("finalRaceHistory");
-
 const finalRaceCount =
     document.getElementById("finalRaceCount");
 
 const leaveFinalButton =
     document.getElementById("leaveFinalBtn");
-
 
 
 /* =========================================================
@@ -407,12 +299,56 @@ let currentPlayerName =
 let currentPlayerIsHost =
     false;
 
+let currentUserUid =
+    null;
+
 let currentRoomData =
     null;
 
 let stopRoomListener =
     null;
 
+
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+populateCarSelect();
+
+
+function populateCarSelect() {
+
+    carSelect.innerHTML =
+        "";
+
+
+    CAR_LIBRARY.forEach(
+        function (car) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                car.name;
+
+
+            option.textContent =
+                car.name +
+                " — " +
+                car.startingPI;
+
+
+            carSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
 
 
 /* =========================================================
@@ -423,13 +359,23 @@ async function getCurrentPlayer() {
 
     if (auth.currentUser) {
 
+        currentUserUid =
+            auth.currentUser.uid;
+
+
         return auth.currentUser;
 
     }
 
 
     const result =
-        await signInAnonymously(auth);
+        await signInAnonymously(
+            auth
+        );
+
+
+    currentUserUid =
+        result.user.uid;
 
 
     return result.user;
@@ -437,22 +383,19 @@ async function getCurrentPlayer() {
 }
 
 
-
 /* =========================================================
-   HELPERS
+   BASIC HELPERS
    ========================================================= */
 
-function randomFromArray(array) {
+function cloneObject(value) {
 
-    return array[
-        Math.floor(
-            Math.random() *
-            array.length
+    return JSON.parse(
+        JSON.stringify(
+            value || {}
         )
-    ];
+    );
 
 }
-
 
 
 function generateRoomCode() {
@@ -487,7 +430,6 @@ function generateRoomCode() {
 }
 
 
-
 function showHomeMessage(
     message,
     type
@@ -512,7 +454,6 @@ function showHomeMessage(
     }
 
 }
-
 
 
 function getPlayerName() {
@@ -543,22 +484,58 @@ function getPlayerName() {
 }
 
 
-
 function placeLabel(place) {
 
-    if (place === 1) return "1st";
-    if (place === 2) return "2nd";
-    if (place === 3) return "3rd";
+    if (place === 1) {
+        return "1st";
+    }
+
+
+    if (place === 2) {
+        return "2nd";
+    }
+
+
+    if (place === 3) {
+        return "3rd";
+    }
+
 
     return place + "th";
 
 }
 
 
+function getRoundKey(round) {
 
-/* =========================================================
-   PLAYER LIST
-   ========================================================= */
+    return (
+        "round_" +
+        round
+    );
+
+}
+
+
+function getSelectedCarDefinition(
+    roomData
+) {
+
+    if (
+        !roomData ||
+        !roomData.selectedCar
+    ) {
+
+        return null;
+
+    }
+
+
+    return getCarByName(
+        roomData.selectedCar.name
+    );
+
+}
+
 
 function getSortedPlayers(players) {
 
@@ -579,6 +556,41 @@ function getSortedPlayers(players) {
 }
 
 
+function normalizeRolls(rolls) {
+
+    if (!rolls) {
+
+        return [];
+
+    }
+
+
+    if (
+        Array.isArray(rolls)
+    ) {
+
+        return rolls;
+
+    }
+
+
+    return Object.keys(rolls)
+        .sort(
+            (a, b) =>
+                Number(a) -
+                Number(b)
+        )
+        .map(
+            key =>
+                rolls[key]
+        );
+
+}
+
+
+/* =========================================================
+   PLAYER LIST
+   ========================================================= */
 
 function renderPlayers(
     targetElement,
@@ -590,12 +602,13 @@ function renderPlayers(
 
 
     const sortedPlayers =
-        getSortedPlayers(players);
+        getSortedPlayers(
+            players
+        );
 
 
     sortedPlayers.forEach(
         function ([uid, player]) {
-
 
             const row =
                 document.createElement(
@@ -623,9 +636,7 @@ function renderPlayers(
             );
 
 
-            if (
-                player.isHost
-            ) {
+            if (player.isHost) {
 
                 const badge =
                     document.createElement(
@@ -662,7 +673,6 @@ function renderPlayers(
 }
 
 
-
 /* =========================================================
    STANDINGS
    ========================================================= */
@@ -672,7 +682,8 @@ function calculateStandings(
     raceHistory
 ) {
 
-    const standings = {};
+    const standings =
+        {};
 
 
     Object.entries(
@@ -719,13 +730,13 @@ function calculateStandings(
     .forEach(
         function (race) {
 
-
             Object.entries(
                 race.finishOrder || {}
             )
             .forEach(
-                function ([placeString, result]) {
-
+                function (
+                    [placeString, result]
+                ) {
 
                     const place =
                         Number(
@@ -792,13 +803,16 @@ function calculateStandings(
                         entry.wins += 1;
                     }
 
+
                     if (place === 2) {
                         entry.seconds += 1;
                     }
 
+
                     if (place === 3) {
                         entry.thirds += 1;
                     }
+
 
                     if (place === 4) {
                         entry.fourths += 1;
@@ -816,7 +830,6 @@ function calculateStandings(
     )
     .sort(
         function (a, b) {
-
 
             if (
                 b.points !==
@@ -880,7 +893,6 @@ function calculateStandings(
 }
 
 
-
 function renderStandings(
     target,
     standings
@@ -911,13 +923,41 @@ function renderStandings(
         "standing-row standing-header";
 
 
-    header.innerHTML =
-        `
-        <span>POS</span>
-        <span>PLAYER</span>
-        <span style="text-align:right">PTS</span>
-        <span style="text-align:right">WINS</span>
-        `;
+    [
+        "POS",
+        "PLAYER",
+        "PTS",
+        "WINS"
+    ]
+    .forEach(
+        function (text, index) {
+
+            const span =
+                document.createElement(
+                    "span"
+                );
+
+
+            span.textContent =
+                text;
+
+
+            if (
+                index >= 2
+            ) {
+
+                span.style.textAlign =
+                    "right";
+
+            }
+
+
+            header.appendChild(
+                span
+            );
+
+        }
+    );
 
 
     table.appendChild(
@@ -927,7 +967,6 @@ function renderStandings(
 
     standings.forEach(
         function (player, index) {
-
 
             const row =
                 document.createElement(
@@ -940,24 +979,73 @@ function renderStandings(
             );
 
 
-            row.innerHTML =
-                `
-                <span class="standing-position">
-                    ${index + 1}
-                </span>
+            const position =
+                document.createElement(
+                    "span"
+                );
 
-                <span class="standing-name">
-                    ${player.name}
-                </span>
 
-                <span class="standing-points">
-                    ${player.points}
-                </span>
+            position.classList.add(
+                "standing-position"
+            );
 
-                <span class="standing-wins">
-                    🏆 ${player.wins}
-                </span>
-                `;
+
+            position.textContent =
+                index + 1;
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+
+            name.classList.add(
+                "standing-name"
+            );
+
+
+            name.textContent =
+                player.name;
+
+
+            const points =
+                document.createElement(
+                    "span"
+                );
+
+
+            points.classList.add(
+                "standing-points"
+            );
+
+
+            points.textContent =
+                player.points;
+
+
+            const wins =
+                document.createElement(
+                    "span"
+                );
+
+
+            wins.classList.add(
+                "standing-wins"
+            );
+
+
+            wins.textContent =
+                "🏆 " +
+                player.wins;
+
+
+            row.append(
+                position,
+                name,
+                points,
+                wins
+            );
 
 
             table.appendChild(
@@ -975,9 +1063,518 @@ function renderStandings(
 }
 
 
+/* =========================================================
+   UPGRADE ENGINE
+   ========================================================= */
+
+function evaluateRollAgainstGarage(
+    car,
+    playerGarage,
+    roll,
+    round,
+    mutateGarage
+) {
+
+    const upgrade =
+        getUpgradeById(
+            car,
+            roll.modId
+        );
+
+
+    if (!upgrade) {
+
+        return {
+
+            previousOption:
+                "Unknown",
+
+            previousTier:
+                0,
+
+            resultOption:
+                "Unknown",
+
+            resultTier:
+                0,
+
+            outcome:
+                "NO CHANGE",
+
+            changed:
+                false
+
+        };
+
+    }
+
+
+    const stock =
+        getStockForUpgrade(
+            upgrade
+        );
+
+
+    const existing =
+        playerGarage[
+            roll.modId
+        ];
+
+
+    const previousOption =
+        existing
+            ? existing.option
+            : stock.name;
+
+
+    const previousTier =
+        existing
+            ? Number(existing.tier || 0)
+            : Number(stock.tier || 0);
+
+
+    let resultOption =
+        previousOption;
+
+
+    let resultTier =
+        previousTier;
+
+
+    let outcome =
+        "NO CHANGE";
+
+
+    let changed =
+        false;
+
+
+    if (
+        roll.tier >
+        previousTier
+    ) {
+
+        resultOption =
+            roll.option;
+
+
+        resultTier =
+            roll.tier;
+
+
+        outcome =
+            "UPGRADE";
+
+
+        changed =
+            true;
+
+    }
+    else if (
+        roll.tier ===
+        previousTier
+    ) {
+
+        if (
+            roll.option ===
+            previousOption
+        ) {
+
+            outcome =
+                "NO CHANGE";
+
+        }
+        else {
+
+            resultOption =
+                roll.option;
+
+
+            resultTier =
+                roll.tier;
+
+
+            outcome =
+                "SIDEGRADE";
+
+
+            changed =
+                true;
+
+        }
+
+    }
+    else {
+
+        outcome =
+            "LOCKED - KEEP";
+
+    }
+
+
+    if (
+        mutateGarage &&
+        changed
+    ) {
+
+        playerGarage[
+            roll.modId
+        ] = {
+
+            category:
+                roll.category,
+
+            mod:
+                roll.mod,
+
+            option:
+                resultOption,
+
+            tier:
+                resultTier,
+
+            installedRound:
+                round
+
+        };
+
+    }
+
+
+    return {
+
+        previousOption:
+            previousOption,
+
+        previousTier:
+            previousTier,
+
+        resultOption:
+            resultOption,
+
+        resultTier:
+            resultTier,
+
+        outcome:
+            outcome,
+
+        changed:
+            changed
+
+    };
+
+}
+
+
+function buildPreviewRoll(
+    car,
+    garage,
+    baseRoll,
+    round,
+    mutateGarage
+) {
+
+    const evaluation =
+        evaluateRollAgainstGarage(
+            car,
+            garage,
+            baseRoll,
+            round,
+            mutateGarage
+        );
+
+
+    return {
+
+        ...baseRoll,
+
+        previousOption:
+            evaluation.previousOption,
+
+        previousTier:
+            evaluation.previousTier,
+
+        resultOption:
+            evaluation.resultOption,
+
+        resultTier:
+            evaluation.resultTier,
+
+        outcome:
+            evaluation.outcome
+
+    };
+
+}
+
+
+function buildUpgradePackage(
+    car,
+    roomData,
+    uid,
+    raceResult,
+    place,
+    round
+) {
+
+    const reward =
+        REWARDS_BY_PLACE[
+            place
+        ] || {
+            rolls: 0,
+            keep: 0,
+            text: "No upgrade"
+        };
+
+
+    const originalGarage =
+        cloneObject(
+            roomData.garages &&
+            roomData.garages[uid]
+                ? roomData.garages[uid]
+                : {}
+        );
+
+
+    const packageData = {
+
+        uid:
+            uid,
+
+        name:
+            raceResult.name,
+
+        place:
+            place,
+
+        rewardText:
+            reward.text,
+
+        rollCount:
+            reward.rolls,
+
+        keepCount:
+            reward.keep,
+
+        choiceRequired:
+            (
+                reward.rolls === 2 &&
+                reward.keep === 1
+            ),
+
+        resolved:
+            false
+
+    };
+
+
+    if (
+        reward.rolls === 0
+    ) {
+
+        packageData.rolls =
+            [];
+
+
+        return packageData;
+
+    }
+
+
+    const rolls =
+        [];
+
+
+    if (
+        packageData.choiceRequired
+    ) {
+
+        /*
+            Both choices are compared against
+            the same current garage because the
+            player will keep only one.
+        */
+
+        for (
+            let i = 0;
+            i < reward.rolls;
+            i++
+        ) {
+
+            const baseRoll =
+                getRandomUpgradeRoll(
+                    car
+                );
+
+
+            rolls.push(
+                buildPreviewRoll(
+                    car,
+                    cloneObject(
+                        originalGarage
+                    ),
+                    baseRoll,
+                    round,
+                    false
+                )
+            );
+
+        }
+
+    }
+    else {
+
+        /*
+            Auto-kept rolls are previewed in
+            sequence. This matters when both
+            rolls hit the same mod.
+        */
+
+        const tempGarage =
+            cloneObject(
+                originalGarage
+            );
+
+
+        for (
+            let i = 0;
+            i < reward.rolls;
+            i++
+        ) {
+
+            const baseRoll =
+                getRandomUpgradeRoll(
+                    car
+                );
+
+
+            rolls.push(
+                buildPreviewRoll(
+                    car,
+                    tempGarage,
+                    baseRoll,
+                    round,
+                    true
+                )
+            );
+
+        }
+
+    }
+
+
+    packageData.rolls =
+        rolls;
+
+
+    return packageData;
+
+}
+
+
+function getSelectedRollIndices(
+    packageData
+) {
+
+    const rolls =
+        normalizeRolls(
+            packageData.rolls
+        );
+
+
+    if (
+        packageData.place === 2
+    ) {
+
+        return rolls.length
+            ? [0]
+            : [];
+
+    }
+
+
+    if (
+        packageData.place === 4
+    ) {
+
+        return rolls.map(
+            (unused, index) =>
+                index
+        );
+
+    }
+
+
+    if (
+        packageData.choiceRequired &&
+        Number.isInteger(
+            packageData.choiceIndex
+        )
+    ) {
+
+        return [
+            packageData.choiceIndex
+        ];
+
+    }
+
+
+    return [];
+
+}
+
+
+function allUpgradeChoicesReady(
+    upgradeRound
+) {
+
+    if (
+        !upgradeRound ||
+        !upgradeRound.players
+    ) {
+
+        return false;
+
+    }
+
+
+    return Object.values(
+        upgradeRound.players
+    )
+    .every(
+        function (packageData) {
+
+            if (
+                !packageData.choiceRequired
+            ) {
+
+                return true;
+
+            }
+
+
+            const rolls =
+                normalizeRolls(
+                    packageData.rolls
+                );
+
+
+            return (
+                Number.isInteger(
+                    packageData.choiceIndex
+                ) &&
+                packageData.choiceIndex >= 0 &&
+                packageData.choiceIndex < rolls.length
+            );
+
+        }
+    );
+
+}
+
 
 /* =========================================================
-   GAME SETUP
+   GAME SETUP DISPLAY
    ========================================================= */
 
 function updateGameSetupDisplay(
@@ -989,12 +1586,14 @@ function updateGameSetupDisplay(
         1;
 
 
+    const phase =
+        roomData.gamePhase ||
+        "setup";
+
+
     roundNumber.textContent =
         round;
 
-
-
-    /* CAR */
 
     if (
         roomData.selectedCar
@@ -1008,6 +1607,18 @@ function updateGameSetupDisplay(
             "Starting PI: " +
             roomData.selectedCar.startingPI;
 
+
+        if (
+            getCarByName(
+                roomData.selectedCar.name
+            )
+        ) {
+
+            carSelect.value =
+                roomData.selectedCar.name;
+
+        }
+
     }
     else {
 
@@ -1020,9 +1631,6 @@ function updateGameSetupDisplay(
 
     }
 
-
-
-    /* RACE */
 
     if (
         roomData.currentRace
@@ -1063,7 +1671,6 @@ function updateGameSetupDisplay(
     }
 
 
-
     const setupReady =
         Boolean(
             roomData.selectedCar &&
@@ -1071,9 +1678,7 @@ function updateGameSetupDisplay(
         );
 
 
-    if (
-        setupReady
-    ) {
+    if (setupReady) {
 
         roundReadyBadge.classList.remove(
             "hidden"
@@ -1089,15 +1694,16 @@ function updateGameSetupDisplay(
     }
 
 
-
-    const isResultsPhase =
-        roomData.gamePhase ===
-        "results";
+    const setupPhase =
+        (
+            phase === "setup" ||
+            phase === "racing"
+        );
 
 
     if (
         currentPlayerIsHost &&
-        !isResultsPhase
+        setupPhase
     ) {
 
         hostGameControls.classList.remove(
@@ -1114,11 +1720,50 @@ function updateGameSetupDisplay(
     }
 
 
+    const raceCount =
+        Object.keys(
+            roomData.raceHistory ||
+            {}
+        ).length;
+
+
+    const canChangeCar =
+        (
+            round === 1 &&
+            raceCount === 0
+        );
+
+
+    if (canChangeCar) {
+
+        carSetupControls.classList.remove(
+            "hidden"
+        );
+
+
+        randomSetupButton.classList.remove(
+            "hidden"
+        );
+
+    }
+    else {
+
+        carSetupControls.classList.add(
+            "hidden"
+        );
+
+
+        randomSetupButton.classList.add(
+            "hidden"
+        );
+
+    }
+
 
     if (
-        setupReady &&
         currentPlayerIsHost &&
-        !isResultsPhase
+        setupReady &&
+        setupPhase
     ) {
 
         raceCompleteControls.classList.remove(
@@ -1135,19 +1780,19 @@ function updateGameSetupDisplay(
     }
 
 
-
-    if (
-        !isResultsPhase
-    ) {
+    if (setupPhase) {
 
         roundResultsPanel.classList.add(
             "hidden"
         );
 
 
-        if (
-            setupReady
-        ) {
+        upgradePanel.classList.add(
+            "hidden"
+        );
+
+
+        if (setupReady) {
 
             gameNote.textContent =
                 "Round " +
@@ -1160,7 +1805,9 @@ function updateGameSetupDisplay(
         ) {
 
             gameNote.textContent =
-                "Choose the car and generate the race.";
+                canChangeCar
+                    ? "Choose the car and generate the race."
+                    : "Generate the next race.";
 
         }
         else {
@@ -1175,9 +1822,8 @@ function updateGameSetupDisplay(
 }
 
 
-
 /* =========================================================
-   RESULT ENTRY FORM
+   RESULT ENTRY
    ========================================================= */
 
 function buildFinishOrderForm() {
@@ -1207,7 +1853,6 @@ function buildFinishOrderForm() {
             index
         ) {
 
-
             const place =
                 index + 1;
 
@@ -1235,7 +1880,9 @@ function buildFinishOrderForm() {
 
 
             label.textContent =
-                placeLabel(place);
+                placeLabel(
+                    place
+                );
 
 
             const select =
@@ -1270,7 +1917,6 @@ function buildFinishOrderForm() {
             players.forEach(
                 function ([uid, player]) {
 
-
                     const option =
                         document.createElement(
                             "option"
@@ -1293,12 +1939,8 @@ function buildFinishOrderForm() {
             );
 
 
-            row.appendChild(
-                label
-            );
-
-
-            row.appendChild(
+            row.append(
+                label,
                 select
             );
 
@@ -1311,7 +1953,6 @@ function buildFinishOrderForm() {
     );
 
 }
-
 
 
 /* =========================================================
@@ -1327,17 +1968,21 @@ function renderRoundResults(
         1;
 
 
+    const roundKey =
+        getRoundKey(
+            round
+        );
+
+
     const race =
         roomData.raceHistory
             ? roomData.raceHistory[
-                "round_" + round
+                roundKey
             ]
             : null;
 
 
-    if (
-        !race
-    ) {
+    if (!race) {
 
         return;
 
@@ -1360,18 +2005,12 @@ function renderRoundResults(
         race.finishOrder || {}
     )
     .sort(
-        function (a, b) {
-
-            return (
-                Number(a[0]) -
-                Number(b[0])
-            );
-
-        }
+        (a, b) =>
+            Number(a[0]) -
+            Number(b[0])
     )
     .forEach(
         function ([placeString, result]) {
-
 
             const place =
                 Number(
@@ -1390,26 +2029,69 @@ function renderRoundResults(
             );
 
 
-            resultRow.innerHTML =
-                `
-                <span class="result-place">
-                    ${placeLabel(place)}
-                </span>
+            const placeSpan =
+                document.createElement(
+                    "span"
+                );
 
-                <span class="result-name">
-                    ${result.name}
-                </span>
 
-                <span class="result-points">
-                    +${POINTS_BY_PLACE[place] || 0} pts
-                </span>
-                `;
+            placeSpan.classList.add(
+                "result-place"
+            );
+
+
+            placeSpan.textContent =
+                placeLabel(
+                    place
+                );
+
+
+            const nameSpan =
+                document.createElement(
+                    "span"
+                );
+
+
+            nameSpan.classList.add(
+                "result-name"
+            );
+
+
+            nameSpan.textContent =
+                result.name;
+
+
+            const pointsSpan =
+                document.createElement(
+                    "span"
+                );
+
+
+            pointsSpan.classList.add(
+                "result-points"
+            );
+
+
+            pointsSpan.textContent =
+                "+" +
+                (
+                    POINTS_BY_PLACE[
+                        place
+                    ] || 0
+                ) +
+                " pts";
+
+
+            resultRow.append(
+                placeSpan,
+                nameSpan,
+                pointsSpan
+            );
 
 
             roundResultsList.appendChild(
                 resultRow
             );
-
 
 
             const reward =
@@ -1418,9 +2100,7 @@ function renderRoundResults(
                 ];
 
 
-            if (
-                reward
-            ) {
+            if (reward) {
 
                 const rewardRow =
                     document.createElement(
@@ -1433,24 +2113,64 @@ function renderRoundResults(
                 );
 
 
-                rewardRow.innerHTML =
-                    `
-                    <span class="result-place">
-                        ${placeLabel(place)}
-                    </span>
+                const rewardPlace =
+                    document.createElement(
+                        "span"
+                    );
 
-                    <div class="reward-info">
 
-                        <strong>
-                            ${result.name}
-                        </strong>
+                rewardPlace.classList.add(
+                    "result-place"
+                );
 
-                        <span>
-                            ${reward.text}
-                        </span>
 
-                    </div>
-                    `;
+                rewardPlace.textContent =
+                    placeLabel(
+                        place
+                    );
+
+
+                const rewardInfo =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                rewardInfo.classList.add(
+                    "reward-info"
+                );
+
+
+                const rewardName =
+                    document.createElement(
+                        "strong"
+                    );
+
+
+                rewardName.textContent =
+                    result.name;
+
+
+                const rewardText =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                rewardText.textContent =
+                    reward.text;
+
+
+                rewardInfo.append(
+                    rewardName,
+                    rewardText
+                );
+
+
+                rewardRow.append(
+                    rewardPlace,
+                    rewardInfo
+                );
 
 
                 upgradeRewardList.appendChild(
@@ -1483,18 +2203,23 @@ function renderRoundResults(
     );
 
 
+    upgradePanel.classList.add(
+        "hidden"
+    );
+
+
     if (
         currentPlayerIsHost
     ) {
 
-        hostAfterRaceControls.classList.remove(
+        hostResultsControls.classList.remove(
             "hidden"
         );
 
     }
     else {
 
-        hostAfterRaceControls.classList.add(
+        hostResultsControls.classList.add(
             "hidden"
         );
 
@@ -1509,6 +2234,877 @@ function renderRoundResults(
 }
 
 
+/* =========================================================
+   UPGRADE DISPLAY
+   ========================================================= */
+
+function getOutcomeClass(outcome) {
+
+    if (outcome === "UPGRADE") {
+        return "outcome-upgrade";
+    }
+
+
+    if (outcome === "SIDEGRADE") {
+        return "outcome-sidegrade";
+    }
+
+
+    if (outcome === "LOCKED - KEEP") {
+        return "outcome-locked";
+    }
+
+
+    return "outcome-no-change";
+
+}
+
+
+function createRollCard(
+    packageData,
+    roll,
+    rollIndex,
+    roomData
+) {
+
+    const card =
+        document.createElement(
+            "div"
+        );
+
+
+    card.classList.add(
+        "roll-card"
+    );
+
+
+    const selectedIndices =
+        getSelectedRollIndices(
+            packageData
+        );
+
+
+    if (
+        selectedIndices.includes(
+            rollIndex
+        )
+    ) {
+
+        card.classList.add(
+            "selected-roll"
+        );
+
+    }
+
+
+    const rollNumber =
+        document.createElement(
+            "div"
+        );
+
+
+    rollNumber.classList.add(
+        "roll-number"
+    );
+
+
+    rollNumber.textContent =
+        "ROLL " +
+        (
+            rollIndex +
+            1
+        );
+
+
+    const category =
+        document.createElement(
+            "div"
+        );
+
+
+    category.classList.add(
+        "roll-category"
+    );
+
+
+    category.textContent =
+        roll.category;
+
+
+    const mod =
+        document.createElement(
+            "div"
+        );
+
+
+    mod.classList.add(
+        "roll-mod"
+    );
+
+
+    mod.textContent =
+        roll.mod;
+
+
+    const option =
+        document.createElement(
+            "div"
+        );
+
+
+    option.classList.add(
+        "roll-option"
+    );
+
+
+    option.textContent =
+        roll.option;
+
+
+    const current =
+        document.createElement(
+            "div"
+        );
+
+
+    current.classList.add(
+        "roll-current"
+    );
+
+
+    current.textContent =
+        "Current: " +
+        roll.previousOption;
+
+
+    const outcome =
+        document.createElement(
+            "div"
+        );
+
+
+    outcome.classList.add(
+        "outcome-badge",
+        getOutcomeClass(
+            roll.outcome
+        )
+    );
+
+
+    outcome.textContent =
+        roll.outcome;
+
+
+    card.append(
+        rollNumber,
+        category,
+        mod,
+        option,
+        current,
+        outcome
+    );
+
+
+    const canChoose =
+        (
+            packageData.choiceRequired &&
+            packageData.uid === currentUserUid &&
+            roomData.gamePhase === "upgrades" &&
+            !packageData.resolved
+        );
+
+
+    if (canChoose) {
+
+        const chooseButton =
+            document.createElement(
+                "button"
+            );
+
+
+        chooseButton.className =
+            "secondary-button choose-upgrade-button";
+
+
+        chooseButton.type =
+            "button";
+
+
+        chooseButton.textContent =
+            (
+                packageData.choiceIndex ===
+                rollIndex
+            )
+                ? "Selected"
+                : "Choose This Roll";
+
+
+        chooseButton.addEventListener(
+            "click",
+            function () {
+
+                saveUpgradeChoice(
+                    rollIndex
+                );
+
+            }
+        );
+
+
+        card.appendChild(
+            chooseButton
+        );
+
+    }
+
+
+    return card;
+
+}
+
+
+function renderUpgradePanel(
+    roomData
+) {
+
+    const round =
+        roomData.currentRound ||
+        1;
+
+
+    const roundKey =
+        getRoundKey(
+            round
+        );
+
+
+    const upgradeRound =
+        roomData.upgradeRounds
+            ? roomData.upgradeRounds[
+                roundKey
+            ]
+            : null;
+
+
+    if (!upgradeRound) {
+
+        return;
+
+    }
+
+
+    roundResultsPanel.classList.add(
+        "hidden"
+    );
+
+
+    resultsEntryPanel.classList.add(
+        "hidden"
+    );
+
+
+    hostGameControls.classList.add(
+        "hidden"
+    );
+
+
+    raceCompleteControls.classList.add(
+        "hidden"
+    );
+
+
+    upgradePanel.classList.remove(
+        "hidden"
+    );
+
+
+    upgradeRoundNumber.textContent =
+        round;
+
+
+    upgradeRollsList.innerHTML =
+        "";
+
+
+    const packages =
+        Object.values(
+            upgradeRound.players ||
+            {}
+        )
+        .sort(
+            (a, b) =>
+                a.place -
+                b.place
+        );
+
+
+    let currentPlayerNeedsChoice =
+        false;
+
+
+    packages.forEach(
+        function (packageData) {
+
+            const card =
+                document.createElement(
+                    "section"
+                );
+
+
+            card.classList.add(
+                "player-upgrade-card"
+            );
+
+
+            const heading =
+                document.createElement(
+                    "div"
+                );
+
+
+            heading.classList.add(
+                "upgrade-player-heading"
+            );
+
+
+            const headingText =
+                document.createElement(
+                    "div"
+                );
+
+
+            const name =
+                document.createElement(
+                    "h3"
+                );
+
+
+            name.textContent =
+                packageData.name;
+
+
+            const reward =
+                document.createElement(
+                    "div"
+                );
+
+
+            reward.classList.add(
+                "setup-detail"
+            );
+
+
+            reward.textContent =
+                packageData.rewardText;
+
+
+            headingText.append(
+                name,
+                reward
+            );
+
+
+            const place =
+                document.createElement(
+                    "span"
+                );
+
+
+            place.classList.add(
+                "place-badge"
+            );
+
+
+            place.textContent =
+                placeLabel(
+                    packageData.place
+                );
+
+
+            heading.append(
+                headingText,
+                place
+            );
+
+
+            card.appendChild(
+                heading
+            );
+
+
+            const rolls =
+                normalizeRolls(
+                    packageData.rolls
+                );
+
+
+            if (
+                rolls.length === 0
+            ) {
+
+                const noUpgrade =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                noUpgrade.classList.add(
+                    "no-upgrade-box"
+                );
+
+
+                noUpgrade.textContent =
+                    "No upgrade this round.";
+
+
+                card.appendChild(
+                    noUpgrade
+                );
+
+            }
+            else {
+
+                const grid =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                grid.classList.add(
+                    "roll-grid"
+                );
+
+
+                rolls.forEach(
+                    function (roll, rollIndex) {
+
+                        grid.appendChild(
+                            createRollCard(
+                                packageData,
+                                roll,
+                                rollIndex,
+                                roomData
+                            )
+                        );
+
+                    }
+                );
+
+
+                card.appendChild(
+                    grid
+                );
+
+            }
+
+
+            if (
+                packageData.choiceRequired
+            ) {
+
+                const choiceStatus =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                choiceStatus.classList.add(
+                    "choice-status"
+                );
+
+
+                if (
+                    Number.isInteger(
+                        packageData.choiceIndex
+                    )
+                ) {
+
+                    choiceStatus.textContent =
+                        packageData.resolved
+                            ? "Choice applied."
+                            : "Choice locked in — waiting for host.";
+
+                }
+                else if (
+                    packageData.uid ===
+                    currentUserUid
+                ) {
+
+                    choiceStatus.textContent =
+                        "Choose one of your two rolls.";
+
+
+                    currentPlayerNeedsChoice =
+                        true;
+
+                }
+                else {
+
+                    choiceStatus.textContent =
+                        "Waiting for " +
+                        packageData.name +
+                        " to choose.";
+
+                }
+
+
+                card.appendChild(
+                    choiceStatus
+                );
+
+            }
+
+
+            upgradeRollsList.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    const choicesReady =
+        allUpgradeChoicesReady(
+            upgradeRound
+        );
+
+
+    if (
+        roomData.gamePhase ===
+        "upgrades"
+    ) {
+
+        hostAfterUpgradesControls.classList.add(
+            "hidden"
+        );
+
+
+        if (
+            currentPlayerIsHost
+        ) {
+
+            hostApplyUpgradesControls.classList.remove(
+                "hidden"
+            );
+
+
+            applyUpgradesButton.disabled =
+                !choicesReady;
+
+
+            upgradeStatusMessage.textContent =
+                choicesReady
+                    ? "All choices are ready. Apply the upgrades."
+                    : "Waiting for the keep-one upgrade choice.";
+
+        }
+        else {
+
+            hostApplyUpgradesControls.classList.add(
+                "hidden"
+            );
+
+
+            upgradeStatusMessage.textContent =
+                currentPlayerNeedsChoice
+                    ? "Pick the upgrade you want to keep."
+                    : "Waiting for the host to apply the upgrades.";
+
+        }
+
+    }
+    else if (
+        roomData.gamePhase ===
+        "upgradeComplete"
+    ) {
+
+        hostApplyUpgradesControls.classList.add(
+            "hidden"
+        );
+
+
+        upgradeStatusMessage.textContent =
+            "Upgrades applied. Garages are ready.";
+
+
+        if (
+            currentPlayerIsHost
+        ) {
+
+            hostAfterUpgradesControls.classList.remove(
+                "hidden"
+            );
+
+        }
+        else {
+
+            hostAfterUpgradesControls.classList.add(
+                "hidden"
+            );
+
+        }
+
+    }
+
+
+    renderGarages(
+        roomData
+    );
+
+
+    gameNote.textContent =
+        roomData.gamePhase ===
+        "upgradeComplete"
+            ? "Round " + round + " upgrades complete."
+            : "Round " + round + " upgrade phase.";
+
+}
+
+
+/* =========================================================
+   GARAGES
+   ========================================================= */
+
+function renderGarages(
+    roomData
+) {
+
+    playerGarages.innerHTML =
+        "";
+
+
+    const players =
+        getSortedPlayers(
+            roomData.players
+        );
+
+
+    players.forEach(
+        function ([uid, player]) {
+
+            const garage =
+                roomData.garages &&
+                roomData.garages[uid]
+                    ? roomData.garages[uid]
+                    : {};
+
+
+            const upgrades =
+                Object.values(
+                    garage
+                )
+                .sort(
+                    function (a, b) {
+
+                        const categoryCompare =
+                            a.category.localeCompare(
+                                b.category
+                            );
+
+
+                        if (categoryCompare !== 0) {
+                            return categoryCompare;
+                        }
+
+
+                        return a.mod.localeCompare(
+                            b.mod
+                        );
+
+                    }
+                );
+
+
+            const details =
+                document.createElement(
+                    "details"
+                );
+
+
+            details.classList.add(
+                "garage-card"
+            );
+
+
+            if (
+                uid ===
+                currentUserUid
+            ) {
+
+                details.open =
+                    true;
+
+            }
+
+
+            const summary =
+                document.createElement(
+                    "summary"
+                );
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+
+            name.textContent =
+                player.name;
+
+
+            const count =
+                document.createElement(
+                    "span"
+                );
+
+
+            count.classList.add(
+                "garage-count"
+            );
+
+
+            count.textContent =
+                upgrades.length === 1
+                    ? "1 retained upgrade"
+                    : upgrades.length +
+                      " retained upgrades";
+
+
+            summary.append(
+                name,
+                count
+            );
+
+
+            const content =
+                document.createElement(
+                    "div"
+                );
+
+
+            content.classList.add(
+                "garage-content"
+            );
+
+
+            if (
+                upgrades.length === 0
+            ) {
+
+                const empty =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                empty.classList.add(
+                    "garage-empty"
+                );
+
+
+                empty.textContent =
+                    "Stock build — no retained upgrades yet.";
+
+
+                content.appendChild(
+                    empty
+                );
+
+            }
+            else {
+
+                upgrades.forEach(
+                    function (upgrade) {
+
+                        const row =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        row.classList.add(
+                            "garage-upgrade-row"
+                        );
+
+
+                        const category =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        category.classList.add(
+                            "garage-category"
+                        );
+
+
+                        category.textContent =
+                            upgrade.category;
+
+
+                        const mod =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        mod.classList.add(
+                            "garage-mod"
+                        );
+
+
+                        mod.textContent =
+                            upgrade.mod;
+
+
+                        const option =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        option.classList.add(
+                            "garage-option"
+                        );
+
+
+                        option.textContent =
+                            upgrade.option;
+
+
+                        row.append(
+                            category,
+                            mod,
+                            option
+                        );
+
+
+                        content.appendChild(
+                            row
+                        );
+
+                    }
+                );
+
+            }
+
+
+            details.append(
+                summary,
+                content
+            );
+
+
+            playerGarages.appendChild(
+                details
+            );
+
+        }
+    );
+
+}
+
 
 /* =========================================================
    FINAL RESULTS
@@ -1522,13 +3118,16 @@ function showFinalScreen(
         "hidden"
     );
 
+
     lobbyScreen.classList.add(
         "hidden"
     );
 
+
     gameScreen.classList.add(
         "hidden"
     );
+
 
     finalScreen.classList.remove(
         "hidden"
@@ -1552,9 +3151,7 @@ function showFinalScreen(
         standings[0];
 
 
-    if (
-        champion
-    ) {
+    if (champion) {
 
         finalChampionName.textContent =
             champion.name;
@@ -1571,11 +3168,6 @@ function showFinalScreen(
             );
 
     }
-
-
-    renderRaceHistory(
-        roomData.raceHistory
-    );
 
 
     const raceCount =
@@ -1602,140 +3194,16 @@ function showFinalScreen(
 }
 
 
-
-function renderRaceHistory(
-    raceHistory
-) {
-
-    finalRaceHistory.innerHTML =
-        "";
-
-
-    const races =
-        Object.values(
-            raceHistory || {}
-        )
-        .sort(
-            function (a, b) {
-
-                return (
-                    a.round -
-                    b.round
-                );
-
-            }
-        );
-
-
-    races.forEach(
-        function (race) {
-
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-
-            card.classList.add(
-                "history-card"
-            );
-
-
-            const heading =
-                document.createElement(
-                    "h3"
-                );
-
-
-            heading.textContent =
-                "Round " +
-                race.round +
-                " — " +
-                (
-                    race.race
-                        ? race.race.name
-                        : "Race"
-                );
-
-
-            card.appendChild(
-                heading
-            );
-
-
-            Object.entries(
-                race.finishOrder || {}
-            )
-            .sort(
-                function (a, b) {
-
-                    return (
-                        Number(a[0]) -
-                        Number(b[0])
-                    );
-
-                }
-            )
-            .forEach(
-                function (
-                    [place, result]
-                ) {
-
-
-                    const line =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    line.classList.add(
-                        "history-result"
-                    );
-
-
-                    line.innerHTML =
-                        `
-                        <span>
-                            ${placeLabel(Number(place))}
-                        </span>
-
-                        <strong>
-                            ${result.name}
-                        </strong>
-                        `;
-
-
-                    card.appendChild(
-                        line
-                    );
-
-                }
-            );
-
-
-            finalRaceHistory.appendChild(
-                card
-            );
-
-        }
-    );
-
-}
-
-
-
 /* =========================================================
    ROOM LISTENER
    ========================================================= */
 
 function clearRoomListener() {
 
-    if (
-        stopRoomListener
-    ) {
+    if (stopRoomListener) {
 
         stopRoomListener();
+
 
         stopRoomListener =
             null;
@@ -1743,7 +3211,6 @@ function clearRoomListener() {
     }
 
 }
-
 
 
 function listenToRoom(
@@ -1764,9 +3231,7 @@ function listenToRoom(
     stopRoomListener =
         onValue(
             roomReference,
-
             function (snapshot) {
-
 
                 if (
                     !snapshot.exists()
@@ -1798,7 +3263,6 @@ function listenToRoom(
                     roomData;
 
 
-
                 const playerCount =
                     renderPlayers(
                         playerList,
@@ -1812,7 +3276,6 @@ function listenToRoom(
                 );
 
 
-
                 const standings =
                     calculateStandings(
                         roomData.players,
@@ -1824,7 +3287,6 @@ function listenToRoom(
                     liveStandings,
                     standings
                 );
-
 
 
                 if (
@@ -1842,7 +3304,6 @@ function listenToRoom(
                 }
 
 
-
                 if (
                     roomData.status ===
                     "lobby"
@@ -1852,21 +3313,11 @@ function listenToRoom(
                         currentPlayerIsHost
                     ) {
 
-                        if (
+                        lobbyNote.textContent =
                             playerCount === 1
-                        ) {
-
-                            lobbyNote.textContent =
-                                "Share the room code with the other players.";
-
-                        }
-                        else {
-
-                            lobbyNote.textContent =
-                                playerCount +
-                                " players connected.";
-
-                        }
+                                ? "Share the room code with the other players."
+                                : playerCount +
+                                  " players connected.";
 
                     }
 
@@ -1874,7 +3325,6 @@ function listenToRoom(
                     return;
 
                 }
-
 
 
                 if (
@@ -1901,6 +3351,20 @@ function listenToRoom(
 
                     }
 
+
+                    if (
+                        roomData.gamePhase ===
+                            "upgrades" ||
+                        roomData.gamePhase ===
+                            "upgradeComplete"
+                    ) {
+
+                        renderUpgradePanel(
+                            roomData
+                        );
+
+                    }
+
                 }
 
             }
@@ -1909,9 +3373,8 @@ function listenToRoom(
 }
 
 
-
 /* =========================================================
-   SCREENS
+   SCREEN CONTROL
    ========================================================= */
 
 function showLobby(
@@ -1923,8 +3386,10 @@ function showLobby(
     currentRoomCode =
         roomCode;
 
+
     currentPlayerName =
         playerName;
+
 
     currentPlayerIsHost =
         isHost;
@@ -1938,9 +3403,7 @@ function showLobby(
         playerName;
 
 
-    if (
-        isHost
-    ) {
+    if (isHost) {
 
         startGameButton.classList.remove(
             "hidden"
@@ -1964,13 +3427,16 @@ function showLobby(
         "hidden"
     );
 
+
     gameScreen.classList.add(
         "hidden"
     );
 
+
     finalScreen.classList.add(
         "hidden"
     );
+
 
     lobbyScreen.classList.remove(
         "hidden"
@@ -1990,12 +3456,9 @@ function showLobby(
 }
 
 
-
 function showGameScreen() {
 
-    if (
-        !currentRoomCode
-    ) {
+    if (!currentRoomCode) {
 
         return;
 
@@ -2014,20 +3477,22 @@ function showGameScreen() {
         "hidden"
     );
 
+
     lobbyScreen.classList.add(
         "hidden"
     );
 
+
     finalScreen.classList.add(
         "hidden"
     );
+
 
     gameScreen.classList.remove(
         "hidden"
     );
 
 }
-
 
 
 function returnToHome(
@@ -2041,11 +3506,14 @@ function returnToHome(
     currentRoomCode =
         null;
 
+
     currentPlayerName =
         null;
 
+
     currentPlayerIsHost =
         false;
+
 
     currentRoomData =
         null;
@@ -2055,13 +3523,16 @@ function returnToHome(
         "hidden"
     );
 
+
     gameScreen.classList.add(
         "hidden"
     );
 
+
     finalScreen.classList.add(
         "hidden"
     );
+
 
     homeScreen.classList.remove(
         "hidden"
@@ -2082,32 +3553,32 @@ function returnToHome(
 }
 
 
-
 /* =========================================================
    CREATE ROOM
    ========================================================= */
 
 createGameButton.addEventListener(
     "click",
-
     async function () {
-
 
         const playerName =
             getPlayerName();
 
 
-        if (
-            !playerName
-        ) {
+        if (!playerName) {
 
             return;
 
         }
 
 
-        try {
+        showHomeMessage(
+            "",
+            ""
+        );
 
+
+        try {
 
             const user =
                 await getCurrentPlayer();
@@ -2145,7 +3616,6 @@ createGameButton.addEventListener(
 
             await set(
                 roomReference,
-
                 {
 
                     hostUid:
@@ -2188,6 +3658,7 @@ createGameButton.addEventListener(
         catch (error) {
 
             console.error(
+                "Could not create room:",
                 error
             );
 
@@ -2203,24 +3674,19 @@ createGameButton.addEventListener(
 );
 
 
-
 /* =========================================================
    JOIN ROOM
    ========================================================= */
 
 joinGameButton.addEventListener(
     "click",
-
     async function () {
-
 
         const playerName =
             getPlayerName();
 
 
-        if (
-            !playerName
-        ) {
+        if (!playerName) {
 
             return;
 
@@ -2235,8 +3701,7 @@ joinGameButton.addEventListener(
 
 
         if (
-            enteredCode.length !==
-            5
+            enteredCode.length !== 5
         ) {
 
             showHomeMessage(
@@ -2250,8 +3715,13 @@ joinGameButton.addEventListener(
         }
 
 
-        try {
+        showHomeMessage(
+            "",
+            ""
+        );
 
+
+        try {
 
             const user =
                 await getCurrentPlayer();
@@ -2314,8 +3784,7 @@ joinGameButton.addEventListener(
 
 
             if (
-                playerCount >=
-                4
+                playerCount >= 4
             ) {
 
                 showHomeMessage(
@@ -2330,16 +3799,13 @@ joinGameButton.addEventListener(
 
 
             await set(
-
                 ref(
                     database,
-
                     "rooms/" +
                     enteredCode +
                     "/players/" +
                     user.uid
                 ),
-
                 {
 
                     name:
@@ -2352,7 +3818,6 @@ joinGameButton.addEventListener(
                         serverTimestamp()
 
                 }
-
             );
 
 
@@ -2366,6 +3831,7 @@ joinGameButton.addEventListener(
         catch (error) {
 
             console.error(
+                "Could not join room:",
                 error
             );
 
@@ -2381,16 +3847,13 @@ joinGameButton.addEventListener(
 );
 
 
-
 /* =========================================================
    START GAME
    ========================================================= */
 
 startGameButton.addEventListener(
     "click",
-
     async function () {
-
 
         if (
             !currentPlayerIsHost
@@ -2402,13 +3865,11 @@ startGameButton.addEventListener(
 
 
         await update(
-
             ref(
                 database,
                 "rooms/" +
                 currentRoomCode
             ),
-
             {
 
                 status:
@@ -2424,24 +3885,58 @@ startGameButton.addEventListener(
                     serverTimestamp()
 
             }
-
         );
 
     }
 );
 
 
-
 /* =========================================================
    CAR
    ========================================================= */
+
+function carSummary(car) {
+
+    return {
+
+        name:
+            car.name,
+
+        startingPI:
+            car.startingPI
+
+    };
+
+}
+
 
 async function saveSelectedCar(
     car
 ) {
 
     if (
-        !currentPlayerIsHost
+        !currentPlayerIsHost ||
+        !currentRoomData
+    ) {
+
+        return;
+
+    }
+
+
+    const raceCount =
+        Object.keys(
+            currentRoomData.raceHistory ||
+            {}
+        ).length;
+
+
+    if (
+        raceCount > 0 ||
+        (
+            currentRoomData.currentRound ||
+            1
+        ) > 1
     ) {
 
         return;
@@ -2450,41 +3945,41 @@ async function saveSelectedCar(
 
 
     await update(
-
         ref(
             database,
             "rooms/" +
             currentRoomCode
         ),
-
         {
-            selectedCar:
-                car
-        }
 
+            selectedCar:
+                carSummary(
+                    car
+                ),
+
+            garages:
+                null,
+
+            upgradeRounds:
+                null
+
+        }
     );
 
 }
 
 
-
 setCarButton.addEventListener(
     "click",
-
     async function () {
 
-
         const car =
-            CAR_LIBRARY.find(
-                item =>
-                    item.name ===
-                    carSelect.value
+            getCarByName(
+                carSelect.value
             );
 
 
-        if (
-            car
-        ) {
+        if (car) {
 
             await saveSelectedCar(
                 car
@@ -2496,12 +3991,9 @@ setCarButton.addEventListener(
 );
 
 
-
 randomCarButton.addEventListener(
     "click",
-
     async function () {
-
 
         const car =
             randomFromArray(
@@ -2521,19 +4013,97 @@ randomCarButton.addEventListener(
 );
 
 
-
 /* =========================================================
    RACE
    ========================================================= */
 
+async function saveRandomRace() {
+
+    if (
+        !currentPlayerIsHost ||
+        !currentRoomData
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !currentRoomData.selectedCar
+    ) {
+
+        gameNote.textContent =
+            "Choose a car first.";
+
+
+        return;
+
+    }
+
+
+    let race =
+        randomFromArray(
+            RACE_POOL
+        );
+
+
+    if (
+        currentRoomData.currentRace &&
+        RACE_POOL.length > 1
+    ) {
+
+        while (
+            race.name ===
+            currentRoomData.currentRace.name
+        ) {
+
+            race =
+                randomFromArray(
+                    RACE_POOL
+                );
+
+        }
+
+    }
+
+
+    await update(
+        ref(
+            database,
+            "rooms/" +
+            currentRoomCode
+        ),
+        {
+
+            currentRace:
+                race,
+
+            gamePhase:
+                "racing",
+
+            raceGeneratedAt:
+                serverTimestamp()
+
+        }
+    );
+
+}
+
+
 generateRaceButton.addEventListener(
     "click",
+    saveRandomRace
+);
 
+
+randomSetupButton.addEventListener(
+    "click",
     async function () {
 
-
         if (
-            !currentPlayerIsHost
+            !currentPlayerIsHost ||
+            !currentRoomData
         ) {
 
             return;
@@ -2541,68 +4111,19 @@ generateRaceButton.addEventListener(
         }
 
 
-        let race =
-            randomFromArray(
-                RACE_POOL
-            );
+        const raceCount =
+            Object.keys(
+                currentRoomData.raceHistory ||
+                {}
+            ).length;
 
 
         if (
-            currentRoomData.currentRace &&
-            RACE_POOL.length > 1
-        ) {
-
-            while (
-                race.name ===
-                currentRoomData.currentRace.name
-            ) {
-
-                race =
-                    randomFromArray(
-                        RACE_POOL
-                    );
-
-            }
-
-        }
-
-
-        await update(
-
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            ),
-
-            {
-
-                currentRace:
-                    race,
-
-                gamePhase:
-                    "racing",
-
-                raceGeneratedAt:
-                    serverTimestamp()
-
-            }
-
-        );
-
-    }
-);
-
-
-
-randomSetupButton.addEventListener(
-    "click",
-
-    async function () {
-
-
-        if (
-            !currentPlayerIsHost
+            raceCount > 0 ||
+            (
+                currentRoomData.currentRound ||
+                1
+            ) > 1
         ) {
 
             return;
@@ -2627,31 +4148,38 @@ randomSetupButton.addEventListener(
 
 
         await update(
-
             ref(
                 database,
                 "rooms/" +
                 currentRoomCode
             ),
-
             {
 
                 selectedCar:
-                    car,
+                    carSummary(
+                        car
+                    ),
 
                 currentRace:
                     race,
 
+                garages:
+                    null,
+
+                upgradeRounds:
+                    null,
+
                 gamePhase:
-                    "racing"
+                    "racing",
+
+                raceGeneratedAt:
+                    serverTimestamp()
 
             }
-
         );
 
     }
 );
-
 
 
 /* =========================================================
@@ -2660,9 +4188,7 @@ randomSetupButton.addEventListener(
 
 enterResultsButton.addEventListener(
     "click",
-
     function () {
-
 
         buildFinishOrderForm();
 
@@ -2685,12 +4211,9 @@ enterResultsButton.addEventListener(
 );
 
 
-
 cancelResultsButton.addEventListener(
     "click",
-
     function () {
-
 
         resultsEntryPanel.classList.add(
             "hidden"
@@ -2705,16 +4228,13 @@ cancelResultsButton.addEventListener(
 );
 
 
-
 /* =========================================================
    SUBMIT RESULTS
    ========================================================= */
 
 submitResultsButton.addEventListener(
     "click",
-
     async function () {
-
 
         if (
             !currentPlayerIsHost ||
@@ -2762,14 +4282,10 @@ submitResultsButton.addEventListener(
         }
 
 
-        const uniqueUids =
+        if (
             new Set(
                 selectedUids
-            );
-
-
-        if (
-            uniqueUids.size !==
+            ).size !==
             selectedUids.length
         ) {
 
@@ -2791,14 +4307,19 @@ submitResultsButton.addEventListener(
             1;
 
 
+        const roundKey =
+            getRoundKey(
+                round
+            );
+
+
         const historyReference =
             ref(
                 database,
-
                 "rooms/" +
                 currentRoomCode +
-                "/raceHistory/round_" +
-                round
+                "/raceHistory/" +
+                roundKey
             );
 
 
@@ -2830,11 +4351,7 @@ submitResultsButton.addEventListener(
 
 
         selects.forEach(
-            function (
-                select,
-                index
-            ) {
-
+            function (select, index) {
 
                 const place =
                     index + 1;
@@ -2845,16 +4362,19 @@ submitResultsButton.addEventListener(
 
 
                 const player =
-                    currentRoomData
-                        .players[
-                            uid
-                        ];
+                    currentRoomData.players[
+                        uid
+                    ];
 
 
                 const reward =
                     REWARDS_BY_PLACE[
                         place
-                    ];
+                    ] || {
+                        rolls: 0,
+                        keep: 0,
+                        text: "No upgrade"
+                    };
 
 
                 finishOrder[
@@ -2873,19 +4393,13 @@ submitResultsButton.addEventListener(
                         ] || 0,
 
                     upgradeRolls:
-                        reward
-                            ? reward.rolls
-                            : 0,
+                        reward.rolls,
 
                     upgradesKept:
-                        reward
-                            ? reward.keep
-                            : 0,
+                        reward.keep,
 
                     rewardText:
-                        reward
-                            ? reward.text
-                            : ""
+                        reward.text
 
                 };
 
@@ -2913,21 +4427,13 @@ submitResultsButton.addEventListener(
         };
 
 
-        const roomReference =
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            );
-
-
         const updates =
             {};
 
 
         updates[
-            "raceHistory/round_" +
-            round
+            "raceHistory/" +
+            roundKey
         ] =
             raceResult;
 
@@ -2937,13 +4443,517 @@ submitResultsButton.addEventListener(
 
 
         await update(
-            roomReference,
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
             updates
         );
 
     }
 );
 
+
+/* =========================================================
+   GENERATE UPGRADE ROLLS
+   ========================================================= */
+
+goToUpgradesButton.addEventListener(
+    "click",
+    async function () {
+
+        if (
+            !currentPlayerIsHost ||
+            !currentRoomData
+        ) {
+
+            return;
+
+        }
+
+
+        const round =
+            currentRoomData.currentRound ||
+            1;
+
+
+        const roundKey =
+            getRoundKey(
+                round
+            );
+
+
+        const existingUpgradeRound =
+            currentRoomData.upgradeRounds
+                ? currentRoomData.upgradeRounds[
+                    roundKey
+                ]
+                : null;
+
+
+        if (existingUpgradeRound) {
+
+            await update(
+                ref(
+                    database,
+                    "rooms/" +
+                    currentRoomCode
+                ),
+                {
+                    gamePhase:
+                        "upgrades"
+                }
+            );
+
+
+            return;
+
+        }
+
+
+        const race =
+            currentRoomData.raceHistory
+                ? currentRoomData.raceHistory[
+                    roundKey
+                ]
+                : null;
+
+
+        const car =
+            getSelectedCarDefinition(
+                currentRoomData
+            );
+
+
+        if (
+            !race ||
+            !car
+        ) {
+
+            return;
+
+        }
+
+
+        const playerPackages =
+            {};
+
+
+        Object.entries(
+            race.finishOrder || {}
+        )
+        .sort(
+            (a, b) =>
+                Number(a[0]) -
+                Number(b[0])
+        )
+        .forEach(
+            function ([placeString, result]) {
+
+                const place =
+                    Number(
+                        placeString
+                    );
+
+
+                playerPackages[
+                    result.uid
+                ] =
+                    buildUpgradePackage(
+                        car,
+                        currentRoomData,
+                        result.uid,
+                        result,
+                        place,
+                        round
+                    );
+
+            }
+        );
+
+
+        const updates =
+            {};
+
+
+        updates[
+            "upgradeRounds/" +
+            roundKey
+        ] = {
+
+            round:
+                round,
+
+            generatedAt:
+                Date.now(),
+
+            players:
+                playerPackages
+
+        };
+
+
+        updates.gamePhase =
+            "upgrades";
+
+
+        await update(
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
+            updates
+        );
+
+    }
+);
+
+
+/* =========================================================
+   PLAYER UPGRADE CHOICE
+   ========================================================= */
+
+async function saveUpgradeChoice(
+    rollIndex
+) {
+
+    if (
+        !currentRoomData ||
+        currentRoomData.gamePhase !==
+            "upgrades" ||
+        !currentUserUid
+    ) {
+
+        return;
+
+    }
+
+
+    const round =
+        currentRoomData.currentRound ||
+        1;
+
+
+    const roundKey =
+        getRoundKey(
+            round
+        );
+
+
+    const packageData =
+        currentRoomData.upgradeRounds &&
+        currentRoomData.upgradeRounds[
+            roundKey
+        ] &&
+        currentRoomData.upgradeRounds[
+            roundKey
+        ].players
+            ? currentRoomData.upgradeRounds[
+                roundKey
+            ].players[
+                currentUserUid
+            ]
+            : null;
+
+
+    if (
+        !packageData ||
+        !packageData.choiceRequired ||
+        packageData.resolved
+    ) {
+
+        return;
+
+    }
+
+
+    const rolls =
+        normalizeRolls(
+            packageData.rolls
+        );
+
+
+    if (
+        rollIndex < 0 ||
+        rollIndex >= rolls.length
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        await set(
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode +
+                "/upgradeRounds/" +
+                roundKey +
+                "/players/" +
+                currentUserUid +
+                "/choiceIndex"
+            ),
+            rollIndex
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not save upgrade choice:",
+            error
+        );
+
+
+        upgradeStatusMessage.textContent =
+            "Could not save your choice. Check the Firebase rules.";
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLY UPGRADES
+   ========================================================= */
+
+applyUpgradesButton.addEventListener(
+    "click",
+    async function () {
+
+        if (
+            !currentPlayerIsHost ||
+            !currentRoomData ||
+            currentRoomData.gamePhase !==
+                "upgrades"
+        ) {
+
+            return;
+
+        }
+
+
+        const round =
+            currentRoomData.currentRound ||
+            1;
+
+
+        const roundKey =
+            getRoundKey(
+                round
+            );
+
+
+        const upgradeRound =
+            currentRoomData.upgradeRounds
+                ? currentRoomData.upgradeRounds[
+                    roundKey
+                ]
+                : null;
+
+
+        if (
+            !upgradeRound ||
+            !allUpgradeChoicesReady(
+                upgradeRound
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        const car =
+            getSelectedCarDefinition(
+                currentRoomData
+            );
+
+
+        if (!car) {
+
+            return;
+
+        }
+
+
+        const garages =
+            cloneObject(
+                currentRoomData.garages ||
+                {}
+            );
+
+
+        const updates =
+            {};
+
+
+        Object.entries(
+            upgradeRound.players || {}
+        )
+        .forEach(
+            function ([uid, packageData]) {
+
+                const playerGarage =
+                    cloneObject(
+                        garages[uid] ||
+                        {}
+                    );
+
+
+                const rolls =
+                    normalizeRolls(
+                        packageData.rolls
+                    );
+
+
+                const selectedIndices =
+                    getSelectedRollIndices(
+                        packageData
+                    );
+
+
+                const applied =
+                    {};
+
+
+                selectedIndices.forEach(
+                    function (rollIndex) {
+
+                        const roll =
+                            rolls[
+                                rollIndex
+                            ];
+
+
+                        if (!roll) {
+
+                            return;
+
+                        }
+
+
+                        const result =
+                            evaluateRollAgainstGarage(
+                                car,
+                                playerGarage,
+                                roll,
+                                round,
+                                true
+                            );
+
+
+                        applied[
+                            "roll_" +
+                            (
+                                rollIndex +
+                                1
+                            )
+                        ] = {
+
+                            category:
+                                roll.category,
+
+                            mod:
+                                roll.mod,
+
+                            modId:
+                                roll.modId,
+
+                            rolledOption:
+                                roll.option,
+
+                            rolledTier:
+                                roll.tier,
+
+                            previousOption:
+                                result.previousOption,
+
+                            previousTier:
+                                result.previousTier,
+
+                            resultOption:
+                                result.resultOption,
+
+                            resultTier:
+                                result.resultTier,
+
+                            outcome:
+                                result.outcome
+
+                        };
+
+                    }
+                );
+
+
+                garages[uid] =
+                    playerGarage;
+
+
+                updates[
+                    "upgradeRounds/" +
+                    roundKey +
+                    "/players/" +
+                    uid +
+                    "/resolved"
+                ] =
+                    true;
+
+
+                if (
+                    Object.keys(
+                        applied
+                    ).length > 0
+                ) {
+
+                    updates[
+                        "upgradeRounds/" +
+                        roundKey +
+                        "/players/" +
+                        uid +
+                        "/applied"
+                    ] =
+                        applied;
+
+                }
+
+            }
+        );
+
+
+        updates.garages =
+            garages;
+
+
+        updates.gamePhase =
+            "upgradeComplete";
+
+
+        updates[
+            "upgradeRounds/" +
+            roundKey +
+            "/appliedAt"
+        ] =
+            Date.now();
+
+
+        await update(
+            ref(
+                database,
+                "rooms/" +
+                currentRoomCode
+            ),
+            updates
+        );
+
+    }
+);
 
 
 /* =========================================================
@@ -2952,13 +4962,13 @@ submitResultsButton.addEventListener(
 
 nextRoundButton.addEventListener(
     "click",
-
     async function () {
-
 
         if (
             !currentPlayerIsHost ||
-            !currentRoomData
+            !currentRoomData ||
+            currentRoomData.gamePhase !==
+                "upgradeComplete"
         ) {
 
             return;
@@ -2973,24 +4983,12 @@ nextRoundButton.addEventListener(
             ) + 1;
 
 
-        resultsEntryPanel.classList.add(
-            "hidden"
-        );
-
-
-        roundResultsPanel.classList.add(
-            "hidden"
-        );
-
-
         await update(
-
             ref(
                 database,
                 "rooms/" +
                 currentRoomCode
             ),
-
             {
 
                 currentRound:
@@ -3006,7 +5004,6 @@ nextRoundButton.addEventListener(
                     null
 
             }
-
         );
 
 
@@ -3019,49 +5016,51 @@ nextRoundButton.addEventListener(
 );
 
 
-
 /* =========================================================
    END RACE NIGHT
    ========================================================= */
 
-endRaceNightButton.addEventListener(
-    "click",
+async function endRaceNight() {
 
-    async function () {
+    if (
+        !currentPlayerIsHost
+    ) {
 
-
-        if (
-            !currentPlayerIsHost
-        ) {
-
-            return;
-
-        }
-
-
-        await update(
-
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            ),
-
-            {
-
-                status:
-                    "finished",
-
-                finishedAt:
-                    serverTimestamp()
-
-            }
-
-        );
+        return;
 
     }
+
+
+    await update(
+        ref(
+            database,
+            "rooms/" +
+            currentRoomCode
+        ),
+        {
+
+            status:
+                "finished",
+
+            finishedAt:
+                serverTimestamp()
+
+        }
+    );
+
+}
+
+
+endRaceNightFromResultsButton.addEventListener(
+    "click",
+    endRaceNight
 );
 
+
+endRaceNightButton.addEventListener(
+    "click",
+    endRaceNight
+);
 
 
 /* =========================================================
@@ -3070,20 +5069,12 @@ endRaceNightButton.addEventListener(
 
 async function leaveCurrentRoom() {
 
-
-    if (
-        !currentRoomCode
-    ) {
+    if (!currentRoomCode) {
 
         return;
 
     }
 
-
-    /*
-        On the finished screen, don't destroy the room.
-        Everyone gets time to view final results.
-    */
 
     if (
         currentRoomData &&
@@ -3112,7 +5103,6 @@ async function leaveCurrentRoom() {
 
     try {
 
-
         const user =
             await getCurrentPlayer();
 
@@ -3120,18 +5110,14 @@ async function leaveCurrentRoom() {
         clearRoomListener();
 
 
-        if (
-            wasHost
-        ) {
+        if (wasHost) {
 
             await remove(
-
                 ref(
                     database,
                     "rooms/" +
                     roomCode
                 )
-
             );
 
 
@@ -3144,16 +5130,13 @@ async function leaveCurrentRoom() {
         else {
 
             await remove(
-
                 ref(
                     database,
-
                     "rooms/" +
                     roomCode +
                     "/players/" +
                     user.uid
                 )
-
             );
 
 
@@ -3168,6 +5151,7 @@ async function leaveCurrentRoom() {
     catch (error) {
 
         console.error(
+            "Could not leave room:",
             error
         );
 
@@ -3177,7 +5161,6 @@ async function leaveCurrentRoom() {
     }
 
 }
-
 
 
 leaveGameButton.addEventListener(
@@ -3194,7 +5177,6 @@ leaveGameButtonGame.addEventListener(
 
 leaveFinalButton.addEventListener(
     "click",
-
     function () {
 
         returnToHome(
@@ -3206,14 +5188,12 @@ leaveFinalButton.addEventListener(
 );
 
 
-
 /* =========================================================
-   INPUT
+   INPUT HELPERS
    ========================================================= */
 
 roomCodeInput.addEventListener(
     "input",
-
     function () {
 
         roomCodeInput.value =
@@ -3225,10 +5205,8 @@ roomCodeInput.addEventListener(
 );
 
 
-
 roomCodeInput.addEventListener(
     "keydown",
-
     function (event) {
 
         if (

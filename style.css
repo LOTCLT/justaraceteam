@@ -5,33 +5,18 @@
 
 body {
     margin: 0;
-
     min-height: 100vh;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #252525,
-            #0b0b0b 60%
-        );
-
+    font-family: Arial, Helvetica, sans-serif;
+    background: radial-gradient(circle at top, #252525, #0b0b0b 60%);
     color: white;
 }
 
 
 .app {
     width: min(900px, 92%);
-
     margin: 0 auto;
-
     padding: 70px 0 30px;
 }
-
 
 
 /* =========================================================
@@ -40,46 +25,31 @@ body {
 
 .hero {
     text-align: center;
-
     margin-bottom: 45px;
 }
 
 
 .eyebrow {
     margin: 0 0 10px;
-
     font-size: 13px;
-
     font-weight: bold;
-
     letter-spacing: 4px;
-
     color: #ff4d30;
 }
 
 
 .hero h1 {
     margin: 0;
-
-    font-size:
-        clamp(
-            38px,
-            7vw,
-            70px
-        );
-
+    font-size: clamp(38px, 7vw, 70px);
     letter-spacing: -2px;
 }
 
 
 .subtitle {
     margin-top: 14px;
-
     color: #a7a7a7;
-
     font-size: 18px;
 }
-
 
 
 /* =========================================================
@@ -88,16 +58,10 @@ body {
 
 .game-card {
     background: #151515;
-
     border: 1px solid #303030;
-
     border-radius: 18px;
-
     padding: 40px;
-
-    box-shadow:
-        0 25px 60px
-        rgba(0, 0, 0, 0.4);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
 }
 
 
@@ -108,7 +72,6 @@ body {
 
 .game-section h2 {
     margin-top: 0;
-
     font-size: 28px;
 }
 
@@ -118,28 +81,19 @@ body {
 }
 
 
-
 /* =========================================================
    BUTTONS
    ========================================================= */
 
 button {
     width: 100%;
-
     max-width: 360px;
-
     padding: 16px 20px;
-
     border-radius: 9px;
-
     border: none;
-
     font-size: 17px;
-
     font-weight: bold;
-
     cursor: pointer;
-
     transition: 0.2s;
 }
 
@@ -149,60 +103,58 @@ button:hover {
 }
 
 
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
 .primary-button {
     background: #ff4d30;
-
     color: white;
 }
 
 
-.primary-button:hover {
+.primary-button:hover:not(:disabled) {
     background: #ff654d;
 }
 
 
 .secondary-button {
     background: white;
-
     color: #111;
-
     margin-top: 12px;
 }
 
 
-.secondary-button:hover {
+.secondary-button:hover:not(:disabled) {
     background: #dddddd;
 }
 
 
 .dark-button {
     margin-top: 12px;
-
     background: #252525;
-
     color: white;
-
     border: 1px solid #444;
 }
 
 
-.dark-button:hover {
+.dark-button:hover:not(:disabled) {
     background: #303030;
 }
 
 
 .end-button {
     margin-top: 12px;
-
     background: transparent;
-
     color: #ff6b6b;
-
     border: 1px solid #773333;
 }
 
 
-.end-button:hover {
+.end-button:hover:not(:disabled) {
     background: #351515;
 }
 
@@ -212,7 +164,6 @@ button:hover {
 }
 
 
-
 /* =========================================================
    INPUTS
    ========================================================= */
@@ -220,41 +171,35 @@ button:hover {
 input,
 select {
     width: 100%;
-
     max-width: 360px;
-
     padding: 16px;
-
     background: #090909;
-
     color: white;
-
     border: 1px solid #444;
-
     border-radius: 9px;
-
     font-size: 18px;
-
     font-weight: bold;
-
     outline: none;
 }
 
 
-input {
+.room-code-input {
     text-align: center;
-
     font-size: 22px;
-
     letter-spacing: 5px;
-
     text-transform: uppercase;
+}
+
+
+.name-input {
+    text-align: center;
+    font-size: 20px;
+    letter-spacing: 1px;
 }
 
 
 select {
     max-width: none;
-
     text-align: left;
 }
 
@@ -267,18 +212,12 @@ select:focus {
 
 .input-label {
     display: block;
-
     margin-bottom: 10px;
-
     color: #888;
-
     font-size: 12px;
-
     font-weight: bold;
-
     letter-spacing: 2px;
 }
-
 
 
 /* =========================================================
@@ -287,13 +226,9 @@ select:focus {
 
 .divider {
     display: flex;
-
     align-items: center;
-
     gap: 20px;
-
     margin: 38px 0;
-
     color: #666;
 }
 
@@ -301,14 +236,10 @@ select:focus {
 .divider::before,
 .divider::after {
     content: "";
-
     height: 1px;
-
     flex: 1;
-
     background: #333;
 }
-
 
 
 /* =========================================================
@@ -317,7 +248,6 @@ select:focus {
 
 .message {
     min-height: 20px;
-
     margin-bottom: 0;
 }
 
@@ -342,7 +272,6 @@ select:focus {
 }
 
 
-
 /* =========================================================
    LOBBY
    ========================================================= */
@@ -354,20 +283,15 @@ select:focus {
 
 .lobby-header {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 20px;
-
     margin-bottom: 30px;
 }
 
 
 .lobby-header h2 {
     margin: 5px 0 0;
-
     font-size: 32px;
 }
 
@@ -375,55 +299,40 @@ select:focus {
 #lobbyRoomCode,
 #gameRoomCode {
     color: #ff4d30;
-
     letter-spacing: 3px;
 }
 
 
 .small-button {
     width: auto;
-
     max-width: none;
-
     padding: 10px 18px;
-
     background: transparent;
-
     color: #aaa;
-
     border: 1px solid #444;
 }
 
 
 .small-button:hover {
     color: white;
-
     border-color: #777;
 }
 
 
 .lobby-meta {
     padding: 18px 20px;
-
     margin-bottom: 30px;
-
     background: #0c0c0c;
-
     border: 1px solid #303030;
-
     border-radius: 10px;
 }
 
 
 .lobby-meta span {
     display: block;
-
     margin-bottom: 6px;
-
     color: #777;
-
     font-size: 11px;
-
     letter-spacing: 2px;
 }
 
@@ -435,31 +344,20 @@ select:focus {
 
 .player-list {
     margin-bottom: 25px;
-
     border: 1px solid #303030;
-
     border-radius: 10px;
-
     overflow: hidden;
 }
 
 
 .player-row {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding: 18px 20px;
-
     background: #0c0c0c;
-
-    border-bottom:
-        1px solid #252525;
-
+    border-bottom: 1px solid #252525;
     font-size: 18px;
-
     font-weight: bold;
 }
 
@@ -471,137 +369,98 @@ select:focus {
 
 .host-badge {
     padding: 5px 9px;
-
     background: #ff4d30;
-
     color: white;
-
     border-radius: 5px;
-
     font-size: 10px;
-
     letter-spacing: 1px;
 }
 
 
 .lobby-note {
     margin: 25px 0;
-
     text-align: center;
-
     color: #888;
 }
 
 
-
 /* =========================================================
-   ROUND
+   ROUND / SETUP
    ========================================================= */
 
 .round-header {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     margin-bottom: 20px;
 }
 
 
 .setup-label {
     margin: 0 0 8px;
-
     color: #777;
-
     font-size: 11px;
-
     font-weight: bold;
-
     letter-spacing: 2px;
 }
 
 
 .round-number {
     font-size: 42px;
-
     font-weight: bold;
-
     color: #ff4d30;
 }
 
 
 .ready-badge {
     padding: 8px 12px;
-
     border-radius: 7px;
-
     background: #1d6f42;
-
     color: white;
-
     font-size: 12px;
-
     font-weight: bold;
-
     letter-spacing: 2px;
 }
 
 
 .setup-card {
     padding: 22px;
-
     margin-bottom: 16px;
-
     background: #0c0c0c;
-
     border: 1px solid #303030;
-
     border-radius: 12px;
 }
 
 
 .setup-card h2 {
     margin: 0;
-
     font-size: 26px;
 }
 
 
 .setup-detail {
     margin: 8px 0 0;
-
     color: #999;
 }
 
 
 .race-heading {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 15px;
 }
 
 
 .race-type-badge {
     padding: 6px 9px;
-
     border-radius: 5px;
-
     background: #292929;
-
     color: white;
-
     font-size: 10px;
-
     font-weight: bold;
-
     letter-spacing: 1px;
 }
-
 
 
 /* =========================================================
@@ -615,12 +474,8 @@ select:focus {
 
 .button-grid {
     display: grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
-
     margin-bottom: 12px;
 }
 
@@ -630,34 +485,24 @@ select:focus {
 }
 
 
-
 /* =========================================================
    STANDINGS
    ========================================================= */
 
 .standings-table {
     overflow: hidden;
-
     border: 1px solid #303030;
-
     border-radius: 12px;
-
     background: #0c0c0c;
 }
 
 
 .standing-row {
     display: grid;
-
-    grid-template-columns:
-        55px 1fr 80px 85px;
-
+    grid-template-columns: 55px 1fr 80px 85px;
     align-items: center;
-
     gap: 10px;
-
     padding: 15px 18px;
-
     border-bottom: 1px solid #242424;
 }
 
@@ -669,20 +514,15 @@ select:focus {
 
 .standing-header {
     color: #777;
-
     font-size: 11px;
-
     font-weight: bold;
-
     letter-spacing: 1px;
 }
 
 
 .standing-position {
     color: #ff4d30;
-
     font-size: 20px;
-
     font-weight: bold;
 }
 
@@ -692,65 +532,51 @@ select:focus {
 }
 
 
-.standing-points {
+.standing-points,
+.standing-wins {
     text-align: right;
+}
 
+
+.standing-points {
     font-weight: bold;
 }
 
 
 .standing-wins {
-    text-align: right;
-
     color: #aaa;
 }
-
-
-
-/* =========================================================
-   FINISH ORDER ENTRY
-   ========================================================= */
-
-.finish-entry-row {
-    display: grid;
-
-    grid-template-columns:
-        85px 1fr;
-
-    align-items: center;
-
-    gap: 15px;
-
-    margin: 15px 0;
-}
-
-
-.finish-place {
-    font-size: 18px;
-
-    font-weight: bold;
-
-    color: #ff4d30;
-}
-
 
 
 /* =========================================================
    RESULTS
    ========================================================= */
 
+.finish-entry-row {
+    display: grid;
+    grid-template-columns: 85px 1fr;
+    align-items: center;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+
+.finish-place {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff4d30;
+}
+
+
 .results-title {
     text-align: center;
-
     margin-bottom: 20px;
 }
 
 
 .results-title h2 {
     margin: 0;
-
     font-size: 40px;
-
     color: #ff4d30;
 }
 
@@ -758,48 +584,34 @@ select:focus {
 .result-row,
 .reward-row {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     gap: 20px;
-
     padding: 18px 20px;
-
     margin-bottom: 10px;
-
     background: #0c0c0c;
-
     border: 1px solid #303030;
-
     border-radius: 10px;
 }
 
 
 .result-place {
     min-width: 55px;
-
     color: #ff4d30;
-
     font-size: 20px;
-
     font-weight: bold;
 }
 
 
 .result-name {
     flex: 1;
-
     font-size: 18px;
-
     font-weight: bold;
 }
 
 
 .result-points {
     color: #aaa;
-
     font-weight: bold;
 }
 
@@ -811,7 +623,6 @@ select:focus {
 
 .reward-info strong {
     display: block;
-
     margin-bottom: 5px;
 }
 
@@ -821,107 +632,284 @@ select:focus {
 }
 
 
-.temporary-note {
-    margin-top: 20px;
+/* =========================================================
+   UPGRADE ROLLS
+   ========================================================= */
 
+.player-upgrade-card {
+    margin-bottom: 18px;
+    padding: 20px;
+    background: #0c0c0c;
+    border: 1px solid #303030;
+    border-radius: 12px;
+}
+
+
+.player-upgrade-card h3 {
+    margin: 0;
+    font-size: 22px;
+}
+
+
+.upgrade-player-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 16px;
+}
+
+
+.place-badge {
+    padding: 6px 9px;
+    background: #252525;
+    border-radius: 6px;
+    color: #ff4d30;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+
+.no-upgrade-box {
+    padding: 18px;
     text-align: center;
+    color: #888;
+    border: 1px dashed #343434;
+    border-radius: 9px;
+}
 
-    color: #666;
 
+.roll-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+
+.roll-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 225px;
+    padding: 17px;
+    background: #151515;
+    border: 1px solid #343434;
+    border-radius: 10px;
+}
+
+
+.roll-card.selected-roll {
+    border-color: #ff4d30;
+}
+
+
+.roll-number {
+    margin-bottom: 8px;
+    color: #777;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+
+.roll-category {
+    margin-bottom: 4px;
+    color: #ff4d30;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+
+.roll-mod {
+    margin-bottom: 12px;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+
+.roll-option {
+    margin-bottom: 12px;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+
+.roll-current {
+    margin-top: auto;
+    color: #777;
     font-size: 12px;
 }
 
 
+.outcome-badge {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 10px;
+    padding: 6px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+
+.outcome-upgrade {
+    background: #1d6f42;
+    color: white;
+}
+
+
+.outcome-sidegrade {
+    background: #344a7a;
+    color: white;
+}
+
+
+.outcome-no-change {
+    background: #383838;
+    color: #ddd;
+}
+
+
+.outcome-locked {
+    background: #5b321c;
+    color: #ffd0a9;
+}
+
+
+.choose-upgrade-button {
+    max-width: none;
+    margin-top: 14px;
+    padding: 12px;
+    font-size: 14px;
+}
+
+
+.choice-status {
+    margin-top: 12px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+}
+
 
 /* =========================================================
-   FINAL SCREEN
+   GARAGES
+   ========================================================= */
+
+.garage-card {
+    margin-bottom: 12px;
+    background: #0c0c0c;
+    border: 1px solid #303030;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+
+.garage-card summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 17px 18px;
+    cursor: pointer;
+    font-weight: bold;
+    list-style: none;
+}
+
+
+.garage-card summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.garage-count {
+    color: #888;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+
+.garage-content {
+    padding: 0 18px 16px;
+}
+
+
+.garage-empty {
+    color: #777;
+}
+
+
+.garage-upgrade-row {
+    padding: 12px 0;
+    border-top: 1px solid #242424;
+}
+
+
+.garage-category {
+    color: #777;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+.garage-mod {
+    margin-top: 3px;
+    font-weight: bold;
+}
+
+
+.garage-option {
+    margin-top: 4px;
+    color: #ff8a74;
+}
+
+
+/* =========================================================
+   FINAL
    ========================================================= */
 
 .final-header {
     text-align: center;
-
     margin-bottom: 30px;
 }
 
 
 .final-header h2 {
     margin: 0;
-
     font-size: 38px;
 }
 
 
 .champion-card {
     padding: 35px 20px;
-
     text-align: center;
-
     background: #0c0c0c;
-
     border: 1px solid #47362a;
-
     border-radius: 14px;
 }
 
 
 .trophy {
     margin: 10px 0;
-
     font-size: 55px;
 }
 
 
 .champion-card h1 {
     margin: 5px 0;
-
     font-size: 38px;
-
     color: #ff4d30;
 }
 
 
 .champion-card p:last-child {
     color: #aaa;
-
     font-size: 18px;
 }
-
-
-.history-card {
-    padding: 18px;
-
-    margin-bottom: 12px;
-
-    background: #0c0c0c;
-
-    border: 1px solid #303030;
-
-    border-radius: 10px;
-}
-
-
-.history-card h3 {
-    margin: 0 0 12px;
-
-    color: #ff4d30;
-}
-
-
-.history-result {
-    display: flex;
-
-    justify-content: space-between;
-
-    padding: 5px 0;
-
-    color: #aaa;
-}
-
-
-.history-result strong {
-    color: white;
-}
-
 
 
 /* =========================================================
@@ -930,14 +918,10 @@ select:focus {
 
 footer {
     margin-top: 30px;
-
     text-align: center;
-
     color: #555;
-
     font-size: 13px;
 }
-
 
 
 /* =========================================================
@@ -950,61 +934,52 @@ footer {
         padding-top: 40px;
     }
 
-
     .game-card {
         padding: 25px 18px;
     }
-
 
     .hero {
         margin-bottom: 30px;
     }
 
-
     .lobby-header {
         align-items: flex-start;
     }
-
 
     .lobby-header h2 {
         font-size: 26px;
     }
 
-
-    .button-grid {
+    .button-grid,
+    .roll-grid {
         grid-template-columns: 1fr;
     }
-
 
     .button-grid button {
         margin-top: 0;
     }
 
-
     .setup-card h2 {
         font-size: 22px;
     }
 
-
     .standing-row {
-        grid-template-columns:
-            35px 1fr 55px 65px;
-
+        grid-template-columns: 35px 1fr 55px 65px;
         padding: 13px 12px;
-
         font-size: 13px;
     }
 
-
     .finish-entry-row {
-        grid-template-columns:
-            65px 1fr;
+        grid-template-columns: 65px 1fr;
     }
-
 
     .result-row,
     .reward-row {
         padding: 14px;
+    }
+
+    .roll-card {
+        min-height: 0;
     }
 
 }

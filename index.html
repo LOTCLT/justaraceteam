@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta
@@ -19,24 +18,15 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=4"
+        href="style.css?v=5"
     >
-
 </head>
-
 
 <body>
 
-
     <main class="app">
 
-
-        <!-- ==================================================
-             HEADER
-             ================================================== -->
-
         <header class="hero">
-
             <p class="eyebrow">
                 RANDOM UPGRADE RACING
             </p>
@@ -48,9 +38,7 @@
             <p class="subtitle">
                 Race. Finish. Upgrade. Repeat.
             </p>
-
         </header>
-
 
 
         <!-- ==================================================
@@ -61,9 +49,7 @@
 
             <section class="game-card">
 
-
                 <div class="game-section">
-
                     <label
                         for="playerNameInput"
                         class="input-label"
@@ -73,6 +59,7 @@
 
                     <input
                         id="playerNameInput"
+                        class="name-input"
                         type="text"
                         maxlength="20"
                         placeholder="PLAYER NAME"
@@ -83,22 +70,14 @@
                         id="homeMessage"
                         class="message"
                     ></p>
-
                 </div>
-
-
 
                 <div class="divider">
                     <span>CREATE</span>
                 </div>
 
-
-
                 <div class="game-section">
-
-                    <h2>
-                        Create a Game
-                    </h2>
+                    <h2>Create a Game</h2>
 
                     <p>
                         Start a new room and invite your friends.
@@ -111,22 +90,14 @@
                     >
                         Create Game
                     </button>
-
                 </div>
-
-
 
                 <div class="divider">
                     <span>OR</span>
                 </div>
 
-
-
                 <div class="game-section">
-
-                    <h2>
-                        Join a Game
-                    </h2>
+                    <h2>Join a Game</h2>
 
                     <p>
                         Enter the room code from the host.
@@ -134,6 +105,7 @@
 
                     <input
                         id="roomCodeInput"
+                        class="room-code-input"
                         type="text"
                         maxlength="5"
                         placeholder="ROOM CODE"
@@ -148,14 +120,11 @@
                     >
                         Join Game
                     </button>
-
                 </div>
-
 
             </section>
 
         </section>
-
 
 
         <!-- ==================================================
@@ -169,27 +138,19 @@
 
             <section class="game-card lobby-card">
 
-
                 <div class="lobby-header">
-
                     <div>
-
                         <p class="eyebrow">
                             GAME LOBBY
                         </p>
 
                         <h2>
-
                             Room
-
                             <span id="lobbyRoomCode">
                                 -----
                             </span>
-
                         </h2>
-
                     </div>
-
 
                     <button
                         id="leaveGameBtn"
@@ -198,13 +159,9 @@
                     >
                         Leave
                     </button>
-
                 </div>
 
-
-
                 <div class="lobby-meta">
-
                     <span>
                         YOU ARE PLAYING AS
                     </span>
@@ -212,23 +169,14 @@
                     <strong id="lobbyPlayerName">
                         Player
                     </strong>
-
                 </div>
 
-
-
-                <h3>
-                    Players
-                </h3>
-
+                <h3>Players</h3>
 
                 <div
                     id="playerList"
                     class="player-list"
-                >
-                </div>
-
-
+                ></div>
 
                 <p
                     id="lobbyNote"
@@ -236,8 +184,6 @@
                 >
                     Waiting for players...
                 </p>
-
-
 
                 <button
                     id="startGameBtn"
@@ -247,11 +193,9 @@
                     Start Game
                 </button>
 
-
             </section>
 
         </section>
-
 
 
         <!-- ==================================================
@@ -265,29 +209,19 @@
 
             <section class="game-card lobby-card">
 
-
-                <!-- HEADER -->
-
                 <div class="lobby-header">
-
                     <div>
-
                         <p class="eyebrow">
                             RACE NIGHT
                         </p>
 
                         <h2>
-
                             Room
-
                             <span id="gameRoomCode">
                                 -----
                             </span>
-
                         </h2>
-
                     </div>
-
 
                     <button
                         id="leaveGameBtnGame"
@@ -296,15 +230,9 @@
                     >
                         Leave
                     </button>
-
                 </div>
 
-
-
-                <!-- PLAYER -->
-
                 <div class="lobby-meta">
-
                     <span>
                         YOU ARE PLAYING AS
                     </span>
@@ -312,23 +240,14 @@
                     <strong id="gamePlayerName">
                         Player
                     </strong>
-
                 </div>
 
-
-
-                <!-- PLAYERS -->
-
-                <h3>
-                    Players
-                </h3>
+                <h3>Players</h3>
 
                 <div
                     id="gamePlayerList"
                     class="player-list"
-                >
-                </div>
-
+                ></div>
 
 
                 <!-- CHAMPIONSHIP -->
@@ -337,10 +256,7 @@
                     <span>CHAMPIONSHIP</span>
                 </div>
 
-
-                <div id="liveStandings">
-                </div>
-
+                <div id="liveStandings"></div>
 
 
                 <!-- ROUND -->
@@ -349,25 +265,18 @@
                     <span>CURRENT ROUND</span>
                 </div>
 
-
                 <div class="round-header">
-
                     <div>
-
                         <p class="setup-label">
                             ROUND
                         </p>
 
                         <div class="round-number">
-
                             <span id="roundNumber">
                                 1
                             </span>
-
                         </div>
-
                     </div>
-
 
                     <div
                         id="roundReadyBadge"
@@ -375,15 +284,12 @@
                     >
                         READY
                     </div>
-
                 </div>
-
 
 
                 <!-- CAR -->
 
                 <div class="setup-card">
-
                     <p class="setup-label">
                         CURRENT CAR
                     </p>
@@ -398,17 +304,13 @@
                     >
                         Starting PI: —
                     </p>
-
                 </div>
-
 
 
                 <!-- RACE -->
 
                 <div class="setup-card">
-
                     <div class="race-heading">
-
                         <p class="setup-label">
                             CURRENT RACE
                         </p>
@@ -419,9 +321,7 @@
                         >
                             ROAD
                         </span>
-
                     </div>
-
 
                     <h2 id="raceName">
                         Waiting for host...
@@ -433,12 +333,10 @@
                     >
                         Distance: —
                     </p>
-
                 </div>
 
 
-
-                <!-- HOST SETUP CONTROLS -->
+                <!-- HOST SETUP -->
 
                 <div
                     id="hostGameControls"
@@ -449,71 +347,52 @@
                         <span>HOST CONTROLS</span>
                     </div>
 
-
-                    <label
-                        for="carSelect"
-                        class="input-label"
-                    >
-                        SELECT CAR
-                    </label>
-
-
-                    <select id="carSelect">
-
-                        <option value="2024 Ford Mustang GT">
-                            2024 Ford Mustang GT — A628
-                        </option>
-
-                        <option value="1986 Honda Civic Si">
-                            1986 Honda Civic Si — D253
-                        </option>
-
-                    </select>
-
-
-
-                    <div class="button-grid">
-
-                        <button
-                            id="setCarBtn"
-                            class="secondary-button"
-                            type="button"
+                    <div id="carSetupControls">
+                        <label
+                            for="carSelect"
+                            class="input-label"
                         >
-                            Set Car
-                        </button>
+                            SELECT CAR
+                        </label>
 
-                        <button
-                            id="randomCarBtn"
-                            class="secondary-button"
-                            type="button"
-                        >
-                            Random Car
-                        </button>
+                        <select id="carSelect"></select>
 
+                        <div class="button-grid">
+                            <button
+                                id="setCarBtn"
+                                class="secondary-button"
+                                type="button"
+                            >
+                                Set Car
+                            </button>
+
+                            <button
+                                id="randomCarBtn"
+                                class="secondary-button"
+                                type="button"
+                            >
+                                Random Car
+                            </button>
+                        </div>
                     </div>
-
-
 
                     <button
                         id="generateRaceBtn"
-                        class="primary-button"
+                        class="primary-button wide-button"
                         type="button"
                     >
                         Generate Race
                     </button>
 
-
                     <button
                         id="randomSetupBtn"
-                        class="dark-button"
+                        class="dark-button wide-button"
                         type="button"
                     >
                         Randomize Car + Race
                     </button>
 
                 </div>
-
-
 
                 <p
                     id="gameNote"
@@ -522,15 +401,10 @@
                     Waiting for the host.
                 </p>
 
-
-
-                <!-- ENTER RESULTS -->
-
                 <div
                     id="raceCompleteControls"
                     class="hidden"
                 >
-
                     <button
                         id="enterResultsBtn"
                         class="primary-button wide-button"
@@ -538,9 +412,7 @@
                     >
                         Enter Race Results
                     </button>
-
                 </div>
-
 
 
                 <!-- ==================================================
@@ -556,9 +428,7 @@
                         <span>FINISHING ORDER</span>
                     </div>
 
-
                     <div class="setup-card">
-
                         <h2>
                             Round
                             <span id="resultEntryRound">
@@ -571,16 +441,12 @@
                             Assign each player a finishing position.
                         </p>
 
-
-                        <div id="finishOrderInputs">
-                        </div>
-
+                        <div id="finishOrderInputs"></div>
 
                         <p
                             id="resultEntryMessage"
                             class="message center-message"
                         ></p>
-
 
                         <button
                             id="submitResultsBtn"
@@ -590,7 +456,6 @@
                             Submit Results
                         </button>
 
-
                         <button
                             id="cancelResultsBtn"
                             class="dark-button wide-button"
@@ -598,11 +463,9 @@
                         >
                             Cancel
                         </button>
-
                     </div>
 
                 </section>
-
 
 
                 <!-- ==================================================
@@ -618,9 +481,7 @@
                         <span>RACE RESULTS</span>
                     </div>
 
-
                     <div class="results-title">
-
                         <p class="setup-label">
                             ROUND
                         </p>
@@ -628,29 +489,99 @@
                         <h2 id="resultsRoundNumber">
                             1
                         </h2>
-
                     </div>
 
-
-                    <div id="roundResultsList">
-                    </div>
-
+                    <div id="roundResultsList"></div>
 
                     <div class="divider">
                         <span>UPGRADE REWARDS</span>
                     </div>
 
+                    <div id="upgradeRewardList"></div>
 
-                    <div id="upgradeRewardList">
+                    <div
+                        id="hostResultsControls"
+                        class="hidden"
+                    >
+                        <button
+                            id="goToUpgradesBtn"
+                            class="primary-button wide-button"
+                            type="button"
+                        >
+                            Roll Upgrades
+                        </button>
+
+                        <button
+                            id="endRaceNightFromResultsBtn"
+                            class="end-button wide-button"
+                            type="button"
+                        >
+                            End Race Night
+                        </button>
+                    </div>
+
+                </section>
+
+
+                <!-- ==================================================
+                     UPGRADE PHASE
+                     ================================================== -->
+
+                <section
+                    id="upgradePanel"
+                    class="hidden"
+                >
+
+                    <div class="divider">
+                        <span>UPGRADE ROLLS</span>
+                    </div>
+
+                    <div class="results-title">
+                        <p class="setup-label">
+                            ROUND
+                        </p>
+
+                        <h2 id="upgradeRoundNumber">
+                            1
+                        </h2>
+                    </div>
+
+                    <p
+                        id="upgradeStatusMessage"
+                        class="lobby-note"
+                    ></p>
+
+                    <div id="upgradeRollsList"></div>
+
+                    <div
+                        id="hostApplyUpgradesControls"
+                        class="hidden"
+                    >
+                        <button
+                            id="applyUpgradesBtn"
+                            class="primary-button wide-button"
+                            type="button"
+                        >
+                            Apply Upgrades
+                        </button>
                     </div>
 
 
+                    <!-- GARAGES -->
+
+                    <div class="divider">
+                        <span>PLAYER GARAGES</span>
+                    </div>
+
+                    <div id="playerGarages"></div>
+
+
+                    <!-- AFTER UPGRADES -->
 
                     <div
-                        id="hostAfterRaceControls"
+                        id="hostAfterUpgradesControls"
                         class="hidden"
                     >
-
                         <button
                             id="nextRoundBtn"
                             class="primary-button wide-button"
@@ -659,7 +590,6 @@
                             Next Round
                         </button>
 
-
                         <button
                             id="endRaceNightBtn"
                             class="end-button wide-button"
@@ -667,24 +597,13 @@
                         >
                             End Race Night
                         </button>
-
                     </div>
 
-
-                    <p class="temporary-note">
-
-                        Upgrade rolls will be inserted between
-                        Results and Next Round in the next build.
-
-                    </p>
-
                 </section>
-
 
             </section>
 
         </section>
-
 
 
         <!-- ==================================================
@@ -698,9 +617,7 @@
 
             <section class="game-card lobby-card">
 
-
                 <div class="final-header">
-
                     <p class="eyebrow">
                         RACE NIGHT COMPLETE
                     </p>
@@ -708,13 +625,9 @@
                     <h2>
                         FINAL RESULTS
                     </h2>
-
                 </div>
 
-
-
                 <div class="champion-card">
-
                     <p class="setup-label">
                         RACE NIGHT CHAMPION
                     </p>
@@ -730,30 +643,13 @@
                     <p id="finalChampionStats">
                         0 Points
                     </p>
-
                 </div>
-
-
 
                 <div class="divider">
                     <span>FINAL STANDINGS</span>
                 </div>
 
-
-                <div id="finalStandings">
-                </div>
-
-
-
-                <div class="divider">
-                    <span>RACE HISTORY</span>
-                </div>
-
-
-                <div id="finalRaceHistory">
-                </div>
-
-
+                <div id="finalStandings"></div>
 
                 <p
                     id="finalRaceCount"
@@ -761,8 +657,6 @@
                 >
                     0 races completed.
                 </p>
-
-
 
                 <button
                     id="leaveFinalBtn"
@@ -772,31 +666,21 @@
                     Back to Home
                 </button>
 
-
             </section>
 
         </section>
 
 
-
-        <!-- ==================================================
-             FOOTER
-             ================================================== -->
-
         <footer>
             Just A Race Team
         </footer>
 
-
     </main>
-
-
 
     <script
         type="module"
-        src="script.js?v=4"
+        src="script.js?v=5"
     ></script>
-
 
 </body>
 
