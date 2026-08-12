@@ -19,7 +19,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=2"
+        href="style.css?v=3"
     >
 
 </head>
@@ -88,19 +88,13 @@
 
 
                 <div class="divider">
-
-                    <span>
-                        CREATE
-                    </span>
-
+                    <span>CREATE</span>
                 </div>
 
 
                 <div class="game-section">
 
-                    <h2>
-                        Create a Game
-                    </h2>
+                    <h2>Create a Game</h2>
 
                     <p>
                         Start a new room and invite your friends.
@@ -119,19 +113,13 @@
 
 
                 <div class="divider">
-
-                    <span>
-                        OR
-                    </span>
-
+                    <span>OR</span>
                 </div>
 
 
                 <div class="game-section">
 
-                    <h2>
-                        Join a Game
-                    </h2>
+                    <h2>Join a Game</h2>
 
                     <p>
                         Enter the room code from the host.
@@ -178,7 +166,6 @@
 
                 <div class="lobby-header">
 
-
                     <div>
 
                         <p class="eyebrow">
@@ -186,13 +173,10 @@
                         </p>
 
                         <h2>
-
                             Room
-
                             <span id="lobbyRoomCode">
                                 -----
                             </span>
-
                         </h2>
 
                     </div>
@@ -205,7 +189,6 @@
                     >
                         Leave
                     </button>
-
 
                 </div>
 
@@ -225,9 +208,7 @@
 
 
 
-                <h3>
-                    Players
-                </h3>
+                <h3>Players</h3>
 
                 <div
                     id="playerList"
@@ -274,8 +255,9 @@
             <section class="game-card lobby-card">
 
 
-                <div class="lobby-header">
+                <!-- GAME HEADER -->
 
+                <div class="lobby-header">
 
                     <div>
 
@@ -284,13 +266,10 @@
                         </p>
 
                         <h2>
-
                             Room
-
                             <span id="gameRoomCode">
                                 -----
                             </span>
-
                         </h2>
 
                     </div>
@@ -304,10 +283,11 @@
                         Leave
                     </button>
 
-
                 </div>
 
 
+
+                <!-- PLAYER -->
 
                 <div class="lobby-meta">
 
@@ -323,9 +303,9 @@
 
 
 
-                <h3>
-                    Players
-                </h3>
+                <!-- PLAYERS -->
+
+                <h3>Players</h3>
 
                 <div
                     id="gamePlayerList"
@@ -335,33 +315,182 @@
 
 
 
-                <div class="divider">
+                <!-- ROUND -->
 
-                    <span>
-                        GAME
-                    </span>
+                <div class="divider">
+                    <span>ROUND</span>
+                </div>
+
+
+                <div class="round-header">
+
+                    <div>
+
+                        <p class="setup-label">
+                            CURRENT ROUND
+                        </p>
+
+                        <div class="round-number">
+                            <span id="roundNumber">
+                                1
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="roundReadyBadge"
+                        class="ready-badge hidden"
+                    >
+                        READY
+                    </div>
 
                 </div>
 
 
 
-                <div class="game-section">
+                <!-- CURRENT CAR -->
 
-                    <h2>
-                        Game Started!
+                <div class="setup-card">
+
+                    <p class="setup-label">
+                        CURRENT CAR
+                    </p>
+
+                    <h2 id="selectedCarName">
+                        Waiting for host...
                     </h2>
 
-                    <p id="gameNote">
-                        Everyone made it into the game.
-                    </p>
-
-                    <p>
-                        Next we will add the starting car,
-                        random race selection, finishing order,
-                        and upgrade rolls.
+                    <p
+                        id="selectedCarPI"
+                        class="setup-detail"
+                    >
+                        Starting PI: —
                     </p>
 
                 </div>
+
+
+
+                <!-- CURRENT RACE -->
+
+                <div class="setup-card">
+
+                    <div class="race-heading">
+
+                        <p class="setup-label">
+                            CURRENT RACE
+                        </p>
+
+                        <span
+                            id="raceTypeBadge"
+                            class="race-type-badge hidden"
+                        >
+                            ROAD
+                        </span>
+
+                    </div>
+
+
+                    <h2 id="raceName">
+                        Waiting for host...
+                    </h2>
+
+                    <p
+                        id="raceDistance"
+                        class="setup-detail"
+                    >
+                        Distance: —
+                    </p>
+
+                </div>
+
+
+
+                <!-- HOST CONTROLS -->
+
+                <div
+                    id="hostGameControls"
+                    class="host-controls hidden"
+                >
+
+                    <div class="divider">
+                        <span>HOST CONTROLS</span>
+                    </div>
+
+
+                    <label
+                        for="carSelect"
+                        class="input-label"
+                    >
+                        SELECT CAR
+                    </label>
+
+
+                    <select id="carSelect">
+
+                        <option value="2024 Ford Mustang GT">
+                            2024 Ford Mustang GT — A628
+                        </option>
+
+                        <option value="1986 Honda Civic Si">
+                            1986 Honda Civic Si — D253
+                        </option>
+
+                    </select>
+
+
+                    <div class="button-grid">
+
+                        <button
+                            id="setCarBtn"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Set Car
+                        </button>
+
+                        <button
+                            id="randomCarBtn"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Random Car
+                        </button>
+
+                    </div>
+
+
+                    <button
+                        id="generateRaceBtn"
+                        class="primary-button"
+                        type="button"
+                    >
+                        Generate Race
+                    </button>
+
+
+                    <button
+                        id="randomSetupBtn"
+                        class="dark-button"
+                        type="button"
+                    >
+                        Randomize Car + Race
+                    </button>
+
+                </div>
+
+
+
+                <!-- STATUS -->
+
+                <p
+                    id="gameNote"
+                    class="lobby-note"
+                >
+                    Waiting for the host to set up Round 1.
+                </p>
 
 
             </section>
@@ -373,9 +502,7 @@
         <!-- FOOTER -->
 
         <footer>
-
             Just A Race Team
-
         </footer>
 
 
@@ -385,7 +512,7 @@
 
     <script
         type="module"
-        src="script.js?v=2"
+        src="script.js?v=3"
     ></script>
 
 
