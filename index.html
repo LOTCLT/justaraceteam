@@ -18,7 +18,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=6"
+        href="style.css?v=7"
     >
 </head>
 
@@ -368,6 +368,63 @@
                         class="setup-detail"
                     >
                         Distance: —
+                    </p>
+                </div>
+
+
+                <!-- APPROXIMATE RACE MAP -->
+
+                <div
+                    id="raceMapCard"
+                    class="setup-card race-map-card race-theme-card hidden"
+                >
+                    <div class="race-map-header">
+                        <div>
+                            <p class="setup-label">
+                                RACE MAP
+                            </p>
+
+                            <strong id="raceMapRegion">
+                                Approximate area
+                            </strong>
+                        </div>
+
+                        <span class="race-map-hint">
+                            START AREA
+                        </span>
+                    </div>
+
+                    <div class="race-map-frame">
+                        <img
+                            id="raceMapImage"
+                            alt="Forza Horizon 6 world map reference"
+                            loading="lazy"
+                            referrerpolicy="no-referrer"
+                        >
+
+                        <div
+                            id="raceMapPin"
+                            class="race-map-pin"
+                            aria-hidden="true"
+                        ></div>
+                    </div>
+
+                    <p
+                        id="raceMapNote"
+                        class="race-map-note"
+                    >
+                        Approximate starting area.
+                    </p>
+
+                    <p class="race-map-credit">
+                        Map reference:
+                        <a
+                            id="raceMapSource"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ForzaLabs Interactive Map
+                        </a>
                     </p>
                 </div>
 
@@ -764,7 +821,7 @@
 
     <script
         type="module"
-        src="script.js?v=6"
+        src="script.js?v=7"
     ></script>
 
 </body>

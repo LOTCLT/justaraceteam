@@ -1,6 +1,6 @@
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
-   Version 6
+   Version 7
 
    Add future cars here.
    script.js automatically builds the car dropdown from this file.
@@ -507,6 +507,201 @@ export const RACE_POOL = [
     { type: "Dirt / Rally", name: "The Gauntlet", distance: "18.7 mi" }
 
 ];
+
+
+
+/* =========================================================
+   RACE MAP — APPROXIMATE STARTING AREAS
+
+   These pins are intentionally approximate. They are meant
+   to get players into the correct part of the FH6 world map,
+   not replace the exact in-game event icon.
+   ========================================================= */
+
+export const RACE_MAP_IMAGE_URL =
+    "https://forza.labsgg.com/_astro/FH6-full-map.59v5pH0D.jpg";
+
+export const RACE_MAP_SOURCE_URL =
+    "https://forza.labsgg.com/interactive-map";
+
+
+const REGION_MAP_POINTS = {
+
+    "Sotoyama": {
+        x: 59,
+        y: 15
+    },
+
+    "Takashiro": {
+        x: 67,
+        y: 30
+    },
+
+    "Hokubu": {
+        x: 52,
+        y: 38
+    },
+
+    "Ohtani": {
+        x: 32,
+        y: 54
+    },
+
+    "Minamino": {
+        x: 50,
+        y: 53
+    },
+
+    "Ito": {
+        x: 70,
+        y: 56
+    },
+
+    "Tokyo City": {
+        x: 49,
+        y: 72
+    },
+
+    "Shimanoyama": {
+        x: 25,
+        y: 59
+    },
+
+    "Nangan": {
+        x: 39,
+        y: 84
+    },
+
+    "Legend Island": {
+        x: 86,
+        y: 73
+    }
+
+};
+
+
+const RACE_REGION_BY_NAME = {
+
+    /* STREET */
+    "Cedar Run Street Race": "Minamino",
+    "Daikoku Chase Street Race": "Tokyo City",
+    "Festival Chase Street Race": "Ohtani",
+    "Hokubu Ascent Street Race": "Hokubu",
+    "Kita Ine Street Race": "Ito",
+    "Matsumi Climb Street Race": "Ohtani",
+    "Minami Chase Street Race": "Shimanoyama",
+    "Nachi Run Street Race": "Takashiro",
+    "Norikura Descent Street Race": "Takashiro",
+    "Okishinaimura Run Street Race": "Takashiro",
+    "Rainbow Bridge Descent Street Race": "Tokyo City",
+    "River Descent Street Race": "Minamino",
+    "Shimanoyama Charge Street Race": "Shimanoyama",
+    "Sunflower Charge Street Race": "Hokubu",
+    "Tokyo City Docks Charge Street Race": "Tokyo City",
+
+    /* ROAD */
+    "Coastline Sprint": "Nangan",
+    "Daikoku Circuit": "Tokyo City",
+    "Electric Town Circuit": "Tokyo City",
+    "Festival Sprint": "Ohtani",
+    "Highway Circuit": "Tokyo City",
+    "Hokubu Circuit": "Hokubu",
+    "Irokawa Circuit Road Race": "Nangan",
+    "Ito Sprint": "Ito",
+    "Legend Island Circuit": "Legend Island",
+    "Narai-Juku Circuit": "Shimanoyama",
+    "Satta Sprint": "Ito",
+    "Seaside Park Sprint": "Shimanoyama",
+    "Shikisai Sprint": "Hokubu",
+    "Shimanoyama Circuit": "Shimanoyama",
+    "Shimanoyama Sprint": "Shimanoyama",
+    "Shirakawa Circuit": "Sotoyama",
+    "Tateyama Kurobe Sprint": "Sotoyama",
+    "The Colossus": "Ohtani",
+    "The Goliath": "Ohtani",
+    "Venus Sprint": "Takashiro",
+
+    /* DRAG */
+    "Horizon Festival Drag Strip": "Ohtani",
+    "Irokawa Space Center Drag Strip": "Nangan",
+    "Ito Airfield Drag Strip": "Ito",
+
+    /* DIRT / RALLY */
+    "Airfield Trail": "Minamino",
+    "Bamboo Forest Scramble": "Ito",
+    "Cherry Field Trail": "Ohtani",
+    "Chiheisen Scramble": "Ohtani",
+    "Hirosaki Scramble": "Takashiro",
+    "Hokubu Trail": "Hokubu",
+    "Horizon Stadium Scramble": "Ohtani",
+    "Ine Scramble": "Ito",
+    "Ito Trail": "Ito",
+    "Kawazu Nanadaru Scramble": "Ito",
+    "Kinkaku-ji Trail": "Ohtani",
+    "Legend Island Trail": "Legend Island",
+    "Nukabira Trail": "Takashiro",
+    "Oyashirazu Trail": "Ito",
+    "Sekibe Scramble": "Ito",
+    "Sotoyama Scramble": "Sotoyama",
+    "Sunflower Scramble": "Hokubu",
+    "Taiyaki Scramble": "Shimanoyama",
+    "Takashiro Trail": "Takashiro",
+    "The Gauntlet": "Ohtani"
+
+};
+
+
+const LONG_RACE_NAMES = new Set([
+    "The Colossus",
+    "The Goliath",
+    "The Gauntlet"
+]);
+
+
+export function getRaceMapMeta(race) {
+
+    if (!race) {
+        return null;
+    }
+
+
+    const name =
+        String(race.name || "").trim();
+
+
+    const region =
+        race.region ||
+        RACE_REGION_BY_NAME[name];
+
+
+    if (!region) {
+        return null;
+    }
+
+
+    const point =
+        REGION_MAP_POINTS[region];
+
+
+    if (!point) {
+        return null;
+    }
+
+
+    return {
+        region: region,
+        x: Number.isFinite(race.mapX)
+            ? race.mapX
+            : point.x,
+        y: Number.isFinite(race.mapY)
+            ? race.mapY
+            : point.y,
+        note: LONG_RACE_NAMES.has(name)
+            ? "Approximate starting area — this route covers a large part of the map."
+            : "Approximate starting area — use the matching race icon in-game for the exact start."
+    };
+
+}
 
 
 

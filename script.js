@@ -28,9 +28,12 @@ import {
     getUpgradeById,
     getStockForUpgrade,
     getRandomUpgradeRoll,
-    randomFromArray
+    randomFromArray,
+    RACE_MAP_IMAGE_URL,
+    RACE_MAP_SOURCE_URL,
+    getRaceMapMeta
 }
-    from "./game-data.js?v=6";
+    from "./game-data.js?v=7";
 
 
 /* =========================================================
@@ -182,6 +185,31 @@ const raceTypeBadge =
 
 const currentRaceCard =
     document.getElementById("currentRaceCard");
+
+const raceMapCard =
+    document.getElementById("raceMapCard");
+
+const raceMapRegion =
+    document.getElementById("raceMapRegion");
+
+const raceMapImage =
+    document.getElementById("raceMapImage");
+
+const raceMapPin =
+    document.getElementById("raceMapPin");
+
+const raceMapNote =
+    document.getElementById("raceMapNote");
+
+const raceMapSource =
+    document.getElementById("raceMapSource");
+
+
+raceMapImage.src =
+    RACE_MAP_IMAGE_URL;
+
+raceMapSource.href =
+    RACE_MAP_SOURCE_URL;
 
 const raceName =
     document.getElementById("raceName");
@@ -536,6 +564,10 @@ function applyRaceTheme(type) {
                 className
             );
 
+            raceMapCard.classList.remove(
+                className
+            );
+
             raceTypeBadge.classList.remove(
                 className
             );
@@ -560,8 +592,90 @@ function applyRaceTheme(type) {
     );
 
 
+    raceMapCard.classList.add(
+        className
+    );
+
+
     raceTypeBadge.classList.add(
         className
+    );
+
+}
+
+
+/* =========================================================
+   APPROXIMATE RACE MAP
+   ========================================================= */
+
+const RACE_MAP_PIN_CLASSES = [
+    "map-race-street",
+    "map-race-road",
+    "map-race-drag",
+    "map-race-dirt",
+    "map-race-rally",
+    "map-race-cross-country",
+    "map-race-touge"
+];
+
+
+function applyRaceMap(race) {
+
+    RACE_MAP_PIN_CLASSES.forEach(
+        function (className) {
+
+            raceMapPin.classList.remove(
+                className
+            );
+
+        }
+    );
+
+
+    const meta =
+        getRaceMapMeta(
+            race
+        );
+
+
+    if (!race || !meta) {
+
+        raceMapCard.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+
+    raceMapRegion.textContent =
+        meta.region;
+
+
+    raceMapPin.style.left =
+        meta.x + "%";
+
+    raceMapPin.style.top =
+        meta.y + "%";
+
+
+    raceMapNote.textContent =
+        meta.note;
+
+
+    const themeClass =
+        getRaceThemeClass(
+            race.type
+        );
+
+
+    raceMapPin.classList.add(
+        "map-" + themeClass
+    );
+
+
+    raceMapCard.classList.remove(
+        "hidden"
     );
 
 }
@@ -2394,6 +2508,11 @@ function updateGameSetupDisplay(
             roomData.currentRace.type
         );
 
+
+        applyRaceMap(
+            roomData.currentRace
+        );
+
     }
     else {
 
@@ -2411,6 +2530,11 @@ function updateGameSetupDisplay(
 
 
         applyRaceTheme(
+            null
+        );
+
+
+        applyRaceMap(
             null
         );
 
