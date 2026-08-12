@@ -1,3 +1,48 @@
+import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+
+import {
+    getAuth,
+    signInAnonymously
+}
+    from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+import {
+    getDatabase,
+    ref,
+    set,
+    get,
+    serverTimestamp
+}
+    from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+const firebaseConfig = {
+    apiKey: "AIzaSyBRBaBatRkK5sz8ag4iY5RYzz8rzU9Sds8",
+    authDomain: "justaraceteam-c53eb.firebaseapp.com",
+
+    databaseURL:
+        "https://justaraceteam-c53eb-default-rtdb.firebaseio.com",
+
+    projectId: "justaraceteam-c53eb",
+    storageBucket: "justaraceteam-c53eb.firebasestorage.app",
+    messagingSenderId: "491124011414",
+    appId: "1:491124011414:web:92f33c31cc2366f5bdedb7"
+};
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const database = getDatabase(app);
+async function getCurrentPlayer() {
+
+    if (auth.currentUser) {
+        return auth.currentUser;
+    }
+
+    const result =
+        await signInAnonymously(auth);
+
+    return result.user;
+}
 const homeScreen =
     document.getElementById("homeScreen");
 
@@ -173,7 +218,7 @@ function showLobby(
 
 createGameButton.addEventListener(
     "click",
-    function () {
+    async function () {
 
         const playerName =
             getPlayerName();
@@ -182,16 +227,85 @@ createGameButton.addEventListener(
             return;
         }
 
+        try {
 
-        const newRoomCode =
-            generateRoomCode();
+            const user =
+                await getCurrentPlayer();
+
+            let newRoomCode;
+            let roomReference;
+            let roomSnapshot;
+
+            do {
+
+                newRoomCode =
+                    generateRoomCode();
+
+                roomReference =
+                    ref(
+                        database,
+                        "rooms/" + newRoomCode
+                    );
+
+                roomSnapshot =
+                    await get(roomReference);
+
+            }
+            while (roomSnapshot.exists());
 
 
-        showLobby(
-            newRoomCode,
-            playerName,
-            true
-        );
+            await set(
+                roomReference,
+                {
+
+                    hostUid: user.uid,
+
+                    status: "lobby",
+
+                    createdAt:
+                        serverTimestamp(),
+
+                    players: {
+
+                        [user.uid]: {
+
+                            name:
+                                playerName,
+
+                            isHost:
+                                true,
+
+                            joinedAt:
+                                serverTimestamp()
+
+                        }
+
+                    }
+
+                }
+            );
+
+
+            showLobby(
+                newRoomCode,
+                playerName,
+                true
+            );
+
+        }
+        catch (error) {
+
+            console.error(
+                "Could not create room:",
+                error
+            );
+
+            showHomeMessage(
+                "Could not create the room. Try again.",
+                "error"
+            );
+
+        }
 
     }
 );
