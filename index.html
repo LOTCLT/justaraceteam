@@ -31,9 +31,7 @@
     <main class="app">
 
 
-        <!-- ==================================================
-             HEADER / LOGO AREA
-             ================================================== -->
+        <!-- HEADER -->
 
         <header class="hero">
 
@@ -63,8 +61,6 @@
             <section class="game-card">
 
 
-                <!-- PLAYER NAME -->
-
                 <div class="game-section">
 
                     <label
@@ -74,7 +70,6 @@
                         YOUR NAME
                     </label>
 
-
                     <input
                         id="playerNameInput"
                         type="text"
@@ -82,7 +77,6 @@
                         placeholder="PLAYER NAME"
                         autocomplete="off"
                     >
-
 
                     <p
                         id="homeMessage"
@@ -92,8 +86,6 @@
                 </div>
 
 
-
-                <!-- CREATE GAME -->
 
                 <div class="divider">
 
@@ -110,11 +102,9 @@
                         Create a Game
                     </h2>
 
-
                     <p>
                         Start a new room and invite your friends.
                     </p>
-
 
                     <button
                         id="createGameBtn"
@@ -127,8 +117,6 @@
                 </div>
 
 
-
-                <!-- JOIN GAME -->
 
                 <div class="divider">
 
@@ -145,11 +133,9 @@
                         Join a Game
                     </h2>
 
-
                     <p>
                         Enter the room code from the host.
                     </p>
-
 
                     <input
                         id="roomCodeInput"
@@ -159,7 +145,6 @@
                         autocomplete="off"
                         spellcheck="false"
                     >
-
 
                     <button
                         id="joinGameBtn"
@@ -191,8 +176,6 @@
             <section class="game-card lobby-card">
 
 
-                <!-- LOBBY HEADER -->
-
                 <div class="lobby-header">
 
 
@@ -201,7 +184,6 @@
                         <p class="eyebrow">
                             GAME LOBBY
                         </p>
-
 
                         <h2>
 
@@ -214,7 +196,6 @@
                         </h2>
 
                     </div>
-
 
 
                     <button
@@ -230,14 +211,11 @@
 
 
 
-                <!-- CURRENT PLAYER -->
-
                 <div class="lobby-meta">
 
                     <span>
                         YOU ARE PLAYING AS
                     </span>
-
 
                     <strong id="lobbyPlayerName">
                         Player
@@ -247,26 +225,17 @@
 
 
 
-                <!-- PLAYER LIST -->
+                <h3>
+                    Players
+                </h3>
 
-                <div class="lobby-section">
-
-                    <h3>
-                        Players
-                    </h3>
-
-
-                    <div
-                        id="playerList"
-                        class="player-list"
-                    >
-                    </div>
-
+                <div
+                    id="playerList"
+                    class="player-list"
+                >
                 </div>
 
 
-
-                <!-- LOBBY STATUS -->
 
                 <p
                     id="lobbyNote"
@@ -276,8 +245,6 @@
                 </p>
 
 
-
-                <!-- START GAME -->
 
                 <button
                     id="startGameBtn"
@@ -295,8 +262,115 @@
 
 
         <!-- ==================================================
-             FOOTER
+             GAME SCREEN
              ================================================== -->
+
+        <section
+            id="gameScreen"
+            class="hidden"
+        >
+
+
+            <section class="game-card lobby-card">
+
+
+                <div class="lobby-header">
+
+
+                    <div>
+
+                        <p class="eyebrow">
+                            GAME IN PROGRESS
+                        </p>
+
+                        <h2>
+
+                            Room
+
+                            <span id="gameRoomCode">
+                                -----
+                            </span>
+
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        id="leaveGameBtnGame"
+                        class="small-button"
+                        type="button"
+                    >
+                        Leave
+                    </button>
+
+
+                </div>
+
+
+
+                <div class="lobby-meta">
+
+                    <span>
+                        YOU ARE PLAYING AS
+                    </span>
+
+                    <strong id="gamePlayerName">
+                        Player
+                    </strong>
+
+                </div>
+
+
+
+                <h3>
+                    Players
+                </h3>
+
+                <div
+                    id="gamePlayerList"
+                    class="player-list"
+                >
+                </div>
+
+
+
+                <div class="divider">
+
+                    <span>
+                        GAME
+                    </span>
+
+                </div>
+
+
+
+                <div class="game-section">
+
+                    <h2>
+                        Game Started!
+                    </h2>
+
+                    <p id="gameNote">
+                        Everyone made it into the game.
+                    </p>
+
+                    <p>
+                        Next we will add the starting car,
+                        random race selection, finishing order,
+                        and upgrade rolls.
+                    </p>
+
+                </div>
+
+
+            </section>
+
+        </section>
+
+
+
+        <!-- FOOTER -->
 
         <footer>
 
@@ -308,10 +382,6 @@
     </main>
 
 
-
-    <!-- ======================================================
-         JAVASCRIPT
-         ====================================================== -->
 
     <script
         type="module"

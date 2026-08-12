@@ -1,17 +1,21 @@
 import { initializeApp }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 
+
 import {
     getAuth,
     signInAnonymously
 }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
+
 import {
     getDatabase,
     ref,
     set,
     get,
+    update,
+    remove,
     onValue,
     serverTimestamp
 }
@@ -20,7 +24,7 @@ import {
 
 
 /* =========================================================
-   FIREBASE SETUP
+   FIREBASE
    ========================================================= */
 
 const firebaseConfig = {
@@ -70,6 +74,9 @@ const homeScreen =
 const lobbyScreen =
     document.getElementById("lobbyScreen");
 
+const gameScreen =
+    document.getElementById("gameScreen");
+
 
 const playerNameInput =
     document.getElementById("playerNameInput");
@@ -90,6 +97,9 @@ const joinGameButton =
 const leaveGameButton =
     document.getElementById("leaveGameBtn");
 
+const leaveGameButtonGame =
+    document.getElementById("leaveGameBtnGame");
+
 const startGameButton =
     document.getElementById("startGameBtn");
 
@@ -107,9 +117,19 @@ const playerList =
     document.getElementById("playerList");
 
 
+const gameRoomCode =
+    document.getElementById("gameRoomCode");
+
+const gamePlayerName =
+    document.getElementById("gamePlayerName");
+
+const gamePlayerList =
+    document.getElementById("gamePlayerList");
+
+
 
 /* =========================================================
-   CURRENT LOCAL GAME STATE
+   LOCAL GAME STATE
    ========================================================= */
 
 let currentRoomCode = null;
@@ -119,9 +139,14 @@ let currentPlayerName = null;
 let currentPlayerIsHost = false;
 
 
+let stopPlayerListener = null;
+
+let stopRoomListener = null;
+
+
 
 /* =========================================================
-   FIREBASE PLAYER LOGIN
+   FIREBASE LOGIN
    ========================================================= */
 
 async function getCurrentPlayer() {
@@ -144,19 +169,10 @@ async function getCurrentPlayer() {
 
 
 /* =========================================================
-   ROOM CODE GENERATOR
+   ROOM CODE
    ========================================================= */
 
 function generateRoomCode() {
-
-    /*
-        We skip confusing characters such as:
-
-        I
-        O
-        0
-        1
-    */
 
     const characters =
         "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -187,7 +203,7 @@ function generateRoomCode() {
 
 
 /* =========================================================
-   HOME SCREEN MESSAGES
+   MESSAGES
    ========================================================= */
 
 function showHomeMessage(
@@ -218,7 +234,7 @@ function showHomeMessage(
 
 
 /* =========================================================
-   PLAYER NAME VALIDATION
+   PLAYER NAME
    ========================================================= */
 
 function getPlayerName() {
@@ -249,7 +265,131 @@ function getPlayerName() {
 
 
 /* =========================================================
-   REAL-TIME PLAYER LIST
+   STOP FIREBASE LISTENERS
+   ========================================================= */
+
+function clearListeners() {
+
+    if (stopPlayerListener) {
+
+        stopPlayerListener();
+
+        stopPlayerListener =
+            null;
+
+    }
+
+
+    if (stopRoomListener) {
+
+        stopRoomListener();
+
+        stopRoomListener =
+            null;
+
+    }
+
+}
+
+
+
+/* =========================================================
+   PLAYER LIST DISPLAY
+   ========================================================= */
+
+function renderPlayers(
+    targetElement,
+    players
+) {
+
+    targetElement.innerHTML =
+        "";
+
+
+    const sortedPlayers =
+        Object.entries(players)
+            .sort(
+                function (a, b) {
+
+                    return (
+                        (a[1].joinedAt || 0) -
+                        (b[1].joinedAt || 0)
+                    );
+
+                }
+            );
+
+
+    sortedPlayers.forEach(
+        function ([uid, player]) {
+
+
+            const playerRow =
+                document.createElement(
+                    "div"
+                );
+
+
+            playerRow.classList.add(
+                "player-row"
+            );
+
+
+            const playerName =
+                document.createElement(
+                    "span"
+                );
+
+
+            playerName.textContent =
+                player.name;
+
+
+            playerRow.appendChild(
+                playerName
+            );
+
+
+            if (player.isHost) {
+
+                const hostBadge =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                hostBadge.classList.add(
+                    "host-badge"
+                );
+
+
+                hostBadge.textContent =
+                    "HOST";
+
+
+                playerRow.appendChild(
+                    hostBadge
+                );
+
+            }
+
+
+            targetElement.appendChild(
+                playerRow
+            );
+
+        }
+    );
+
+
+    return sortedPlayers.length;
+
+}
+
+
+
+/* =========================================================
+   REAL-TIME PLAYER LISTENER
    ========================================================= */
 
 function listenToPlayers(roomCode) {
@@ -263,154 +403,137 @@ function listenToPlayers(roomCode) {
         );
 
 
-    onValue(
-        playersReference,
+    stopPlayerListener =
+        onValue(
+            playersReference,
 
-        function (snapshot) {
+            function (snapshot) {
 
-            /*
-                snapshot.val() gives us the player
-                data currently stored in Firebase.
-
-                If there are somehow no players,
-                use an empty object instead.
-            */
-
-            const players =
-                snapshot.val() || {};
+                const players =
+                    snapshot.val() || {};
 
 
-            /*
-                Remove the old visual player list
-                before rebuilding it.
-            */
-
-            playerList.innerHTML = "";
-
-
-            /*
-                Convert the Firebase object into
-                an array so we can sort it.
-
-                Host should normally appear first
-                because they joined first.
-            */
-
-            const sortedPlayers =
-                Object.entries(players)
-                    .sort(
-                        function (a, b) {
-
-                            return (
-                                (a[1].joinedAt || 0) -
-                                (b[1].joinedAt || 0)
-                            );
-
-                        }
+                const playerCount =
+                    renderPlayers(
+                        playerList,
+                        players
                     );
 
 
-            /*
-                Build one HTML row for
-                every player in Firebase.
-            */
-
-            sortedPlayers.forEach(
-                function ([uid, player]) {
-
-                    const playerRow =
-                        document.createElement(
-                            "div"
-                        );
+                renderPlayers(
+                    gamePlayerList,
+                    players
+                );
 
 
-                    playerRow.classList.add(
-                        "player-row"
-                    );
+                if (
+                    currentPlayerIsHost &&
+                    !gameScreen.classList.contains(
+                        "hidden"
+                    ) === false
+                ) {
+
+                    return;
+
+                }
 
 
-                    const playerName =
-                        document.createElement(
-                            "span"
-                        );
+                if (
+                    currentPlayerIsHost &&
+                    !lobbyScreen.classList.contains(
+                        "hidden"
+                    )
+                ) {
+
+                    if (playerCount === 1) {
+
+                        lobbyNote.textContent =
+                            "Share the room code with the other players.";
+
+                    }
+                    else {
+
+                        lobbyNote.textContent =
+                            playerCount +
+                            " players connected.";
+
+                    }
+
+                }
+
+            }
+        );
+
+}
 
 
-                    playerName.textContent =
-                        player.name;
+
+/* =========================================================
+   REAL-TIME ROOM STATUS LISTENER
+   ========================================================= */
+
+function listenToRoom(roomCode) {
+
+    const roomReference =
+        ref(
+            database,
+            "rooms/" +
+            roomCode
+        );
 
 
-                    playerRow.appendChild(
-                        playerName
-                    );
+    stopRoomListener =
+        onValue(
+            roomReference,
+
+            function (snapshot) {
 
 
-                    /*
-                        Add HOST badge only
-                        to the host.
-                    */
+                /*
+                    If the host deleted the room,
+                    send everyone home.
+                */
 
-                    if (player.isHost) {
+                if (!snapshot.exists()) {
 
-                        const hostBadge =
-                            document.createElement(
-                                "span"
-                            );
+                    if (
+                        currentRoomCode ===
+                        roomCode
+                    ) {
 
-
-                        hostBadge.classList.add(
-                            "host-badge"
-                        );
-
-
-                        hostBadge.textContent =
-                            "HOST";
-
-
-                        playerRow.appendChild(
-                            hostBadge
+                        returnToHome(
+                            "The room was ended.",
+                            "error"
                         );
 
                     }
 
 
-                    playerList.appendChild(
-                        playerRow
-                    );
+                    return;
 
                 }
-            );
 
 
-            /*
-                Update waiting message based
-                on player count.
-            */
-
-            const playerCount =
-                sortedPlayers.length;
+                const roomData =
+                    snapshot.val();
 
 
-            if (currentPlayerIsHost) {
+                /*
+                    This is the multiplayer
+                    START GAME trigger.
+                */
 
-                if (playerCount === 1) {
+                if (
+                    roomData.status ===
+                    "playing"
+                ) {
 
-                    lobbyNote.textContent =
-                        "Share the room code with the other players.";
-
-                }
-                else {
-
-                    lobbyNote.textContent =
-                        playerCount +
-                        " players connected.";
+                    showGameScreen();
 
                 }
 
             }
-
-        }
-
-    );
+        );
 
 }
 
@@ -425,6 +548,9 @@ function showLobby(
     playerName,
     isHost
 ) {
+
+    clearListeners();
+
 
     currentRoomCode =
         roomCode;
@@ -442,11 +568,6 @@ function showLobby(
     lobbyPlayerName.textContent =
         playerName;
 
-
-    /*
-        Only the host gets the
-        Start Game button.
-    */
 
     if (isHost) {
 
@@ -472,26 +593,125 @@ function showLobby(
     }
 
 
-    /*
-        Begin watching Firebase for
-        player changes.
-    */
+    homeScreen.classList.add(
+        "hidden"
+    );
+
+    gameScreen.classList.add(
+        "hidden"
+    );
+
+    lobbyScreen.classList.remove(
+        "hidden"
+    );
+
 
     listenToPlayers(
         roomCode
     );
 
 
-    /*
-        Switch screens.
-    */
+    listenToRoom(
+        roomCode
+    );
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+
+/* =========================================================
+   SHOW GAME
+   ========================================================= */
+
+function showGameScreen() {
+
+    if (!currentRoomCode) {
+
+        return;
+
+    }
+
+
+    gameRoomCode.textContent =
+        currentRoomCode;
+
+    gamePlayerName.textContent =
+        currentPlayerName;
+
 
     homeScreen.classList.add(
         "hidden"
     );
 
-    lobbyScreen.classList.remove(
+    lobbyScreen.classList.add(
         "hidden"
+    );
+
+    gameScreen.classList.remove(
+        "hidden"
+    );
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+
+/* =========================================================
+   RETURN HOME
+   ========================================================= */
+
+function returnToHome(
+    message = "",
+    type = ""
+) {
+
+    clearListeners();
+
+
+    currentRoomCode =
+        null;
+
+    currentPlayerName =
+        null;
+
+    currentPlayerIsHost =
+        false;
+
+
+    playerList.innerHTML =
+        "";
+
+    gamePlayerList.innerHTML =
+        "";
+
+
+    lobbyScreen.classList.add(
+        "hidden"
+    );
+
+    gameScreen.classList.add(
+        "hidden"
+    );
+
+    homeScreen.classList.remove(
+        "hidden"
+    );
+
+
+    showHomeMessage(
+        message,
+        type
     );
 
 
@@ -513,6 +733,7 @@ createGameButton.addEventListener(
 
     async function () {
 
+
         const playerName =
             getPlayerName();
 
@@ -532,10 +753,6 @@ createGameButton.addEventListener(
 
         try {
 
-            /*
-                Get this browser's anonymous
-                Firebase user.
-            */
 
             const user =
                 await getCurrentPlayer();
@@ -548,9 +765,9 @@ createGameButton.addEventListener(
             let roomSnapshot;
 
 
+
             /*
-                Keep generating codes until
-                we find one that doesn't exist.
+                Find an unused room code.
             */
 
             do {
@@ -578,8 +795,9 @@ createGameButton.addEventListener(
             );
 
 
+
             /*
-                Create the room.
+                Create Firebase room.
             */
 
             await set(
@@ -618,13 +836,6 @@ createGameButton.addEventListener(
             );
 
 
-            /*
-                Room successfully exists
-                in Firebase.
-
-                Show the lobby.
-            */
-
             showLobby(
                 newRoomCode,
                 playerName,
@@ -662,6 +873,7 @@ joinGameButton.addEventListener(
 
     async function () {
 
+
         const playerName =
             getPlayerName();
 
@@ -679,11 +891,6 @@ joinGameButton.addEventListener(
                 .trim()
                 .toUpperCase();
 
-
-        /*
-            Room codes must contain
-            exactly five characters.
-        */
 
         if (enteredCode.length !== 5) {
 
@@ -706,13 +913,10 @@ joinGameButton.addEventListener(
 
         try {
 
+
             const user =
                 await getCurrentPlayer();
 
-
-            /*
-                Find the requested room.
-            */
 
             const roomReference =
                 ref(
@@ -727,10 +931,6 @@ joinGameButton.addEventListener(
                     roomReference
                 );
 
-
-            /*
-                Reject invalid room codes.
-            */
 
             if (!roomSnapshot.exists()) {
 
@@ -749,12 +949,10 @@ joinGameButton.addEventListener(
                 roomSnapshot.val();
 
 
-            /*
-                Don't allow players to join
-                after the game starts.
-            */
-
-            if (roomData.status !== "lobby") {
+            if (
+                roomData.status !==
+                "lobby"
+            ) {
 
                 showHomeMessage(
                     "That game has already started.",
@@ -766,11 +964,6 @@ joinGameButton.addEventListener(
 
             }
 
-
-            /*
-                Create this player's record
-                inside the room.
-            */
 
             const playerReference =
                 ref(
@@ -802,10 +995,6 @@ joinGameButton.addEventListener(
             );
 
 
-            /*
-                Successful join.
-            */
-
             showLobby(
                 enteredCode,
                 playerName,
@@ -835,56 +1024,73 @@ joinGameButton.addEventListener(
 
 
 /* =========================================================
-   LEAVE GAME
+   START GAME
    ========================================================= */
 
-leaveGameButton.addEventListener(
+startGameButton.addEventListener(
     "click",
 
-    function () {
-
-        /*
-            For now this returns the browser
-            to the home screen.
-
-            Later we'll also remove the player
-            from Firebase automatically.
-        */
-
-        currentRoomCode =
-            null;
-
-        currentPlayerName =
-            null;
-
-        currentPlayerIsHost =
-            false;
+    async function () {
 
 
-        lobbyScreen.classList.add(
-            "hidden"
-        );
+        if (
+            !currentRoomCode ||
+            !currentPlayerIsHost
+        ) {
+
+            return;
+
+        }
 
 
-        homeScreen.classList.remove(
-            "hidden"
-        );
+        try {
 
 
-        playerList.innerHTML =
-            "";
+            const roomReference =
+                ref(
+                    database,
+                    "rooms/" +
+                    currentRoomCode
+                );
 
 
-        showHomeMessage(
-            "",
-            ""
-        );
+            await update(
+                roomReference,
+
+                {
+
+                    status:
+                        "playing",
+
+                    startedAt:
+                        serverTimestamp()
+
+                }
+
+            );
 
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+            /*
+                We do NOT manually show
+                the game screen here.
+
+                Firebase will notify every
+                browser, including the host.
+            */
+
+        }
+        catch (error) {
+
+            console.error(
+                "Could not start game:",
+                error
+            );
+
+
+            lobbyNote.textContent =
+                "Could not start the game.";
+
+        }
 
     }
 
@@ -893,33 +1099,130 @@ leaveGameButton.addEventListener(
 
 
 /* =========================================================
-   START GAME
+   LEAVE ROOM
    ========================================================= */
 
-startGameButton.addEventListener(
-    "click",
+async function leaveCurrentRoom() {
 
-    function () {
 
-        /*
-            Placeholder for our next step.
+    if (!currentRoomCode) {
 
-            Eventually this will change:
-
-            status: "lobby"
-
-            to:
-
-            status: "playing"
-
-            inside Firebase.
-        */
-
-        lobbyNote.textContent =
-            "Game starting! Game setup comes next.";
+        return;
 
     }
 
+
+    const roomCode =
+        currentRoomCode;
+
+
+    const wasHost =
+        currentPlayerIsHost;
+
+
+    try {
+
+
+        const user =
+            await getCurrentPlayer();
+
+
+        /*
+            Stop our own listeners before
+            deleting anything.
+        */
+
+        clearListeners();
+
+
+
+        /*
+            If the host leaves,
+            delete the entire room.
+        */
+
+        if (wasHost) {
+
+            const roomReference =
+                ref(
+                    database,
+                    "rooms/" +
+                    roomCode
+                );
+
+
+            await remove(
+                roomReference
+            );
+
+
+            returnToHome(
+                "Room ended.",
+                "success"
+            );
+
+        }
+
+
+        /*
+            Normal player only removes
+            their own player entry.
+        */
+
+        else {
+
+            const playerReference =
+                ref(
+                    database,
+
+                    "rooms/" +
+                    roomCode +
+                    "/players/" +
+                    user.uid
+                );
+
+
+            await remove(
+                playerReference
+            );
+
+
+            returnToHome(
+                "You left the room.",
+                "success"
+            );
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Could not leave room:",
+            error
+        );
+
+
+        returnToHome(
+            "You left the game.",
+            ""
+        );
+
+    }
+
+}
+
+
+
+leaveGameButton.addEventListener(
+    "click",
+    leaveCurrentRoom
+);
+
+
+leaveGameButtonGame.addEventListener(
+    "click",
+    leaveCurrentRoom
 );
 
 
@@ -933,11 +1236,6 @@ roomCodeInput.addEventListener(
 
     function () {
 
-        /*
-            Automatically force room codes
-            to uppercase.
-        */
-
         roomCodeInput.value =
             roomCodeInput
                 .value
@@ -950,7 +1248,7 @@ roomCodeInput.addEventListener(
 
 
 /* =========================================================
-   PRESS ENTER TO JOIN
+   ENTER KEY
    ========================================================= */
 
 roomCodeInput.addEventListener(
@@ -958,7 +1256,10 @@ roomCodeInput.addEventListener(
 
     function (event) {
 
-        if (event.key === "Enter") {
+        if (
+            event.key ===
+            "Enter"
+        ) {
 
             joinGameButton.click();
 
