@@ -6,18 +6,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Just A Race Team</title>
-    
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <h1>Just A Race Team</h1>
+    <main class="app">
 
-    <p>Welcome to our racing game.</p>
+        <header class="hero">
 
-    <button>Create Game</button>
-    <button>Join Game</button>
+            <p class="eyebrow">
+                RANDOM UPGRADE RACING
+            </p>
+
+            <h1>JUST A RACE TEAM</h1>
+
+            <p class="subtitle">
+                Race. Finish. Upgrade. Repeat.
+            </p>
+
+        </header>
+
+
+        <!-- HOME SCREEN -->
+
+        <section id="homeScreen">
+
+            <section class="game-card">
+
+                <div class="game-section">
+
+                    <label
+                        for="playerNameInput"
+                        class="input-label"
+                    >
+                        YOUR NAME
+                    </label>
+
+                    <input
+                        id="playerNameInput"
+                        type="text"
+                        maxlength="20"
+                        placeholder="PLAYER NAME"
+                        autocomplete="off"
+                    >
+
+                    <p
+                        id="homeMessage"
+                        class="message"
+                    ></p>
+
+                </div>
+
+
+                <div class="divider">
+                    <span>CREATE</span>
+                </div>
+
+
+                <div class="game-section">
+
+                    <h2>Create a Game</h2>
+
+                    <p>
+                        Start a new room and invite your friends.
+                    </p>
+
+                    <button
+                        id="createGameBtn"
+                        class="primary-button"
+                    >
+                        Create Game
+                    </button>
+
+                </div>
+
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+
+                <div class="game-section">
+
+                    <h2>Join a Game</h2>
+
+                    <p>
+                        Enter the room code from the host.
+                    </p>
+
+                    <input
+                        id="roomCodeInput"
+                        type="text"
+                        maxlength="5"
+                        placeholder="ROOM CODE"
+                        autocomplete="off"
+                    >
+
+                    <button
+                        id="joinGameBtn"
+                        class="secondary-button"
+                    >
+                        Join Game
+                    </button>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <!-- LOBBY SCREEN -->
+
+        <section
+            id="lobbyScreen"
+            class="hidden"
+        >
+
+            <section class="game-card lobby-card">
+
+                <div class="lobby-header">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            GAME LOBBY
+                        </p>
+
+                        <h2>
+                            Room
+                            <span id="lobbyRoomCode">
+                                -----
+                            </span>
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        id="leaveGameBtn"
+                        class="small-button"
+                    >
+                        Leave
+                    </button>
+
+                </div>
+
+
+                <div class="lobby-meta">
+
+                    <span>YOU ARE PLAYING AS</span>
+
+                    <strong id="lobbyPlayerName">
+                        Player
+                    </strong>
+
+                </div>
+
+
+                <h3>Players</h3>
+
+
+                <div class="player-list">
+
+                    <div class="player-row">
+
+                        <span id="playerListName">
+                            Player
+                        </span>
+
+                        <span
+                            id="hostBadge"
+                            class="host-badge"
+                        >
+                            HOST
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="lobbyNote"
+                    class="lobby-note"
+                >
+                    Waiting for players...
+                </p>
+
+
+                <button
+                    id="startGameBtn"
+                    class="primary-button"
+                >
+                    Start Game
+                </button>
+
+            </section>
+
+        </section>
+
+
+        <footer>
+            Just A Race Team
+        </footer>
+
+    </main>
+
 
     <script src="script.js"></script>
 
