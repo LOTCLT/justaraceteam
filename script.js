@@ -28,12 +28,14 @@ import {
     getUpgradeById,
     getStockForUpgrade,
     getRandomUpgradeRoll,
+    isUpgradeEligible,
+    pruneIncompatibleGarage,
     randomFromArray,
     RACE_MAP_IMAGE_URL,
     RACE_MAP_SOURCE_URL,
     getRaceMapMeta
 }
-    from "./game-data.js?v=7";
+    from "./game-data.js?v=8";
 
 
 /* =========================================================
@@ -838,6 +840,16 @@ function createBuildCell(
         );
 
 
+    if (optionName === "—") {
+        cell.classList.add(
+            "build-value",
+            "build-inactive"
+        );
+        cell.textContent = "—";
+        return cell;
+    }
+
+
     cell.classList.add(
         "build-value",
         getBuildValueClass(
@@ -1032,7 +1044,42 @@ function renderBuildComparison(
         null;
 
 
-    car.upgrades.forEach(
+    const stockGarage = {};
+
+    const visibleUpgrades =
+        car.upgrades.filter(
+            function (upgrade) {
+
+                if (
+                    isUpgradeEligible(
+                        car,
+                        stockGarage,
+                        upgrade
+                    )
+                ) {
+                    return true;
+                }
+
+                return players.some(
+                    function ([uid]) {
+                        const garage =
+                            roomData.garages &&
+                            roomData.garages[uid]
+                                ? roomData.garages[uid]
+                                : {};
+
+                        return isUpgradeEligible(
+                            car,
+                            garage,
+                            upgrade
+                        );
+                    }
+                );
+            }
+        );
+
+
+    visibleUpgrades.forEach(
         function (upgrade) {
 
             if (
@@ -1040,26 +1087,30 @@ function renderBuildComparison(
                 lastCategory
             ) {
 
+                lastCategory =
+                    upgrade.category;
+
+
                 const categoryRow =
                     document.createElement(
                         "tr"
                     );
 
 
-                categoryRow.classList.add(
-                    "build-category-row"
-                );
-
-
                 const categoryCell =
                     document.createElement(
-                        "th"
+                        "td"
                     );
 
 
                 categoryCell.colSpan =
-                    2 +
-                    players.length;
+                    players.length +
+                    2;
+
+
+                categoryCell.classList.add(
+                    "build-category-row"
+                );
 
 
                 categoryCell.textContent =
@@ -1074,10 +1125,6 @@ function renderBuildComparison(
                 tbody.appendChild(
                     categoryRow
                 );
-
-
-                lastCategory =
-                    upgrade.category;
 
             }
 
@@ -1100,12 +1147,24 @@ function renderBuildComparison(
 
 
             modCell.textContent =
-                upgrade.mod;
+                upgrade.variantLabel
+                    ? upgrade.mod +
+                      " · " +
+                      upgrade.variantLabel
+                    : upgrade.mod;
 
 
             row.appendChild(
                 modCell
             );
+
+
+            const stockEligible =
+                isUpgradeEligible(
+                    car,
+                    stockGarage,
+                    upgrade
+                );
 
 
             const stock =
@@ -1115,7 +1174,7 @@ function renderBuildComparison(
 
 
             const stockName =
-                stock
+                stockEligible && stock
                     ? stock.name
                     : "—";
 
@@ -1139,16 +1198,48 @@ function renderBuildComparison(
                             : {};
 
 
+                    const eligible =
+                        isUpgradeEligible(
+                            car,
+                            garage,
+                            upgrade
+                        );
+
+
+                    if (!eligible) {
+                        row.appendChild(
+                            createBuildCell(
+                                upgrade,
+                                "—",
+                                false
+                            )
+                        );
+                        return;
+                    }
+
+
                     const installed =
                         garage[
                             upgrade.id
                         ];
 
 
+                    const base =
+                        getStockForUpgrade(
+                            upgrade
+                        );
+
+
+                    const baseName =
+                        base
+                            ? base.name
+                            : "—";
+
+
                     const optionName =
                         installed
                             ? installed.option
-                            : stockName;
+                            : baseName;
 
 
                     row.appendChild(
@@ -1156,7 +1247,7 @@ function renderBuildComparison(
                             upgrade,
                             optionName,
                             optionName !==
-                                stockName
+                                baseName
                         )
                     );
 
@@ -1170,6 +1261,7 @@ function renderBuildComparison(
 
         }
     );
+
 
 
     table.appendChild(
@@ -1942,6 +2034,50 @@ function evaluateRollAgainstGarage(
     }
 
 
+    if (
+        !isUpgradeEligible(
+            car,
+            playerGarage,
+            upgrade
+        )
+    ) {
+
+        const unavailableBase =
+            getStockForUpgrade(
+                upgrade
+            );
+
+        const unavailableExisting =
+            playerGarage[
+                roll.modId
+            ];
+
+        const unavailableOption =
+            unavailableExisting
+                ? unavailableExisting.option
+                : (unavailableBase
+                    ? unavailableBase.name
+                    : "Unavailable");
+
+        const unavailableTier =
+            unavailableExisting
+                ? Number(unavailableExisting.tier || 0)
+                : (unavailableBase
+                    ? Number(unavailableBase.tier || 0)
+                    : 0);
+
+        return {
+            previousOption: unavailableOption,
+            previousTier: unavailableTier,
+            resultOption: unavailableOption,
+            resultTier: unavailableTier,
+            outcome: "INCOMPATIBLE - KEEP",
+            changed: false
+        };
+
+    }
+
+
     const stock =
         getStockForUpgrade(
             upgrade
@@ -2060,6 +2196,11 @@ function evaluateRollAgainstGarage(
             mod:
                 roll.mod,
 
+            variant:
+                upgrade.variantLabel ||
+                roll.variant ||
+                "",
+
             option:
                 resultOption,
 
@@ -2070,6 +2211,12 @@ function evaluateRollAgainstGarage(
                 round
 
         };
+
+
+        pruneIncompatibleGarage(
+            car,
+            playerGarage
+        );
 
     }
 
@@ -2230,8 +2377,14 @@ function buildUpgradePackage(
 
         const baseRoll =
             getRandomUpgradeRoll(
-                car
+                car,
+                originalGarage
             );
+
+
+        if (!baseRoll) {
+            continue;
+        }
 
 
         rolls.push(
@@ -3120,7 +3273,10 @@ function getOutcomeClass(outcome) {
     }
 
 
-    if (outcome === "LOCKED - KEEP") {
+    if (
+        outcome === "LOCKED - KEEP" ||
+        outcome === "INCOMPATIBLE - KEEP"
+    ) {
         return "outcome-locked";
     }
 
@@ -3213,7 +3369,11 @@ function createRollCard(
 
 
     mod.textContent =
-        roll.mod;
+        roll.variant
+            ? roll.mod +
+              " · " +
+              roll.variant
+            : roll.mod;
 
 
     const option =
@@ -4045,7 +4205,11 @@ function renderGarages(
 
 
                         mod.textContent =
-                            upgrade.mod;
+                            upgrade.variant
+                                ? upgrade.mod +
+                                  " · " +
+                                  upgrade.variant
+                                : upgrade.mod;
 
 
                         const option =

@@ -1,30 +1,32 @@
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
-   Version 7
+   Version 8
 
-   Add future cars here.
-   script.js automatically builds the car dropdown from this file.
+   V8 adds conditional upgrade trees for engine swaps and
+   aspiration conversions while keeping V7 race-map data.
    ========================================================= */
 
 
-function makeId(category, mod) {
+function makeId(category, mod, variant = "") {
 
-    return (
-        category +
-        "__" +
-        mod
-    )
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
+    const pieces = [category, mod];
+
+    if (variant) {
+        pieces.push(variant);
+    }
+
+    return pieces
+        .join("__")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "");
 
 }
 
 
-
 function cleanOptions(options) {
 
-    return options
+    return (options || [])
         .filter(
             option =>
                 option !== null &&
@@ -32,334 +34,145 @@ function cleanOptions(options) {
                 String(option).trim() !== "" &&
                 String(option).trim() !== "-"
         )
-        .map(
-            option =>
-                String(option).trim()
-        );
+        .map(option => String(option).trim());
 
 }
 
 
+function getUpgradeTier(mod, option, optionIndex) {
 
-function getUpgradeTier(
-    mod,
-    option,
-    optionIndex
-) {
+    const modName = String(mod || "").trim().toLowerCase();
+    const optionName = String(option || "").trim().toLowerCase();
 
-    const modName =
-        String(mod)
-            .trim()
-            .toLowerCase();
-
-
-    const optionName =
-        String(option)
-            .trim()
-            .toLowerCase();
-
-
-
-    /*
-        First usable option is the car's
-        stock/current state.
-    */
-
-    if (optionIndex === 0) {
-
-        return 0;
-
-    }
-
-
-
-    /*
-        Suspension:
-        Sport < Race/Rally/Drift family
-    */
-
+    /* Equal-tier conversion / appearance families. */
     if (
-        modName.includes("spring") &&
-        modName.includes("damper")
-    ) {
-
-        if (
-            optionName.includes("sport")
-        ) {
-
-            return 1;
-
-        }
-
-
-        return 2;
-
-    }
-
-
-
-    /*
-        Transmission:
-        Stock < Street < Sport <
-        Race / gear-count / Drift family
-    */
-
-    if (
-        modName ===
-        "transmission"
-    ) {
-
-        if (
-            optionName.includes("street")
-        ) {
-
-            return 1;
-
-        }
-
-
-        if (
-            optionName.includes("sport")
-        ) {
-
-            return 2;
-
-        }
-
-
-        return 3;
-
-    }
-
-
-
-    /*
-        Differential:
-        Stock < Street < Sport <
-        Race/Rally/Drift/Offroad family
-    */
-
-    if (
-        modName ===
-        "differential"
-    ) {
-
-        if (
-            optionName.includes("street")
-        ) {
-
-            return 1;
-
-        }
-
-
-        if (
-            optionName.includes("sport")
-        ) {
-
-            return 2;
-
-        }
-
-
-        return 3;
-
-    }
-
-
-
-    /*
-        Tire compounds.
-    */
-
-    if (
-        modName ===
-        "tire compound"
-    ) {
-
-        if (
-            optionName.includes("street")
-        ) {
-
-            return 1;
-
-        }
-
-
-        if (
-            optionName.includes("sport")
-        ) {
-
-            return 2;
-
-        }
-
-
-        if (
-            optionName.includes("semi-slick") ||
-            optionName.includes("semi slick")
-        ) {
-
-            return 3;
-
-        }
-
-
-        return 4;
-
-    }
-
-
-
-    /*
-        Equal-tier sidegrade families.
-    */
-
-    if (
-        modName ===
-        "wheels"
-    ) {
-
-        return 1;
-
-    }
-
-
-    if (
-        modName.includes(
-            "drivetrain swap"
-        )
-    ) {
-
-        return 1;
-
-    }
-
-
-    if (
-        modName ===
-        "aspiration"
-    ) {
-
-        return 1;
-
-    }
-
-
-    if (
+        modName.includes("drivetrain swap") ||
+        modName.includes("engine swap") ||
+        modName === "aspiration" ||
+        modName === "wheels" ||
+        modName === "wheel style" ||
+        modName === "wheel size" ||
         modName.includes("bumper") ||
         modName.includes("wing") ||
         modName.includes("body kit")
     ) {
-
-        return 1;
-
+        return optionIndex === 0 ? 0 : 1;
     }
 
+    /* Tire compounds use their own family tiers. */
+    if (modName === "tire compound") {
+        if (optionName.includes("street")) return 1;
+        if (optionName.includes("sport")) return 2;
+        if (optionName.includes("semi-slick") || optionName.includes("semi slick")) return 3;
+        if (optionIndex === 0) return 0;
+        return 4;
+    }
 
+    /* Forza labels are authoritative even when Street is the first visible option. */
+    if (optionName.includes("street")) return 1;
+    if (optionName.includes("sport")) return 2;
 
-    /*
-        Normal linear upgrades follow
-        their usable-option order.
-    */
+    if (
+        optionName.includes("race") ||
+        optionName.includes("rally") ||
+        optionName.includes("drift") ||
+        optionName.includes("offroad") ||
+        optionName.includes("off-road") ||
+        optionName.includes("snow") ||
+        optionName.includes("drag") ||
+        optionName === "slick" ||
+        optionName === "slick tires"
+    ) {
+        return 3;
+    }
+
+    /* First ordinary option is the stock/current state. */
+    if (optionIndex === 0) return 0;
 
     return optionIndex;
 
 }
 
 
+function normalizeRequirement(requirement) {
 
-function buildCar(
-    name,
-    startingPI,
-    rawUpgrades
-) {
-
-    const upgrades =
-        rawUpgrades
-            .map(
-                function (
-                    [
-                        category,
-                        mod,
-                        rawOptions
-                    ]
-                ) {
-
-                    const options =
-                        cleanOptions(
-                            rawOptions
-                        );
-
-
-                    return {
-
-                        id:
-                            makeId(
-                                category,
-                                mod
-                            ),
-
-                        category:
-                            category,
-
-                        mod:
-                            mod,
-
-                        options:
-                            options.map(
-                                function (
-                                    option,
-                                    optionIndex
-                                ) {
-
-                                    return {
-
-                                        name:
-                                            option,
-
-                                        tier:
-                                            getUpgradeTier(
-                                                mod,
-                                                option,
-                                                optionIndex
-                                            )
-
-                                    };
-
-                                }
-                            )
-
-                    };
-
-                }
-            )
-            .filter(
-                upgrade =>
-                    upgrade.options.length >= 2
-            );
-
+    const allowed = Array.isArray(requirement.options)
+        ? requirement.options
+        : [requirement.options];
 
     return {
-
-        name:
-            name,
-
-        startingPI:
-            startingPI,
-
-        upgrades:
-            upgrades
-
+        modId: makeId(
+            requirement.category,
+            requirement.mod,
+            requirement.variant || ""
+        ),
+        options: cleanOptions(allowed)
     };
 
 }
 
 
+function buildCar(name, startingPI, rawUpgrades) {
 
-/* =========================================================
-   CARS
-   ========================================================= */
+    const upgrades = rawUpgrades
+        .map(function (raw) {
+
+            const config = Array.isArray(raw)
+                ? {
+                    category: raw[0],
+                    mod: raw[1],
+                    options: raw[2]
+                }
+                : raw;
+
+            const category = String(config.category || "").trim();
+            const mod = String(config.mod || "").trim();
+            const variant = String(config.variant || "").trim();
+            const options = cleanOptions(config.options);
+
+            const builtOptions = options.map(
+                function (option, optionIndex) {
+                    return {
+                        name: option,
+                        tier: getUpgradeTier(mod, option, optionIndex)
+                    };
+                }
+            );
+
+            const implicitBase = config.implicitBase
+                ? {
+                    name: String(config.implicitBase),
+                    tier: 0,
+                    implicit: true
+                }
+                : null;
+
+            return {
+                id: makeId(category, mod, variant),
+                category: category,
+                mod: mod,
+                variant: variant,
+                variantLabel: variant,
+                options: builtOptions,
+                baseOption: implicitBase || builtOptions[0] || null,
+                requirements: (config.requires || []).map(normalizeRequirement)
+            };
+
+        })
+        .filter(function (upgrade) {
+            if (!upgrade.baseOption) return false;
+            if (upgrade.baseOption.implicit) return upgrade.options.length >= 1;
+            return upgrade.options.length >= 2;
+        });
+
+    return {
+        name: name,
+        startingPI: startingPI,
+        upgrades: upgrades
+    };
+
+}
+
 
 export const CAR_LIBRARY = [
 
@@ -433,10 +246,853 @@ export const CAR_LIBRARY = [
             ["Body Kits and Conversions", "Drivetrain Swap", ["Stock (FWD)", "RWD", "AWD"]],
             ["Body Kits and Conversions", "Aspiration", ["Stock (NA)", "Big Single Turbo", "Supercharger"]]
         ]
+    ),
+
+
+    buildCar(
+        "2024 Toyota Prius Prime XSE Premium",
+        "C472",
+        [
+        {
+                    category: "Engine",
+                    mod: "Intake",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake Manifold / Throttle Body",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Fuel System",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Ignition",
+                    options: ["Stock", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Exhaust",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Valves",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "street", "sport", "race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Oil / Cooling",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Flywheel",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Platform and Handling",
+                    mod: "Brakes",
+                    options: ["Stock", "Street", "Sport", "Race"]
+                },
+        {
+                    category: "Platform and Handling",
+                    mod: "Springs and Dampers",
+                    options: ["Stock", "Street", "Sport", "Race", "Rally", "Drift"]
+                },
+        {
+                    category: "Platform and Handling",
+                    mod: "Front Anti-Roll Bars",
+                    options: ["Stock", "Sport", "Race"]
+                },
+        {
+                    category: "Platform and Handling",
+                    mod: "Rear Anti-Roll Bars",
+                    options: ["Stock", "Sport", "Race"]
+                },
+        {
+                    category: "Platform and Handling",
+                    mod: "Chassis Reinforcement / Roll Cage",
+                    options: ["Stock", "Street", "Sport", "Race"]
+                },
+        {
+                    category: "Platform and Handling",
+                    mod: "Weight Reduction",
+                    options: ["Stock", "Street", "Sport", "Race"]
+                },
+        {
+                    category: "Drivetrain",
+                    mod: "Clutch",
+                    options: ["Stock", "Street", "Sport", "Race"]
+                },
+        {
+                    category: "Drivetrain",
+                    mod: "Transmission",
+                    options: ["Stock", "Race", "Race: 7 Speed", "Race: 8 Speed", "Race: 9 Speed", "Race: 10 Speed", "Drift: 4 Speed"]
+                },
+        {
+                    category: "Drivetrain",
+                    mod: "Driveline",
+                    options: ["Stock", "Street", "Sport", "Race"]
+                },
+        {
+                    category: "Drivetrain",
+                    mod: "Differential",
+                    options: ["Stock", "Street", "Sport", "Race", "Rally"]
+                },
+        {
+                    category: "Tires and Rims",
+                    mod: "Tire Compound",
+                    options: ["Stock", "Street", "Sport", "Semi-Slick Race", "\"Horizon\" Semi-Slick Race", "Slick", "Drift", "Rally", "Offroad", "Snow", "Drag"]
+                },
+        {
+                    category: "Tires and Rims",
+                    mod: "Front Tire Width",
+                    options: ["195", "215", "225", "235"]
+                },
+        {
+                    category: "Tires and Rims",
+                    mod: "Rear Tire Width",
+                    options: ["195", "215", "225", "235"]
+                },
+        {
+                    category: "Tires and Rims",
+                    mod: "Wheel Style",
+                    options: ["Stock", "Style"]
+                },
+        {
+                    category: "Tires and Rims",
+                    mod: "Wheel Size",
+                    options: ["Stock", "Size"]
+                },
+        {
+                    category: "Aero and Appearance",
+                    mod: "Front Bumper",
+                    options: ["Stock", "TRD Front Bumper", "Forza Race"]
+                },
+        {
+                    category: "Aero and Appearance",
+                    mod: "Rear Bumper",
+                    options: ["Stock", "TRD Rear Bumper", "Forza Race"]
+                },
+        {
+                    category: "Body Kits and Conversions",
+                    mod: "Drivetrain Swap",
+                    options: ["FWD", "RWD", "AWD"]
+                },
+        {
+                    category: "Body Kits and Conversions",
+                    mod: "Aspiration",
+                    options: ["NA", "Single Turbo"],
+                    variant: "Stock Engine",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                    ]
+                },
+        {
+                    category: "Body Kits and Conversions",
+                    mod: "Engine Swap",
+                    options: ["Stock", "1.6L I3-T", "2.5L I6-T", "1.6L I4 - Turbo Rally", "3.0L I6 - TT", "6.2L V8", "4.8L V10"]
+                },
+        {
+                    category: "Engine",
+                    mod: "Single Turbo",
+                    options: ["Street Turbo", "Sport Turbo", "Race Turbo"],
+                    variant: "Stock Engine · Single Turbo",
+                    implicitBase: "Base Single Turbo",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Single Turbo"], variant: "Stock Engine" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intercooler",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "Stock Engine · Single Turbo",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Single Turbo"], variant: "Stock Engine" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Fuel System",
+                    options: ["Stock", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Ignition",
+                    options: ["Stock", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Exhaust",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Valves",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Piston / Compression",
+                    options: ["Stock", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Single Turbo",
+                    options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intercooler",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Oil / Cooling",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Flywheel",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "1.6L I3-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I3-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Fuel System",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Ignition",
+                    options: ["Stock", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Exhaust",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Valves",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Piston / Compression",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "Street", "Sport", "race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Single Turbo",
+                    options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intercooler",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Oil / Cooling",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Flywheel",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "2.5L I6-T",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["2.5L I6-T"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Race"],
+                    variant: "1.6L I4 - Turbo Rally",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "Race"],
+                    variant: "1.6L I4 - Turbo Rally",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Single Turbo",
+                    options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                    variant: "1.6L I4 - Turbo Rally",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Restrictor Plate",
+                    options: ["Stock", "No Restrictor Plate", "Remove Restrictors"],
+                    variant: "1.6L I4 - Turbo Rally",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                    ]
+                },
+        {
+                    category: "Body Kits and Conversions",
+                    mod: "Aspiration",
+                    options: ["Stock Twin Turbos", "Single Turbo"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Single Turbo",
+                    options: ["Street Turbo", "Sport Turbo", "Race Turbo", "Race with Anti-Lag"],
+                    variant: "3.0L I6 - TT",
+                    implicitBase: "Base Single Turbo",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Single Turbo"], variant: "3.0L I6 - TT" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Fuel System",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Ignition",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Exhaust",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Valves",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Piston / Compression",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "Sport", "race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Twin Turbos",
+                    options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Stock Twin Turbos"], variant: "3.0L I6 - TT" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intercooler",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Oil / Cooling",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Flywheel",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "3.0L I6 - TT",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                    ]
+                },
+        {
+                    category: "Body Kits and Conversions",
+                    mod: "Aspiration",
+                    options: ["NA", "Twin Turbos", "Supercharger"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Twin Turbos",
+                    options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Twin Turbos"], variant: "6.2L V8" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Supercharger",
+                    options: ["Street", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    implicitBase: "Base Supercharger",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Supercharger"], variant: "6.2L V8" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake Manifold / Throttle Body",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Fuel System",
+                    options: ["Stock", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Ignition",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Exhaust",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Valves",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Piston / Compression",
+                    options: ["Stock", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "Street", "Sport", "race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Oil / Cooling",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Flywheel",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "6.2L V8",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["6.2L V8"] }
+                    ]
+                },
+        {
+                    category: "Body Kits and Conversions",
+                    mod: "Aspiration",
+                    options: ["NA", "Twin Turbos"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Twin Turbos",
+                    options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Twin Turbos"], variant: "4.8L V10" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intercooler",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] },
+                        { category: "Body Kits and Conversions", mod: "Aspiration", options: ["Twin Turbos"], variant: "4.8L V10" }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake",
+                    options: ["Stock", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Intake Manifold / Throttle Body",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Fuel System",
+                    options: ["Stock", "Street", "Sport", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Ignition",
+                    options: ["Stock", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Exhaust",
+                    options: ["Stock", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Camshaft",
+                    options: ["Stock", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Valves",
+                    options: ["Stock", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Displacement",
+                    options: ["Stock", "race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                },
+        {
+                    category: "Engine",
+                    mod: "Flywheel",
+                    options: ["Stock", "Sport", "Race"],
+                    variant: "4.8L V10",
+                    requires: [
+                        { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.8L V10"] }
+                    ]
+                }
+        ]
     )
 
-];
 
+];
 
 
 /* =========================================================
@@ -758,158 +1414,153 @@ export const REWARDS_BY_PLACE = {
    DATA HELPERS
    ========================================================= */
 
-export function getCarByName(
-    carName
-) {
+export function getCarByName(carName) {
 
-    return (
-        CAR_LIBRARY.find(
-            car =>
-                car.name ===
-                carName
-        ) ||
-        null
-    );
+    return CAR_LIBRARY.find(car => car.name === carName) || null;
 
 }
 
 
+export function getUpgradeById(car, modId) {
 
-export function getUpgradeById(
-    car,
-    modId
-) {
+    if (!car) return null;
 
-    if (!car) {
+    return car.upgrades.find(upgrade => upgrade.id === modId) || null;
 
-        return null;
+}
 
+
+export function getStockForUpgrade(upgrade) {
+
+    if (!upgrade) return null;
+
+    return upgrade.baseOption || upgrade.options[0] || null;
+
+}
+
+
+function normalizeOptionValue(value) {
+    return String(value || "").trim().toLowerCase();
+}
+
+
+export function getEffectiveUpgradeOption(car, garage, upgrade) {
+
+    if (!upgrade) return null;
+
+    const installed = garage && garage[upgrade.id];
+
+    if (installed && installed.option !== undefined) {
+        return String(installed.option);
     }
 
-
-    return (
-        car.upgrades.find(
-            upgrade =>
-                upgrade.id ===
-                modId
-        ) ||
-        null
-    );
+    const base = getStockForUpgrade(upgrade);
+    return base ? base.name : null;
 
 }
 
 
+export function isUpgradeEligible(car, garage, upgrade, visiting = new Set()) {
 
-export function getStockForUpgrade(
-    upgrade
-) {
+    if (!car || !upgrade) return false;
 
-    if (
-        !upgrade ||
-        !upgrade.options.length
-    ) {
-
-        return null;
-
+    if (!upgrade.requirements || upgrade.requirements.length === 0) {
+        return true;
     }
 
+    if (visiting.has(upgrade.id)) return false;
 
-    return upgrade.options[0];
+    const nextVisiting = new Set(visiting);
+    nextVisiting.add(upgrade.id);
+
+    return upgrade.requirements.every(function (requirement) {
+
+        const parent = getUpgradeById(car, requirement.modId);
+        if (!parent) return false;
+
+        if (!isUpgradeEligible(car, garage, parent, nextVisiting)) {
+            return false;
+        }
+
+        const current = normalizeOptionValue(
+            getEffectiveUpgradeOption(car, garage, parent)
+        );
+
+        return requirement.options.some(
+            option => normalizeOptionValue(option) === current
+        );
+
+    });
 
 }
 
 
+export function pruneIncompatibleGarage(car, garage) {
 
-export function randomFromArray(
-    array
-) {
+    if (!car || !garage) return garage;
 
-    return array[
-        Math.floor(
-            Math.random() *
-            array.length
+    let removed = true;
+
+    while (removed) {
+        removed = false;
+
+        Object.keys(garage).forEach(function (modId) {
+            const upgrade = getUpgradeById(car, modId);
+
+            if (!upgrade || !isUpgradeEligible(car, garage, upgrade)) {
+                delete garage[modId];
+                removed = true;
+            }
+        });
+    }
+
+    return garage;
+
+}
+
+
+export function randomFromArray(array) {
+
+    return array[Math.floor(Math.random() * array.length)];
+
+}
+
+
+export function getRandomUpgradeRoll(car, garage = {}) {
+
+    if (!car || !car.upgrades.length) return null;
+
+    const eligibleUpgrades = car.upgrades.filter(
+        upgrade =>
+            upgrade.options.length > 0 &&
+            isUpgradeEligible(car, garage, upgrade)
+    );
+
+    if (eligibleUpgrades.length === 0) return null;
+
+    /* Category first, then an eligible mod, then a real in-game option. */
+    const categories = [
+        ...new Set(
+            eligibleUpgrades.map(upgrade => upgrade.category)
         )
     ];
 
-}
+    const category = randomFromArray(categories);
 
+    const categoryMods = eligibleUpgrades.filter(
+        upgrade => upgrade.category === category
+    );
 
-
-export function getRandomUpgradeRoll(
-    car
-) {
-
-    if (
-        !car ||
-        !car.upgrades.length
-    ) {
-
-        return null;
-
-    }
-
-
-
-    /*
-        Category is chosen first,
-        then a mod inside that category,
-        then one available option.
-    */
-
-    const categories =
-        [
-            ...new Set(
-                car.upgrades.map(
-                    upgrade =>
-                        upgrade.category
-                )
-            )
-        ];
-
-
-    const category =
-        randomFromArray(
-            categories
-        );
-
-
-    const categoryMods =
-        car.upgrades.filter(
-            upgrade =>
-                upgrade.category ===
-                category
-        );
-
-
-    const upgrade =
-        randomFromArray(
-            categoryMods
-        );
-
-
-    const option =
-        randomFromArray(
-            upgrade.options
-        );
-
+    const upgrade = randomFromArray(categoryMods);
+    const option = randomFromArray(upgrade.options);
 
     return {
-
-        category:
-            upgrade.category,
-
-        mod:
-            upgrade.mod,
-
-        modId:
-            upgrade.id,
-
-        option:
-            option.name,
-
-        tier:
-            option.tier
-
+        category: upgrade.category,
+        mod: upgrade.mod,
+        modId: upgrade.id,
+        variant: upgrade.variantLabel || "",
+        option: option.name,
+        tier: option.tier
     };
 
 }
