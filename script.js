@@ -35,7 +35,7 @@ import {
     RACE_MAP_SOURCE_URL,
     getRaceMapMeta
 }
-    from "./game-data.js?v=8.1";
+    from "./game-data.js?v=8.2";
 
 
 /* =========================================================

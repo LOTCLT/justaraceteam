@@ -1,6 +1,6 @@
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
-   Version 8
+   Version 8.2
 
    V8 adds conditional upgrade trees for engine swaps and
    aspiration conversions while keeping V7 race-map data.
@@ -1530,29 +1530,46 @@ export function getRandomUpgradeRoll(car, garage = {}) {
 
     if (!car || !car.upgrades.length) return null;
 
-    const eligibleUpgrades = car.upgrades.filter(
-        upgrade =>
-            upgrade.options.length > 0 &&
-            isUpgradeEligible(car, garage, upgrade)
-    );
+    /*
+        Tier 0 represents the stock / base state. It still exists in the
+        database so garage comparisons and dependency logic know where a
+        build starts, but it is never a reward roll.
+
+        This also handles Forza upgrade trees whose first visible upgrade is
+        Street: those options are Tier 1 and remain eligible to roll.
+    */
+    const eligibleUpgrades = car.upgrades
+        .filter(
+            upgrade => isUpgradeEligible(car, garage, upgrade)
+        )
+        .map(function (upgrade) {
+            return {
+                upgrade: upgrade,
+                rollOptions: upgrade.options.filter(
+                    option => Number(option.tier || 0) > 0
+                )
+            };
+        })
+        .filter(entry => entry.rollOptions.length > 0);
 
     if (eligibleUpgrades.length === 0) return null;
 
-    /* Category first, then an eligible mod, then a real in-game option. */
+    /* Category first, then an eligible mod, then a non-stock in-game option. */
     const categories = [
         ...new Set(
-            eligibleUpgrades.map(upgrade => upgrade.category)
+            eligibleUpgrades.map(entry => entry.upgrade.category)
         )
     ];
 
     const category = randomFromArray(categories);
 
     const categoryMods = eligibleUpgrades.filter(
-        upgrade => upgrade.category === category
+        entry => entry.upgrade.category === category
     );
 
-    const upgrade = randomFromArray(categoryMods);
-    const option = randomFromArray(upgrade.options);
+    const selected = randomFromArray(categoryMods);
+    const upgrade = selected.upgrade;
+    const option = randomFromArray(selected.rollOptions);
 
     return {
         category: upgrade.category,
