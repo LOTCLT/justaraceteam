@@ -1,6 +1,6 @@
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
-   Version 8.2
+   Version 9
 
    V8 adds conditional upgrade trees for engine swaps and
    aspiration conversions while keeping V7 race-map data.
@@ -1546,7 +1546,7 @@ export function getRandomUpgradeRoll(car, garage = {}) {
             return {
                 upgrade: upgrade,
                 rollOptions: upgrade.options.filter(
-                    option => Number(option.tier || 0) > 0
+                    option => Number(option.tier || 0) > 0 && option.name !== (garage[upgrade.id]?.option || getStockForUpgrade(upgrade)?.name)
                 )
             };
         })

@@ -18,7 +18,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=8.2"
+        href="style.css?v=9"
     >
 </head>
 
@@ -46,6 +46,7 @@
              ================================================== -->
 
         <section id="homeScreen">
+            <button id="resumeGameBtn" class="primary-button wide-button hidden" type="button"></button>
 
             <section class="game-card">
 
@@ -603,6 +604,7 @@
                         >
                             Roll Upgrades
                         </button>
+                        <button id="editResultsBtn" class="dark-button wide-button" type="button">Edit Results</button>
 
                         <button
                             id="endRaceNightFromResultsBtn"
@@ -644,6 +646,11 @@
                         class="lobby-note"
                     ></p>
 
+                    <div id="decisionStatus" class="lobby-note" role="status" aria-live="polite"></div>
+                    <div id="nextRaceControls" class="hidden">
+                        <button id="queueRaceBtn" class="dark-button wide-button" type="button">Get Next Race</button>
+                        <div id="queuedRacePreview" class="queued-race" aria-live="polite"></div>
+                    </div>
                     <div id="upgradeRollsList"></div>
 
                     <div
@@ -680,8 +687,9 @@
                             class="primary-button wide-button"
                             type="button"
                         >
-                            Next Round
+                            Start Next Race
                         </button>
+                        <button id="undoUpgradesBtn" class="dark-button wide-button" type="button">Undo Applied Upgrades</button>
 
                         <button
                             id="endRaceNightBtn"
@@ -792,6 +800,7 @@
                 </div>
 
                 <div id="finalStandings"></div>
+                <div id="finalRecap" class="lobby-note"></div>
 
                 <p
                     id="finalRaceCount"
@@ -821,7 +830,7 @@
 
     <script
         type="module"
-        src="script.js?v=8.2"
+        src="script.js?v=9"
     ></script>
 
 </body>

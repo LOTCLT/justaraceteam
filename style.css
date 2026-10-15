@@ -1601,3 +1601,10 @@ footer {
     opacity: 0.38;
     font-style: italic;
 }
+
+/* V9 queue preview */
+.queued-race { margin: 12px 0 20px; padding: 12px; border: 1px solid #465267; border-radius: 12px; }
+.queue-map { position: relative; max-width: 520px; margin: auto; }
+.queue-map img { display: block; width: 100%; border-radius: 8px; }
+.queue-pin { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: currentColor; border: 2px solid white; transform: translate(-50%, -50%); box-shadow: 0 0 0 3px #0009; }
+button:disabled { cursor: default; opacity: .55; }

@@ -15,7 +15,8 @@ import {
     update,
     remove,
     onValue,
-    serverTimestamp
+    serverTimestamp,
+    runTransaction
 }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
@@ -35,7 +36,7 @@ import {
     RACE_MAP_SOURCE_URL,
     getRaceMapMeta
 }
-    from "./game-data.js?v=8.2";
+    from "./game-data.js?v=9";
 
 
 /* =========================================================
@@ -2430,10 +2431,8 @@ function getRollDecision(
     rollIndex
 ) {
 
-    const key =
-        getDecisionKey(
-            rollIndex
-        );
+    if (!rollNeedsDecision(normalizeRolls(packageData.rolls)[rollIndex])) return "pass";
+    const key = getDecisionKey(rollIndex);
 
 
     return (
@@ -3211,9 +3210,7 @@ function renderRoundResults(
     );
 
 
-    resultsEntryPanel.classList.add(
-        "hidden"
-    );
+    if (!editingResults) resultsEntryPanel.classList.add("hidden");
 
 
     raceCompleteControls.classList.add(
@@ -3396,8 +3393,7 @@ function createRollCard(
     );
 
 
-    option.textContent =
-        roll.option;
+    option.textContent = "Rolled: " + roll.option;
 
 
     const current =
@@ -3430,16 +3426,20 @@ function createRollCard(
     );
 
 
-    outcome.textContent =
-        roll.outcome;
+    outcome.textContent = "Result: " + roll.outcome;
 
 
+    const definition = getUpgradeById(getSelectedCarDefinition(roomData), roll.modId);
+    const context = document.createElement("p");
+    context.className = "roll-current";
+    context.textContent = (definition?.requirements || []).map(req => "Requires " + (getUpgradeById(getSelectedCarDefinition(roomData), req.modId)?.mod || "") + " " + (req.options || []).join(" / ")).join(" · ");
     card.append(
         rollNumber,
         category,
         mod,
-        option,
+        context,
         current,
+        option,
         outcome
     );
 
@@ -3462,8 +3462,8 @@ function createRollCard(
 
         decisionBadge.textContent =
             decision === "apply"
-                ? "APPLY"
-                : "PASS";
+                ? "APPLY · LOCKED"
+                : (rollNeedsDecision(roll) ? "PASS · LOCKED" : "AUTO · KEEP CURRENT");
 
 
         card.appendChild(
@@ -3473,7 +3473,7 @@ function createRollCard(
     }
 
 
-    const canDecide =
+    const canDecide = !decision && !decisionSaving && rollNeedsDecision(roll) &&
         (
             packageData.uid ===
                 currentUserUid &&
@@ -3634,9 +3634,7 @@ function renderUpgradePanel(
     );
 
 
-    resultsEntryPanel.classList.add(
-        "hidden"
-    );
+    if (!editingResults) resultsEntryPanel.classList.add("hidden");
 
 
     hostGameControls.classList.add(
@@ -4415,6 +4413,8 @@ function listenToRoom(
 
                 currentRoomData =
                     roomData;
+                if (roomData.gamePhase !== "results") editingResults = false;
+                renderV9(roomData);
 
 
                 const playerCount =
@@ -4544,6 +4544,7 @@ function showLobby(
 
     currentRoomCode =
         roomCode;
+    rememberRoom(roomCode);
 
 
     currentPlayerName =
@@ -5411,6 +5412,7 @@ enterResultsButton.addEventListener(
 cancelResultsButton.addEventListener(
     "click",
     function () {
+        editingResults = false;
 
         resultsEntryPanel.classList.add(
             "hidden"
@@ -5527,7 +5529,7 @@ submitResultsButton.addEventListener(
 
 
         if (
-            existingResult.exists()
+            existingResult.exists() && !editingResults
         ) {
 
             resultEntryMessage.textContent =
@@ -5635,18 +5637,20 @@ submitResultsButton.addEventListener(
             raceResult;
 
 
-        updates.gamePhase =
-            "results";
+        updates.gamePhase = "results";
+        if (currentRoomData.upgradeRounds?.[roundKey]) return;
 
 
-        await update(
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            ),
-            updates
-        );
+        const submission = await hostTransaction(room => {
+            if ((room.currentRound || 1) !== round) return;
+            if (room.upgradeRounds?.[roundKey] || !["racing", "results"].includes(room.gamePhase)) return;
+            if (room.raceHistory?.[roundKey] && !editingResults) return;
+            return applyRoomUpdates(room, updates);
+        });
+        if (submission?.committed) {
+            editingResults = false;
+            resultsEntryPanel.classList.add("hidden");
+        }
 
     }
 );
@@ -5690,20 +5694,6 @@ goToUpgradesButton.addEventListener(
 
 
         if (existingUpgradeRound) {
-
-            await update(
-                ref(
-                    database,
-                    "rooms/" +
-                    currentRoomCode
-                ),
-                {
-                    gamePhase:
-                        "upgrades"
-                }
-            );
-
-
             return;
 
         }
@@ -5795,14 +5785,12 @@ goToUpgradesButton.addEventListener(
             "upgrades";
 
 
-        await update(
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            ),
-            updates
-        );
+        await hostTransaction(room => {
+            if ((room.currentRound || 1) !== round) return;
+            if (room.gamePhase !== "results" || room.upgradeRounds?.[roundKey]) return;
+            if (JSON.stringify(room.raceHistory?.[roundKey]?.finishOrder) !== JSON.stringify(race.finishOrder)) return;
+            return applyRoomUpdates(room, updates);
+        });
 
     }
 );
@@ -5812,180 +5800,40 @@ goToUpgradesButton.addEventListener(
    PLAYER APPLY / PASS DECISIONS
    ========================================================= */
 
-async function setUpgradeDecisionValue(
-    roundKey,
-    rollIndex,
-    decision
-) {
-
-    await set(
-        ref(
-            database,
-            "rooms/" +
-            currentRoomCode +
-            "/upgradeRounds/" +
-            roundKey +
-            "/players/" +
-            currentUserUid +
-            "/decisions/" +
-            getDecisionKey(
-                rollIndex
-            )
-        ),
-        decision
-    );
-
+let decisionSaving = false;
+function rollNeedsDecision(roll) {
+    return !!roll && Number(roll.tier) > 0 && ["UPGRADE", "SIDEGRADE"].includes(roll.outcome);
 }
-
-
-async function saveUpgradeDecision(
-    rollIndex,
-    decision
-) {
-
-    if (
-        !currentRoomData ||
-        currentRoomData.gamePhase !==
-            "upgrades" ||
-        !currentUserUid ||
-        (
-            decision !== "apply" &&
-            decision !== "pass"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const round =
-        currentRoomData.currentRound ||
-        1;
-
-
-    const roundKey =
-        getRoundKey(
-            round
-        );
-
-
-    const packageData =
-        currentRoomData.upgradeRounds &&
-        currentRoomData.upgradeRounds[
-            roundKey
-        ] &&
-        currentRoomData.upgradeRounds[
-            roundKey
-        ].players
-            ? currentRoomData.upgradeRounds[
-                roundKey
-            ].players[
-                currentUserUid
-            ]
-            : null;
-
-
-    if (
-        !packageData ||
-        packageData.resolved
-    ) {
-
-        return;
-
-    }
-
-
-    const rolls =
-        normalizeRolls(
-            packageData.rolls
-        );
-
-
-    if (
-        rollIndex < 0 ||
-        rollIndex >= rolls.length
-    ) {
-
-        return;
-
-    }
-
-
+async function saveUpgradeDecision(rollIndex, decision) {
+    if (decisionSaving || !["apply", "pass"].includes(decision) || currentRoomData?.gamePhase !== "upgrades") return;
+    const roundKey = getRoundKey(currentRoomData.currentRound || 1);
+    const pack = currentRoomData.upgradeRounds?.[roundKey]?.players?.[currentUserUid];
+    const rolls = normalizeRolls(pack?.rolls);
+    if (!pack || pack.resolved || !rollNeedsDecision(rolls[rollIndex]) || getRollDecision(pack, rollIndex)) return;
+    decisionSaving = true;
+    renderUpgradePanel(currentRoomData);
     try {
-
-        const tasks =
-            [];
-
-
-        tasks.push(
-            setUpgradeDecisionValue(
-                roundKey,
-                rollIndex,
-                decision
-            )
-        );
-
-
-        /*
-            Third place may keep at most one.
-            Applying one roll automatically
-            passes the other roll(s).
-        */
-
-        if (
-            decision === "apply" &&
-            Number(
-                packageData.keepCount ||
-                0
-            ) === 1 &&
-            rolls.length > 1
-        ) {
-
-            rolls.forEach(
-                function (unused, index) {
-
-                    if (
-                        index !==
-                        rollIndex
-                    ) {
-
-                        tasks.push(
-                            setUpgradeDecisionValue(
-                                roundKey,
-                                index,
-                                "pass"
-                            )
-                        );
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        await Promise.all(
-            tasks
-        );
-
+        await runTransaction(ref(database, "rooms/" + currentRoomCode + "/upgradeRounds/" + roundKey + "/players/" + currentUserUid + "/decisions"), old => {
+            const choices = {...(old || {})};
+            const key = getDecisionKey(rollIndex);
+            if (choices[key]) return;
+            if (decision === "apply" && Object.values(choices).filter(x => x === "apply").length >= pack.keepCount) return;
+            choices[key] = decision;
+            if (decision === "apply" && Number(pack.keepCount) === 1) {
+                rolls.forEach((roll, index) => {
+                    if (index !== rollIndex && !choices[getDecisionKey(index)]) choices[getDecisionKey(index)] = "pass";
+                });
+            }
+            return choices;
+        }, {applyLocally: false});
+    } catch (error) {
+        showHomeMessage("Could not save choice: " + error.message, "error");
+        alert("Could not save your choice. Please try again. " + error.message);
+    } finally {
+        decisionSaving = false;
+        renderUpgradePanel(currentRoomData);
     }
-    catch (error) {
-
-        console.error(
-            "Could not save upgrade decision:",
-            error
-        );
-
-
-        upgradeStatusMessage.textContent =
-            "Could not save your Apply / Pass decision. Check the Firebase rules.";
-
-    }
-
 }
-
 
 /* =========================================================
    APPLY UPGRADES
@@ -6196,6 +6044,7 @@ applyUpgradesButton.addEventListener(
         );
 
 
+        updates.upgradeUndo = {round, garages: cloneObject(currentRoomData.garages || {})};
         updates.garages =
             garages;
 
@@ -6212,14 +6061,15 @@ applyUpgradesButton.addEventListener(
             Date.now();
 
 
-        await update(
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            ),
-            updates
-        );
+        await hostTransaction(room => {
+            if ((room.currentRound || 1) !== round) return;
+            if (room.gamePhase !== "upgrades" || !allUpgradeDecisionsReady(room.upgradeRounds?.[roundKey])) return;
+            const latestPackages = room.upgradeRounds[roundKey].players || {};
+            if (Object.entries(upgradeRound.players || {}).some(([uid, pack]) =>
+                normalizeRolls(pack.rolls).some((roll, index) =>
+                    getRollDecision(pack, index) !== getRollDecision(latestPackages[uid] || {}, index)))) return;
+            return applyRoomUpdates(room, updates);
+        });
 
     }
 );
@@ -6252,29 +6102,14 @@ nextRoundButton.addEventListener(
             ) + 1;
 
 
-        await update(
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode
-            ),
-            {
-
-                currentRound:
-                    nextRound,
-
-                gamePhase:
-                    "setup",
-
-                currentRace:
-                    null,
-
-                raceGeneratedAt:
-                    null
-
-            }
-        );
-
+        await hostTransaction(room => {
+            if (room.gamePhase !== "upgradeComplete" || (room.currentRound || 1) !== nextRound - 1) return;
+            room.currentRound = nextRound;
+            room.currentRace = room.queuedRace || pickNextRace(room.currentRace);
+            delete room.queuedRace; delete room.upgradeUndo;
+            room.gamePhase = "racing"; room.raceGeneratedAt = Date.now();
+            return room;
+        });
 
         window.scrollTo({
             top: 0,
@@ -6509,3 +6344,126 @@ roomCodeInput.addEventListener(
 
     }
 );
+
+/* V9: one queued race, one undo snapshot, and browser-local reconnect. */
+let editingResults = false;
+function pickNextRace(current) {
+    return randomFromArray(RACE_POOL.filter(race => RACE_POOL.length === 1 || race.name !== current?.name));
+}
+function rememberRoom(code) {
+    try { localStorage.setItem("jart:lastRoom", code); } catch {}
+    const button = document.getElementById("resumeGameBtn");
+    button.textContent = "Resume Race Night · Room " + code;
+    button.classList.remove("hidden");
+}
+function readLastRoom() {
+    try { return localStorage.getItem("jart:lastRoom"); } catch { return null; }
+}
+function renderV9(room) {
+    const round = room.currentRound || 1;
+    const phase = room.gamePhase;
+    const upgradeRound = room.upgradeRounds?.[getRoundKey(round)];
+    const packs = Object.values(upgradeRound?.players || {});
+    const waiting = packs.filter(pack => !packageDecisionsReady(pack)).map(pack => pack.name);
+    document.getElementById("decisionStatus").textContent = packs.map(pack =>
+        (packageDecisionsReady(pack) ? "✓ " : "… ") + pack.name).join(" · ") +
+        (waiting.length ? " — Waiting on: " + waiting.join(", ") : " — Everyone is ready");
+    document.getElementById("nextRaceControls").classList.toggle("hidden", !currentPlayerIsHost || !["upgrades", "upgradeComplete"].includes(phase));
+    document.getElementById("queueRaceBtn").disabled = !!room.queuedRace;
+    const preview = document.getElementById("queuedRacePreview");
+    preview.replaceChildren();
+    if (room.queuedRace) {
+        const race = room.queuedRace;
+        const meta = getRaceMapMeta(race);
+        const title = document.createElement("p");
+        title.textContent = "NEXT RACE · " + race.type + " · " + race.name + " · " + race.distance;
+        preview.append(title);
+        if (meta) {
+            const map = document.createElement("div"); map.className = "queue-map";
+            const image = document.createElement("img"); image.src = RACE_MAP_IMAGE_URL; image.alt = "Approximate next race location: " + meta.region;
+            const pin = document.createElement("span"); pin.className = "queue-pin map-" + getRaceThemeClass(race.type);
+            pin.style.left = meta.x + "%"; pin.style.top = meta.y + "%";
+            map.append(image, pin); preview.append(map);
+            const note = document.createElement("p"); note.textContent = meta.region + " · " + meta.note; preview.append(note);
+        }
+    }
+    document.getElementById("undoUpgradesBtn").disabled = phase !== "upgradeComplete" || room.upgradeUndo?.round !== round;
+    document.getElementById("editResultsBtn").disabled = phase !== "results" || !!upgradeRound;
+    const recap = document.getElementById("finalRecap"); recap.replaceChildren();
+    const standings = calculateStandings(room.players, room.raceHistory);
+    const totals = {};
+    Object.values(room.upgradeRounds || {}).forEach(r => Object.entries(r.players || {}).forEach(([uid, pack]) => {
+        Object.values(pack.applied || {}).forEach(result => {
+            if (["UPGRADE", "SIDEGRADE"].includes(result.outcome)) totals[uid] = (totals[uid] || 0) + 1;
+        });
+    }));
+    standings.forEach(player => {
+        const row = document.createElement("p");
+        const uid = player.uid;
+        row.textContent = player.name + " · " + player.wins + " wins · " +
+            (player.wins + player.seconds + player.thirds) + " podiums · " + (totals[uid] || 0) + " upgrades applied";
+        recap.append(row);
+    });
+}
+async function hostTransaction(change) {
+    if (!currentPlayerIsHost || !currentRoomCode) return;
+    try {
+        return await runTransaction(ref(database, "rooms/" + currentRoomCode), room => {
+            if (!room || room.hostUid !== currentUserUid) return;
+            return change(room);
+        }, {applyLocally: false});
+    } catch (error) { alert("Could not save the change: " + error.message); }
+}
+document.getElementById("queueRaceBtn").addEventListener("click", async () => {
+    const race = pickNextRace(currentRoomData?.currentRace);
+    await hostTransaction(room => {
+        if (!["upgrades", "upgradeComplete"].includes(room.gamePhase) || room.queuedRace) return;
+        room.queuedRace = race; return room;
+    });
+});
+document.getElementById("undoUpgradesBtn").addEventListener("click", async () => {
+    await hostTransaction(room => {
+        if (room.gamePhase !== "upgradeComplete" || room.upgradeUndo?.round !== room.currentRound) return;
+        room.garages = room.upgradeUndo.garages || {};
+        const upgradeRound = room.upgradeRounds[getRoundKey(room.currentRound)];
+        Object.values(upgradeRound.players || {}).forEach(pack => {
+            delete pack.decisions; delete pack.applied; pack.resolved = false;
+        });
+        delete upgradeRound.appliedAt; delete room.upgradeUndo;
+        room.gamePhase = "upgrades"; return room;
+    });
+});
+document.getElementById("editResultsBtn").addEventListener("click", () => {
+    const key = getRoundKey(currentRoomData.currentRound || 1);
+    if (!currentPlayerIsHost || currentRoomData.gamePhase !== "results" || currentRoomData.upgradeRounds?.[key]) return;
+    editingResults = true; buildFinishOrderForm();
+    const order = currentRoomData.raceHistory[key].finishOrder;
+    finishOrderInputs.querySelectorAll("select").forEach((select, index) => { select.value = order[index + 1]?.uid || ""; });
+    resultsEntryPanel.classList.remove("hidden"); resultsEntryPanel.scrollIntoView({behavior: "smooth"});
+});
+const resumeButton = document.getElementById("resumeGameBtn");
+const lastRoom = readLastRoom();
+if (lastRoom && /^[A-Z0-9]{4,8}$/.test(lastRoom)) {
+    resumeButton.textContent = "Resume Race Night · Room " + lastRoom;
+    resumeButton.classList.remove("hidden");
+}
+resumeButton.addEventListener("click", async () => {
+    resumeButton.disabled = true;
+    try {
+        const user = await getCurrentPlayer();
+        const snapshot = await get(ref(database, "rooms/" + readLastRoom()));
+        const room = snapshot.val(); const player = room?.players?.[user.uid];
+        if (!player) { showHomeMessage("Your previous player slot is unavailable. Join or create a room below.", "error"); return; }
+        showLobby(readLastRoom(), player.name, player.isHost === true);
+    } catch (error) { showHomeMessage("Could not resume: " + error.message, "error"); }
+    finally { resumeButton.disabled = false; }
+});
+
+function applyRoomUpdates(room, updates) {
+    Object.entries(updates).forEach(([path, value]) => {
+        const keys = path.split("/"); let parent = room;
+        keys.slice(0, -1).forEach(key => { parent = parent[key] ||= {}; });
+        if (value === null) delete parent[keys.at(-1)]; else parent[keys.at(-1)] = value;
+    });
+    return room;
+}
