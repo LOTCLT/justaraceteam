@@ -35,7 +35,7 @@ import {
     RACE_MAP_SOURCE_URL,
     getRaceMapMeta
 }
-    from "./game-data.js?v=8";
+    from "./game-data.js?v=8.1";
 
 
 /* =========================================================
@@ -4929,13 +4929,41 @@ joinGameButton.addEventListener(
                 roomSnapshot.val();
 
 
+            const existingPlayer =
+                roomData.players &&
+                roomData.players[
+                    user.uid
+                ];
+
+
+            // A player who was already part of this room may
+            // reconnect after the race night has started.
+            // Firebase anonymous auth normally keeps the same
+            // UID on the same browser/device, so no room write
+            // is needed for a reconnect.
+            if (existingPlayer) {
+
+                showLobby(
+                    enteredCode,
+                    existingPlayer.name ||
+                        playerName,
+                    existingPlayer.isHost ===
+                        true
+                );
+
+
+                return;
+
+            }
+
+
             if (
                 roomData.status !==
                 "lobby"
             ) {
 
                 showHomeMessage(
-                    "That game has already started.",
+                    "That game has already started. Existing players can rejoin from the same browser/device they originally used.",
                     "error"
                 );
 
@@ -6370,21 +6398,41 @@ async function leaveCurrentRoom() {
         }
         else {
 
-            await remove(
-                ref(
-                    database,
-                    "rooms/" +
-                    roomCode +
-                    "/players/" +
-                    user.uid
-                )
-            );
+            // Once a race night is underway, keep the player's
+            // room record/garage intact so they can reconnect.
+            // In the pre-game lobby, Leave still removes the
+            // player and frees the slot like before.
+            if (
+                currentRoomData &&
+                currentRoomData.status ===
+                    "playing"
+            ) {
+
+                returnToHome(
+                    "You left the game screen. Re-enter the room code to reconnect.",
+                    "success"
+                );
+
+            }
+            else {
+
+                await remove(
+                    ref(
+                        database,
+                        "rooms/" +
+                        roomCode +
+                        "/players/" +
+                        user.uid
+                    )
+                );
 
 
-            returnToHome(
-                "You left the room.",
-                "success"
-            );
+                returnToHome(
+                    "You left the room.",
+                    "success"
+                );
+
+            }
 
         }
 
