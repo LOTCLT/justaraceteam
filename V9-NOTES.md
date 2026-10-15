@@ -1,6 +1,6 @@
 # V9 local update
 
-Implemented on the repository's V8.2 baseline. No deployment or Firebase rules changes were made.
+Implemented on the repository's V8.2 baseline. Realtime Database rules were deployed and verified on October 15, 2026; the website is published through GitHub Pages.
 
 - Rewards exclude Tier 0 and the exact installed option. Category/mod weighting is unchanged; lower tiers remain possible and resolve automatically as KEEP.
 - Meaningless rolls need no decision. Apply/Pass locks immediately after saving; third-place Apply atomically passes the other roll. Fourth-place choices remain independent.
@@ -26,7 +26,19 @@ The test harness executes the real client module with a small DOM/Firebase mock.
 
 ## Multiplayer check before publishing
 
-The deployed Firebase rules are not present locally. V9 uses Firebase transactions at `rooms/ROOMCODE` for host transitions and `rooms/ROOMCODE/upgradeRounds/ROUND/players/UID/decisions` for player choices. Existing rules must allow the host to read/write its room and players to read/write their own decisions object. If writes are allowed only at individual `roll_1` / `roll_2` children, the atomic decisions transaction needs a corresponding permission at the decisions object. Other players' decisions and host fields must remain protected. Obtain the actual deployed rules before preparing a rules change.
+The deployed rules are tracked in firebase-rules.json. The original V8.2 rules are saved in backups/firebase-rules.v8.2.json. Firebase configuration targets the existing justaraceteam-c53eb project and only Realtime Database rules; website hosting remains GitHub Pages.
+
+The original per-roll write grant rejected V9's atomic decisions transaction. The deployed update allows an existing player to write their own decisions object only during the active round's unresolved upgrade phase. Saved choices cannot be changed/deleted by that player, unknown decision keys are rejected, and the keep limit is enforced. Existing room/host/player/reconnect rules remain unchanged.
+
+Live verification on October 15, 2026:
+
+- Firebase rules dry run passed; fetched deployed rules match the local file.
+- Isolated Edge browser sessions completed two- and four-player flows against the real backend: create/join, start, results/rewards, guest decisions, shared readiness, queued race preview, host apply, undo/redecide, and exact queued next-race transition.
+- Guest attempts to overwrite a locked answer, change another player's decision, change a host field, write an unknown decision key, and exceed the keep limit were denied.
+- Inspected the phone-sized upgrade screen and queued map preview.
+- Test rooms were removed. No existing game rooms were modified.
+
+The local test suite also checks three-player rewards and reconnect behavior. A live three-player session, reconnect/reload behavior, and final recap are still useful game-night checks.
 
 Use a test room with separate browsers/devices and 2, then 3, then 4 players:
 

@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomCode": {
+        ".read": "auth != null",
+
+        ".write": "auth != null && ((!data.exists() && newData.exists() && newData.child('hostUid').val() === auth.uid && newData.child('status').val() === 'lobby' && newData.child('players').child(auth.uid).child('isHost').val() === true) || (data.exists() && data.child('hostUid').val() === auth.uid))",
+
+        ".validate": "!newData.exists() || (newData.child('hostUid').isString() && (newData.child('status').val() === 'lobby' || newData.child('status').val() === 'playing' || newData.child('status').val() === 'finished') && newData.child('players').exists() && (!data.exists() || newData.child('hostUid').val() === data.child('hostUid').val()))",
+
+        "players": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && ((root.child('rooms').child($roomCode).child('status').val() === 'lobby' && newData.exists() && newData.child('isHost').val() === false) || (data.exists() && !newData.exists()))",
+
+            ".validate": "!newData.exists() || (newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 20 && newData.child('isHost').isBoolean() && newData.child('joinedAt').exists())"
+          }
+        },
+
+        "upgradeRounds": {
+          "$roundKey": {
+            "players": {
+              "$uid": {
+                "decisions": {
+                  "$decisionKey": {
+                    ".write": "auth != null && auth.uid === $uid && ($decisionKey === 'roll_1' || $decisionKey === 'roll_2') && newData.exists() && root.child('rooms').child($roomCode).child('status').val() === 'playing' && root.child('rooms').child($roomCode).child('gamePhase').val() === 'upgrades' && root.child('rooms').child($roomCode).child('upgradeRounds').child($roundKey).child('players').child($uid).child('resolved').val() !== true",
+
+                    ".validate": "newData.isString() && (newData.val() === 'apply' || newData.val() === 'pass')"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
