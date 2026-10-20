@@ -1089,6 +1089,768 @@ export const CAR_LIBRARY = [
                     ]
                 }
         ]
+    ),
+
+    // BMW data transcribed from both tabs of 1988 BMW M3.xlsx.
+    // Engine and aspiration requirements keep each conversion tree separate.
+    buildCar(
+        "1988 BMW M3",
+        "C474",
+        [
+            {
+                category: "Engine",
+                mod: "Intake",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intake Manifold / Throttle Body",
+                options: ["Stock", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Fuel System",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Ignition",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Exhaust",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Camshaft",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Valves",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Displacement",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Oil / Cooling",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Flywheel",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Single Turbo",
+                options: ["Street Turbo", "Sport Turbo", "Race Turbo"],
+                variant: "Stock Engine",
+                implicitBase: "Base Single Turbo",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "Stock Engine", options: ["Single Turbo"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intercooler",
+                options: ["Stock", "Sport", "Race"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "Stock Engine", options: ["Single Turbo"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Camshaft",
+                options: ["Stock", "Race"],
+                variant: "1.6L I4 - Turbo Rally",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Displacement",
+                options: ["Stock", "Race"],
+                variant: "1.6L I4 - Turbo Rally",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Single Turbo",
+                options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                variant: "1.6L I4 - Turbo Rally",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Restrictor Plate",
+                options: ["Stock", "No Restrictor Plate", "Remove Restrictors"],
+                variant: "1.6L I4 - Turbo Rally",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["1.6L I4 - Turbo Rally"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Single Turbo",
+                options: ["Street Turbo", "Sport Turbo", "Race Turbo", "Race Turbo with Anti-Lag"],
+                variant: "3.2L I6",
+                implicitBase: "Base Single Turbo",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "3.2L I6", options: ["Single Turbo"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intake",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Fuel System",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Ignition",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Exhaust",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Camshaft",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Valves",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Piston / Compression",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Displacement",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intercooler",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Oil / Cooling",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Flywheel",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Twin Turbo",
+                options: ["Street Turbo", "Sport Turbo", "Race Turbo", "Race Turbo with Anti-Lag"],
+                variant: "4.0L V8",
+                implicitBase: "Base Twin Turbo",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "4.0L V8", options: ["Twin Turbo"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intake",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Fuel System",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Ignition",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Exhaust",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Camshaft",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Valves",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Piston / Compression",
+                options: ["Stock", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Displacement",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intercooler",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Oil / Cooling",
+                options: ["Stock", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Flywheel",
+                options: ["Stock", "Sport", "Race"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Twin Turbo",
+                options: ["Street Turbo", "Sport Turbo", "Race Turbo", "Race Turbo with Anti-Lag"],
+                variant: "5.0L V10",
+                implicitBase: "Base Twin Turbo",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "5.0L V10", options: ["Twin Turbo"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Centrifugal Supercharger",
+                options: ["Street Supercharger", "Sport Supercharger", "Race Supercharger"],
+                variant: "5.0L V10",
+                implicitBase: "Base Centrifugal Supercharger",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "5.0L V10", options: ["Centrifugal Supercharger"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intake",
+                options: ["Stock", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Fuel System",
+                options: ["Stock", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Ignition",
+                options: ["Stock", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Exhaust",
+                options: ["Stock", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Camshaft",
+                options: ["Stock", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Valves",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Piston / Compression",
+                options: ["Stock", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Displacement",
+                options: ["Stock", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intercooler",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Oil / Cooling",
+                options: ["Stock", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Flywheel",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Single Turbo",
+                options: ["Street Turbo", "Sport Turbo", "Race Turbo", "Race Turbo with Anti-Lag"],
+                variant: "3.0L I6 - TT",
+                implicitBase: "Base Single Turbo",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "3.0L I6 - TT", options: ["Single Turbo"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intake",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Fuel System",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Ignition",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Exhaust",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Camshaft",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Valves",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Piston / Compression",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Displacement",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Twin Turbos",
+                options: ["Stock", "Sport", "Race", "Race with Anti-lag"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] },
+                    { category: "Body Kits and Conversions", mod: "Aspiration", variant: "3.0L I6 - TT", options: ["Twin Turbos"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Intercooler",
+                options: ["Stock", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Oil / Cooling",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Engine",
+                mod: "Flywheel",
+                options: ["Stock", "Street", "Sport", "Race"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            },
+            {
+                category: "Platform and Handling",
+                mod: "Brakes",
+                options: ["Stock", "Street", "Sport", "Race"]
+            },
+            {
+                category: "Platform and Handling",
+                mod: "Springs and Dampers",
+                options: ["Stock", "Sport", "Race", "Rally", "Drift"]
+            },
+            {
+                category: "Platform and Handling",
+                mod: "Front Anti-Roll Bars",
+                options: ["Stock", "Sport", "Race"]
+            },
+            {
+                category: "Platform and Handling",
+                mod: "Rear Anti-Roll Bars",
+                options: ["Stock", "Sport", "Race"]
+            },
+            {
+                category: "Platform and Handling",
+                mod: "Chassis Reinforcement / Roll Cage",
+                options: ["Stock", "Street", "Sport", "Race"]
+            },
+            {
+                category: "Platform and Handling",
+                mod: "Weight Reduction",
+                options: ["Stock", "Street", "Sport", "Race"]
+            },
+            {
+                category: "Drivetrain",
+                mod: "Clutch",
+                options: ["Stock", "Street", "Sport", "Race"]
+            },
+            {
+                category: "Drivetrain",
+                mod: "Transmission",
+                options: ["Stock", "Street", "Sport", "Race", "Race: 7 Speed", "Race: 8 Speed", "Race: 9 Speed", "Race: 10 Speed", "Drift: 4 Speed"]
+            },
+            {
+                category: "Drivetrain",
+                mod: "Driveline",
+                options: ["Stock", "Street", "Sport", "Race"]
+            },
+            {
+                category: "Drivetrain",
+                mod: "Differential",
+                options: ["Stock", "Sport", "Race", "Rally", "Drift"]
+            },
+            {
+                category: "Tires and Rims",
+                mod: "Tire Compound",
+                options: ["Stock", "Street", "Sport", "Semi-Slick Race", "\"Horizon\" Semi-Slick Race", "Slick", "Drift", "Rally", "Offroad", "Snow", "Drag"]
+            },
+            {
+                category: "Tires and Rims",
+                mod: "Front Tire Width",
+                options: ["225", "235", "255", "275", "295"]
+            },
+            {
+                category: "Tires and Rims",
+                mod: "Rear Tire Width",
+                options: ["225", "235", "255", "275", "295", "315"]
+            },
+            {
+                category: "Tires and Rims",
+                mod: "Wheel Style",
+                options: ["Stock", "Style"]
+            },
+            {
+                category: "Tires and Rims",
+                mod: "Wheel Size",
+                options: ["Stock", "Size"]
+            },
+            {
+                category: "Aero and Appearance",
+                mod: "Front Bumper",
+                options: ["Stock", "BMW Sport Front Bumper", "Choice Race Front Bumper"]
+            },
+            {
+                category: "Aero and Appearance",
+                mod: "Rear Wing",
+                options: ["Stock", "Remove Rear Wing", "BMW Sport Rear Wing", "Choice Race Rear Wing"]
+            },
+            {
+                category: "Aero and Appearance",
+                mod: "Hood",
+                options: ["Stock", "Forza Street Hood"]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Drivetrain Swap",
+                options: ["RWD", "AWD"]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Aspiration",
+                options: ["NA", "Single Turbo"],
+                variant: "Stock Engine",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["Stock"] }
+                ]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Engine Swap",
+                options: ["Stock", "1.6L I4 - Turbo Rally", "3.2L I6", "4.0L V8", "5.0L V10", "3.0L I6 - TT"]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Aspiration",
+                options: ["NA", "Single Turbo"],
+                variant: "3.2L I6",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.2L I6"] }
+                ]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Aspiration",
+                options: ["NA", "Twin Turbo"],
+                variant: "4.0L V8",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["4.0L V8"] }
+                ]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Aspiration",
+                options: ["NA", "Twin Turbo", "Centrifugal Supercharger"],
+                variant: "5.0L V10",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["5.0L V10"] }
+                ]
+            },
+            {
+                category: "Body Kits and Conversions",
+                mod: "Aspiration",
+                options: ["Twin Turbos", "Single Turbo"],
+                variant: "3.0L I6 - TT",
+                requires: [
+                    { category: "Body Kits and Conversions", mod: "Engine Swap", options: ["3.0L I6 - TT"] }
+                ]
+            }
+        ]
     )
 
 

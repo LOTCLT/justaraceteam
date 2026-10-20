@@ -22,7 +22,18 @@ node tests/v9.mjs
 git diff --check
 ```
 
-The test harness executes the real client module with a small DOM/Firebase mock. It checks startup/DOM IDs, 6,000 reward samples, 2/3/4-player rewards, decision locking, independent fourth-place choices, sequential application without downgrade, apply/undo, queue/start, Prius conversion dependencies, existing-player/host reconnect, Resume, late-player rejection, and the edit-results cutoff. It does not emulate Firebase security rules, offline retries, network contention, or browser layout.
+The test harness executes the real client module with a small DOM/Firebase mock. It checks startup/DOM IDs, 2,000 reward samples per car (8,000 across the current four cars), 2/3/4-player rewards, decision locking, independent fourth-place choices, sequential application without downgrade, apply/undo, queue/start, Prius conversion dependencies, existing-player/host reconnect, Resume, late-player rejection, and the edit-results cutoff. BMW checks additionally exercise every engine/aspiration branch, dependency reachability, reward eligibility, implicit turbo/supercharger bases, incompatible-part pruning, selector presence, and Build Comparison output. It does not emulate Firebase security rules, offline retries, network contention, or browser layout.
+
+## BMW lineup addition
+
+- Added **1988 BMW M3 — C474** from the supplied `1988 BMW M3.xlsx`. The user confirmed both tabs contain BMW data despite the second tab's example heading.
+- Preserved the stock engine and five swap-specific trees: 1.6L I4 - Turbo Rally, 3.2L I6, 4.0L V8, 5.0L V10, and 3.0L I6 - TT. Chassis, drivetrain, tires, wheels, and appearance remain independent of the engine.
+- Rows marked `Requires Aspiration Conversion` are unlocked by the matching conversion. The stock-engine intercooler is marked this way; swapped-engine intercoolers are not, so they require only their engine swap.
+- Conversion menus inferred from the sheet's forced-induction rows: stock/3.2L I6 use NA → Single Turbo; 4.0L V8 uses NA → Twin Turbo; 5.0L V10 uses NA → Twin Turbo or Centrifugal Supercharger; 3.0L I6 - TT uses native Twin Turbos → Single Turbo. The rally engine's turbo is native. These menus/defaults have not been independently verified in Forza.
+- Street-first turbo/supercharger rows retain Street/Sport/Race tiers and use an implicit Tier 0 base, without adding a Stock reward. Engine and aspiration changes use the existing dependency pruning logic. Restrictor-plate labels and their supplied order are preserved.
+- Trimmed whitespace, normalized lowercase `race`, corrected `Cetnrifugal` to `Centrifugal`, and stored numeric tire widths without decimal suffixes. Missing `-` entries remain absent.
+- Selecting the BMW adds it to the existing random-car pool (four cars); race odds, scoring, reward counts, runtime code, and Firebase rules are unchanged.
+- Local Node checks cover the BMW's data and dependency transitions. Phone layout and live BMW multiplayer remain manual checks; this change does not deploy the website or Firebase rules.
 
 ## Multiplayer check before publishing
 
