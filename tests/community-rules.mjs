@@ -6,7 +6,7 @@ const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url')
 const token = uid => `${encode({alg: 'none', typ: 'JWT'})}.${encode({aud: project, iss: 'https://securetoken.google.com/' + project, sub: uid, user_id: uid, iat: Math.floor(Date.now()/1000), exp: Math.floor(Date.now()/1000)+3600, firebase: {sign_in_provider: 'anonymous'}})}.`;
 let checks = 0;
 async function request(path, method, value, uid, allowed, params = {}) {
-    const search = new URLSearchParams({ns: project, ...params});
+    const search = new URLSearchParams({ns: project + '-default-rtdb', ...params});
     if (uid) search.set('auth', token(uid));
     const response = await fetch(`${base}/${path}.json?${search}`, {method, headers: {'Content-Type': 'application/json'}, ...(value === undefined ? {} : {body: JSON.stringify(value)})});
     const body = await response.text();

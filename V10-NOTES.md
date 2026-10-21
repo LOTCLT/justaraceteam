@@ -41,6 +41,6 @@ For rules verification, use Firebase CLI and Java 21 with a **demo** project:
 firebase emulators:exec --only database --project demo-justaraceteam --config firebase.emulators.json 'node tests/community-rules.mjs'
 ```
 
-The emulator test checks community creation/read bounds, ownership, immutable records, denied invalid writes and the existing host/player decision protections. The current environment blocks the official emulator download at `storage.googleapis.com` with proxy 403. Its domain addition has been saved in the environment draft, but must be applied before retrying this required check.
+The emulator test checks community creation/read bounds, ownership, immutable records, denied invalid writes and the existing host/player decision protections. After network access was enabled, all 26 checks passed. The test explicitly targets the demo project's `-default-rtdb` namespace where Firebase CLI installs the rules; using the project ID alone would test a different database.
 
 Before release: pass the emulator tests, review the rules diff, deliberately deploy the rules, publish the website files, then use isolated browser sessions to verify a real community submission, host selection, guest upgrade decisions and reconnect. Firebase rules have not been deployed and no production data was changed during development. Saving environment configuration is separate from code publication or Firebase deployment.
