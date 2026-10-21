@@ -2,7 +2,23 @@
     box-sizing: border-box;
 }
 
-.car-importer-link { color: #8bc9ff; }
+.car-importer-link {
+    display: inline-block;
+    width: 100%;
+    max-width: 360px;
+    padding: 16px 20px;
+    border-radius: 9px;
+    font-size: 17px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.car-importer-link:focus-visible {
+    outline: 3px solid #ff4d30;
+    outline-offset: 4px;
+}
 
 
 body {
