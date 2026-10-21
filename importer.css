@@ -1,7 +1,15 @@
 .importer-app { width: min(1000px, 94%); padding-top: 28px; }
 .importer-header { margin-bottom: 28px; }
 .importer-header h1 { font-size: clamp(30px, 6vw, 48px); margin: 10px 0; }
-.importer-app a { color: #8bc9ff; }
+.importer-app .importer-back-link {
+    width: auto;
+    margin: 0 0 16px;
+    padding: 11px 15px;
+    min-height: 44px;
+    color: white;
+    font-size: 14px;
+}
+.importer-app .importer-back-link:focus-visible { outline-color: #ff4d30; }
 .importer-section { margin: 18px 0; padding: clamp(18px, 4vw, 32px); }
 .importer-app h2 { margin-top: 0; font-size: 23px; }
 .importer-app p { line-height: 1.6; color: #bbb; }
