@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Build and review a Forza car upgrade tree for Just A Race Team.">
+    <title>Car Importer · Just A Race Team</title>
+    <link rel="stylesheet" href="style.css?v=10">
+    <link rel="stylesheet" href="importer.css?v=1">
+</head>
+<body>
+<main class="app importer-app">
+    <header class="importer-header">
+        <a href="index.html">← Race Night</a>
+        <p class="eyebrow">JUST A RACE TEAM</p>
+        <h1>Car Importer</h1>
+        <p>Build the car as it appears in Forza. Choose its upgrades, add motor swaps, then share it with the team.</p>
+    </header>
+
+    <section class="game-card importer-section" aria-labelledby="carHeading">
+        <h2 id="carHeading">1. Start with the car</h2>
+        <div class="importer-grid">
+            <label>Year, make and model<input id="importCarName" maxlength="120" placeholder="1988 BMW M3" autocomplete="off"></label>
+            <label>Starting class and PI<input id="importCarPI" maxlength="6" placeholder="C474" autocomplete="off"></label>
+        </div>
+        <p class="importer-hint">Read the stock car's PI in Forza before installing upgrades.</p>
+        <p id="draftStorageStatus" class="importer-hint" role="status"></p>
+        <button id="newCar" type="button">Start a new car</button>
+    </section>
+
+    <section class="game-card importer-section" aria-labelledby="engineHeading">
+        <h2 id="engineHeading">2. Motors and conversions</h2>
+        <p>Start with the stock motor. Add each available motor swap, then select it to fill out its upgrade tree.</p>
+        <div class="importer-grid">
+            <label>Motor you are entering<select id="importEngine"></select></label>
+            <div><label for="newEngine">Add a motor swap</label><div class="importer-inline"><input id="newEngine" maxlength="100" placeholder="6.2L V8"><button id="addEngine" type="button">Add motor</button></div></div>
+        </div>
+        <div class="importer-grid">
+            <label>Base aspiration<input id="baseAspiration" maxlength="100" value="NA" placeholder="NA, Twin Turbos…"></label>
+            <div><label for="newAspiration">Add an aspiration conversion for this motor</label><div class="importer-inline"><input id="newAspiration" maxlength="100" placeholder="Single Turbo"><button id="addAspiration" type="button">Add conversion</button></div></div>
+        </div>
+        <label>Aspiration you are entering<select id="importAspiration"></select></label>
+        <p class="importer-hint">A motor can already have a turbo. Enter that as its base aspiration. Additional conversions unlock their own turbo/supercharger upgrades.</p>
+    </section>
+
+    <section class="game-card importer-section" aria-labelledby="upgradeHeading">
+        <h2 id="upgradeHeading">3. Check the available upgrades</h2>
+        <p id="engineContext" class="importer-context"></p>
+        <p>Check a mod, then check only the options shown in Forza. Other motor trees stay saved when you switch motors.</p>
+        <label class="importer-check"><input id="aspirationOnly" type="checkbox">Engine upgrades entered now require the selected aspiration</label>
+        <p class="importer-hint">Use this for turbo/supercharger upgrades unlocked by a conversion. Leave it off for parts that work with every aspiration on this motor.</p>
+        <div id="upgradeChecklist"></div>
+        <details class="importer-custom"><summary>Add an upgrade not listed above</summary>
+            <div class="importer-grid">
+                <label>Category<select id="customCategory"></select></label>
+                <label>Upgrade name<input id="customMod" maxlength="120" placeholder="Restrictor Plate"></label>
+            </div>
+            <button id="addCustomUpgrade" type="button">Add upgrade</button>
+            <p class="importer-hint">It uses the selected motor and aspiration setting if its category is Engine. Enter its options below.</p>
+        </details>
+    </section>
+
+    <section class="game-card importer-section" aria-labelledby="reviewHeading">
+        <h2 id="reviewHeading">4. Review the car</h2>
+        <p>Expand an upgrade to edit its options, base state, or prerequisites. Tier 0 is the base; higher numbers are upgrades. Different options at the same tier are sidegrades.</p>
+        <div id="importStatus" role="status" aria-live="polite"></div>
+        <div id="importMessages"></div>
+        <label class="importer-check"><input id="confirmCar" type="checkbox">I checked the selected options, base states and prerequisites against Forza.</label>
+        <div class="importer-actions">
+            <button id="publishCar" class="primary-button" type="button" disabled>Add to Community Cars</button>
+            <button id="downloadCar" class="primary-button" type="button" disabled>Download car file</button>
+            <button id="downloadDraft" class="secondary-button" type="button">Save unfinished draft</button>
+        </div>
+        <p class="importer-hint">Community Cars are shared on the website for hosts to select. They stay out of random selection until reviewed. Existing reviewed cars cannot be overwritten. Downloads are optional backups.</p>
+        <p id="publishStatus" role="status" aria-live="polite"></p>
+        <div id="importRows"></div>
+    </section>
+
+    <section class="game-card importer-section" aria-labelledby="fileHeading">
+        <h2 id="fileHeading">Already have car data?</h2>
+        <p>Continue from a saved car file, upload a spreadsheet, or use an existing car as a starting point. Loading replaces the form after you confirm.</p>
+        <label>Open Excel, CSV, or a saved car file<input id="importFile" type="file" accept=".xlsx,.csv,.tsv,.json"></label>
+        <div id="sheetPicker" hidden><p>Choose the worksheets containing this car's real data. Leave example tabs unchecked.</p><div id="sheetChoices"></div><button id="loadSheets" type="button">Load selected worksheets</button></div>
+        <div class="importer-grid">
+            <label>Start from an existing car<select id="existingCar"></select></label>
+            <button id="copyExistingCar" type="button">Copy into form</button>
+        </div>
+        <button id="downloadTemplate" type="button">Download CSV template</button>
+        <p id="fileStatus" role="status" aria-live="polite"></p>
+    </section>
+</main>
+<script type="module" src="importer.js?v=1"></script>
+</body>
+</html>

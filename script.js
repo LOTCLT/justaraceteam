@@ -16,7 +16,10 @@ import {
     remove,
     onValue,
     serverTimestamp,
-    runTransaction
+    runTransaction,
+    query,
+    orderByChild,
+    limitToLast
 }
     from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
 
@@ -36,37 +39,17 @@ import {
     RACE_MAP_SOURCE_URL,
     getRaceMapMeta
 }
-    from "./game-data.js?v=9";
+    from "./game-data.js?v=10";
 
+
+import { firebaseConfig } from "./firebase-config.js?v=1";
+import { communityCarFromDefinition, communityCarFromRecord } from "./community-data.js?v=1";
 
 /* =========================================================
    FIREBASE
    ========================================================= */
 
-const firebaseConfig = {
 
-    apiKey:
-        "AIzaSyBRBaBatRkK5sz8ag4iY5RYzz8rzU9Sds8",
-
-    authDomain:
-        "justaraceteam-c53eb.firebaseapp.com",
-
-    databaseURL:
-        "https://justaraceteam-c53eb-default-rtdb.firebaseio.com",
-
-    projectId:
-        "justaraceteam-c53eb",
-
-    storageBucket:
-        "justaraceteam-c53eb.firebasestorage.app",
-
-    messagingSenderId:
-        "491124011414",
-
-    appId:
-        "1:491124011414:web:92f33c31cc2366f5bdedb7"
-
-};
 
 
 const app =
@@ -368,16 +351,20 @@ let activeGameTab =
    STARTUP
    ========================================================= */
 
+const communityCars = new Map();
+let cachedCommunityDefinition = null;
+let cachedCommunityCar = null;
 populateCarSelect();
 
 
 function populateCarSelect() {
 
+    const previousSelection = carSelect.value;
     carSelect.innerHTML =
         "";
 
 
-    CAR_LIBRARY.forEach(
+    [...CAR_LIBRARY, ...communityCars.values()].forEach(
         function (car) {
 
             const option =
@@ -386,14 +373,13 @@ function populateCarSelect() {
                 );
 
 
-            option.value =
-                car.name;
+            option.value = car.communityId ? "community:" + car.communityId : car.name;
 
 
             option.textContent =
                 car.name +
                 " — " +
-                car.startingPI;
+                car.startingPI + (car.communityId ? " · Community" : "");
 
 
             carSelect.appendChild(
@@ -402,6 +388,7 @@ function populateCarSelect() {
 
         }
     );
+    if ([...CAR_LIBRARY, ...communityCars.values()].some(car => (car.communityId ? "community:" + car.communityId : car.name) === previousSelection)) carSelect.value = previousSelection;
 
 }
 
@@ -1456,9 +1443,17 @@ function getSelectedCarDefinition(
     }
 
 
-    return getCarByName(
-        roomData.selectedCar.name
-    );
+    if (roomData.selectedCar.communityId) {
+        const definition = roomData.selectedCar.definition;
+        if (cachedCommunityDefinition === definition && cachedCommunityCar?.communityId === roomData.selectedCar.communityId && cachedCommunityCar.name === roomData.selectedCar.name && cachedCommunityCar.startingPI === roomData.selectedCar.startingPI) return cachedCommunityCar;
+        try {
+            const car = communityCarFromDefinition(definition, roomData.selectedCar.communityId);
+            if (car.name !== roomData.selectedCar.name || car.startingPI !== roomData.selectedCar.startingPI) return null;
+            cachedCommunityDefinition = definition; cachedCommunityCar = car;
+            return car;
+        } catch { return null; }
+    }
+    return getCarByName(roomData.selectedCar.name);
 
 }
 
@@ -2610,14 +2605,13 @@ function updateGameSetupDisplay(
             roomData.selectedCar.startingPI;
 
 
-        if (
-            getCarByName(
-                roomData.selectedCar.name
-            )
-        ) {
+        if (getSelectedCarDefinition(roomData)) {
 
-            carSelect.value =
-                roomData.selectedCar.name;
+            const selected = getSelectedCarDefinition(roomData);
+            if (selected.communityId && !communityCars.has(selected.communityId)) {
+                communityCars.set(selected.communityId, selected); populateCarSelect();
+            }
+            carSelect.value = selected.communityId ? "community:" + selected.communityId : selected.name;
 
         }
 
@@ -5101,7 +5095,9 @@ function carSummary(car) {
             car.name,
 
         startingPI:
-            car.startingPI
+            car.startingPI,
+
+        ...(car.communityId ? {communityId: car.communityId, definition: car.definition} : {})
 
     };
 
@@ -5172,9 +5168,9 @@ setCarButton.addEventListener(
     async function () {
 
         const car =
-            getCarByName(
-                carSelect.value
-            );
+            carSelect.value.startsWith("community:")
+                ? communityCars.get(carSelect.value.slice(10))
+                : getCarByName(carSelect.value);
 
 
         if (car) {
@@ -5612,7 +5608,11 @@ submitResultsButton.addEventListener(
                 round,
 
             car:
-                currentRoomData.selectedCar,
+                {
+                    name: currentRoomData.selectedCar.name,
+                    startingPI: currentRoomData.selectedCar.startingPI,
+                    ...(currentRoomData.selectedCar.communityId ? {communityId: currentRoomData.selectedCar.communityId} : {})
+                },
 
             race:
                 currentRoomData.currentRace,
@@ -6467,3 +6467,26 @@ function applyRoomUpdates(room, updates) {
     });
     return room;
 }
+
+// Explicit loading keeps community cars separate from the reviewed random pool.
+document.getElementById("loadCommunityCarsBtn").addEventListener("click", async () => {
+    if (!currentPlayerIsHost) return;
+    const button = document.getElementById("loadCommunityCarsBtn");
+    const status = document.getElementById("communityCarsStatus");
+    button.disabled = true; status.textContent = "Loading Community Cars…";
+    try {
+        await getCurrentPlayer();
+        const snapshot = await get(query(ref(database, "communityCars"), orderByChild("createdAt"), limitToLast(100)));
+        let skipped = 0;
+        communityCars.clear();
+        for (const [id, record] of Object.entries(snapshot.val() || {})) {
+            try { communityCars.set(id, communityCarFromRecord(id, record)); }
+            catch { skipped++; }
+        }
+        const selected = getSelectedCarDefinition(currentRoomData);
+        if (selected?.communityId) communityCars.set(selected.communityId, selected);
+        populateCarSelect();
+        status.textContent = `${communityCars.size} Community Cars loaded (latest 100 submissions). Select one from the car list. Random selection uses reviewed cars only.${skipped ? ` ${skipped} invalid submissions were skipped.` : ""}`;
+    } catch { status.textContent = "Community Cars could not be loaded. The reviewed lineup is still available. Community access may not be enabled yet; try again later."; }
+    finally { button.disabled = false; }
+});

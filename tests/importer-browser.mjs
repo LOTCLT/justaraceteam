@@ -1,0 +1,92 @@
+// Development-only: PLAYWRIGHT_MODULE points to an installed playwright-core module.
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
+const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ? pathToFileURL(process.env.PLAYWRIGHT_MODULE).href : 'playwright-core');
+const browser = await chromium.launch({executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox']});
+const base = process.env.IMPORTER_TEST_URL || 'http://127.0.0.1:8011';
+const errors = [];
+try {
+    const page = await browser.newPage({viewport: {width: 390, height: 844}, acceptDownloads: true});
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(base + '/importer.html');
+    await page.locator('#importCarName').fill('2024 Guided Test');
+    await page.locator('#importCarPI').fill('C474');
+    await page.locator('#upgradeChecklist').getByLabel('Intake', {exact: true}).check();
+    let intake = page.locator('#upgradeChecklist [data-mod="Intake"]');
+    await intake.getByLabel('Sport', {exact: true}).check();
+    await intake.getByLabel('Race', {exact: true}).check();
+    assert.match(await page.locator('#importStatus').textContent(), /Ready to download/);
+    await page.locator('#newEngine').fill('6.2L V8');
+    await page.locator('#addEngine').click();
+    assert.equal(await page.locator('#upgradeChecklist').getByLabel('Intake', {exact: true}).isChecked(), false);
+    await page.locator('#newAspiration').fill('Twin Turbos');
+    await page.locator('#addAspiration').click();
+    assert.equal(await page.locator('#aspirationOnly').isChecked(), true);
+    await page.locator('#upgradeChecklist').getByLabel('Twin Turbos', {exact: true}).check();
+    const turbo = page.locator('#upgradeChecklist [data-mod="Twin Turbos"]');
+    await turbo.getByLabel('No visible Stock/base option in Forza', {exact: true}).check();
+    await turbo.getByLabel('Street', {exact: true}).check();
+    await turbo.getByLabel('Race', {exact: true}).check();
+    await page.locator('#importEngine').selectOption('Stock');
+    assert.equal(await page.locator('#upgradeChecklist').getByLabel('Intake', {exact: true}).isChecked(), true);
+    assert.equal(await intake.getByLabel('Sport', {exact: true}).isChecked(), true);
+    // Native forced induction without a selectable conversion needs no fake upgrade row.
+    await page.locator('#newEngine').fill('3.0L I6 - TT');
+    await page.locator('#addEngine').click();
+    await page.locator('#baseAspiration').fill('Twin Turbos');
+    await page.locator('#baseAspiration').press('Tab');
+    await page.locator('#importEngine').selectOption('Stock');
+    await page.reload();
+    assert.equal(await page.locator('#importCarName').inputValue(), '2024 Guided Test');
+    assert.match(await page.locator('#draftStorageStatus').textContent(), /restored/);
+    await page.locator('#confirmCar').check();
+    assert.equal(await page.locator('#publishCar').isEnabled(), true);
+    const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#downloadCar').click()]);
+    const draft = JSON.parse(await fs.readFile(await download.path(), 'utf8'));
+    assert.equal(draft.name, '2024 Guided Test');
+    assert.deepEqual(draft.upgrades.find(row => row.mod === 'Engine Swap').options, ['Stock', '6.2L V8', '3.0L I6 - TT']);
+    assert.deepEqual(draft.upgrades.find(row => row.mod === 'Intake').options, ['Stock', 'Sport', 'Race']);
+    const boost = draft.upgrades.find(row => row.mod === 'Twin Turbos');
+    assert.equal(boost.implicitBase, 'Base Twin Turbos');
+    assert(boost.requires.some(req => req.mod === 'Aspiration' && req.options.includes('Twin Turbos')));
+    assert(boost.requires.some(req => req.mod === 'Engine Swap' && req.options.includes('6.2L V8')));
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    // Test submission UI without touching Firebase or production data.
+    await page.route('**/community-api.js?v=1', route => route.fulfill({contentType: 'text/javascript', body: 'let calls = 0; export async function submitCommunityCar(draft, previousId) { if (draft.name !== "2024 Guided Test") throw Error("Wrong draft"); if (calls++ === 0) { const error = Error("Simulated connection loss"); error.submissionId = "test-submission"; throw error; } if (previousId !== "test-submission") throw Error("Retry lost submission ID"); return "test-submission"; }'}));
+    await page.locator('#publishCar').click();
+    await page.getByText(/Could not confirm the save/).waitFor();
+    assert.equal(await page.locator('#importCarName').inputValue(), '2024 Guided Test');
+    await page.locator('#publishCar').click();
+    await page.getByText(/is saved as a Community Car/).waitFor();
+    assert.equal(await page.locator('#publishCar').isDisabled(), true);
+    await page.screenshot({path: process.env.IMPORTER_SCREENSHOT || '/workspace/scratch/car-importer-phone.png', fullPage: true});
+    await page.locator('#existingCar').selectOption('1988 BMW M3');
+    await page.locator('#copyExistingCar').click();
+    assert.equal(await page.locator('.importer-row').count(), 91);
+    assert.match(await page.locator('#importStatus').textContent(), /Ready to download/);
+    await page.locator('#confirmCar').check();
+    assert.equal(await page.locator('#publishCar').isDisabled(), true, 'Reviewed car name cannot be published as a community replacement');
+    if (process.env.BMW_WORKBOOK) {
+        const bytes = [...await fs.readFile(process.env.BMW_WORKBOOK)];
+        const result = await page.evaluate(async ({bytes, base}) => {
+            const {readWorkbook} = await import(base + '/spreadsheet.js?v=1');
+            const sheets = await readWorkbook(new Uint8Array(bytes).buffer);
+            return {names: sheets.map(sheet => sheet.name), name: sheets[0].rows[1][1], pi: sheets[0].rows[2][1]};
+        }, {bytes, base});
+        assert.deepEqual(result, {names: ['Car Template', 'Copy of Dependency Examples'], name: '1988 BMW M3', pi: 'C474'});
+        await page.locator('#importFile').setInputFiles(process.env.BMW_WORKBOOK);
+        await page.locator('#sheetPicker').waitFor({state: 'visible'});
+        assert.equal(await page.locator('#sheetChoices input:checked').count(), 1);
+        await page.locator('#sheetChoices input').nth(1).check();
+        await page.locator('#loadSheets').click();
+        assert.equal(await page.locator('#importCarName').inputValue(), '1988 BMW M3');
+        assert.match(await page.locator('#importMessages').textContent(), /prerequisite.*missing|duplicate/i);
+        assert.equal(await page.locator('#publishCar').isDisabled(), true);
+    }
+    const desktop = await browser.newPage({viewport: {width: 1440, height: 1000}});
+    await desktop.goto(base + '/importer.html');
+    assert(await desktop.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    assert.deepEqual(errors, []);
+    console.log('PASS: real Chromium guided checkboxes, motor/aspiration scopes, implicit bases, download content, mocked community submission, duplicate-name protection, optional BMW XLSX and mobile/desktop overflow.');
+} finally { await browser.close(); }

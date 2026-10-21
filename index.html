@@ -18,7 +18,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=9"
+        href="style.css?v=10"
     >
 </head>
 
@@ -46,6 +46,7 @@
              ================================================== -->
 
         <section id="homeScreen">
+            <p><a href="importer.html" class="car-importer-link">Car Importer · Build a car for the lineup</a></p>
             <button id="resumeGameBtn" class="primary-button wide-button hidden" type="button"></button>
 
             <section class="game-card">
@@ -450,6 +451,8 @@
                         </label>
 
                         <select id="carSelect"></select>
+                        <button id="loadCommunityCarsBtn" class="small-button" type="button">Load Community Cars</button>
+                        <p id="communityCarsStatus" class="setup-detail" role="status">Community Cars can be selected here. Random selection uses reviewed cars only.</p>
 
                         <div class="button-grid">
                             <button
@@ -830,7 +833,7 @@
 
     <script
         type="module"
-        src="script.js?v=9"
+        src="script.js?v=10"
     ></script>
 
 </body>

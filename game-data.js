@@ -1,6 +1,6 @@
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
-   Version 9
+   Version 10
 
    V8 adds conditional upgrade trees for engine swaps and
    aspiration conversions while keeping V7 race-map data.
@@ -112,7 +112,7 @@ function normalizeRequirement(requirement) {
 }
 
 
-function buildCar(name, startingPI, rawUpgrades) {
+export function buildCar(name, startingPI, rawUpgrades) {
 
     const upgrades = rawUpgrades
         .map(function (raw) {

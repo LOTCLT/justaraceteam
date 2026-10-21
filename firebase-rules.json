@@ -1,5 +1,21 @@
 {
   "rules": {
+    "communityCars": {
+      ".read": "auth != null && query.orderByChild === 'createdAt' && query.limitToLast != null && query.limitToLast <= 100",
+      ".indexOn": ["createdAt"],
+      "$carId": {
+        ".read": "auth != null",
+        ".write": "auth != null && !data.exists() && newData.exists() && newData.child('ownerUid').val() === auth.uid",
+        ".validate": "newData.hasChildren(['name', 'startingPI', 'definition', 'ownerUid', 'createdAt', 'status'])",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120" },
+        "startingPI": { ".validate": "newData.isString() && newData.val().matches(/^(D|C|B|A|S1|S2|X)[0-9]{3}$/)" },
+        "definition": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 96000" },
+        "ownerUid": { ".validate": "newData.isString() && newData.val() === auth.uid" },
+        "createdAt": { ".validate": "newData.isNumber() && newData.val() === now" },
+        "status": { ".validate": "newData.val() === 'community'" },
+        "$other": { ".validate": false }
+      }
+    },
     "rooms": {
       "$roomCode": {
         ".read": "auth != null",

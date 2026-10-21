@@ -1,0 +1,44 @@
+import assert from 'node:assert/strict';
+const project = 'demo-justaraceteam';
+const base = `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST || '127.0.0.1:9000'}`;
+if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(base)) throw Error('Run this test only against a local emulator.');
+const encode = value => Buffer.from(JSON.stringify(value)).toString('base64url');
+const token = uid => `${encode({alg: 'none', typ: 'JWT'})}.${encode({aud: project, iss: 'https://securetoken.google.com/' + project, sub: uid, user_id: uid, iat: Math.floor(Date.now()/1000), exp: Math.floor(Date.now()/1000)+3600, firebase: {sign_in_provider: 'anonymous'}})}.`;
+let checks = 0;
+async function request(path, method, value, uid, allowed, params = {}) {
+    const search = new URLSearchParams({ns: project, ...params});
+    if (uid) search.set('auth', token(uid));
+    const response = await fetch(`${base}/${path}.json?${search}`, {method, headers: {'Content-Type': 'application/json'}, ...(value === undefined ? {} : {body: JSON.stringify(value)})});
+    const body = await response.text();
+    assert.equal(response.ok, allowed, `${method} ${path}: ${response.status} ${body}`); checks++;
+}
+const record = {name: '2024 Example', startingPI: 'C474', definition: '{"schemaVersion":1}', ownerUid: 'alice', createdAt: {'.sv': 'timestamp'}, status: 'community'};
+await request('communityCars/one', 'PUT', record, null, false);
+await request('communityCars/one', 'PUT', record, 'alice', true);
+await request('communityCars/one', 'GET', undefined, null, false);
+await request('communityCars/one', 'GET', undefined, 'bob', true);
+await request('communityCars/one', 'PUT', {...record, name: 'Changed'}, 'alice', false);
+await request('communityCars/one', 'PUT', {...record, ownerUid: 'bob'}, 'bob', false);
+await request('communityCars/one', 'DELETE', undefined, 'alice', false);
+await request('communityCars/two', 'PUT', {...record, ownerUid: 'bob'}, 'alice', false);
+await request('communityCars/extra', 'PUT', {...record, surprise: true}, 'alice', false);
+await request('communityCars/pi', 'PUT', {...record, startingPI: '474'}, 'alice', false);
+await request('communityCars/large', 'PUT', {...record, definition: 'x'.repeat(96001)}, 'alice', false);
+await request('communityCars/status', 'PUT', {...record, status: 'reviewed'}, 'alice', false);
+await request('communityCars/old', 'PUT', {...record, createdAt: 1}, 'alice', false);
+await request('communityCars', 'GET', undefined, 'alice', false);
+await request('communityCars', 'GET', undefined, 'alice', false, {orderBy: '"createdAt"', limitToLast: '101'});
+await request('communityCars', 'GET', undefined, 'alice', true, {orderBy: '"createdAt"', limitToLast: '100'});
+// The unchanged room rules must still protect hosts and lock player decisions.
+const room = {hostUid: 'host', status: 'lobby', players: {host: {name: 'Host', isHost: true, joinedAt: 1}}};
+await request('rooms/TEST1', 'PUT', room, 'host', true);
+await request('rooms/TEST1/players/bob', 'PUT', {name: 'Guest', isHost: false, joinedAt: 1}, 'bob', true);
+await request('rooms/TEST1/status', 'PUT', 'playing', 'bob', false);
+await request('rooms/TEST1', 'PATCH', {status: 'playing', gamePhase: 'upgrades', currentRound: 1, upgradeRounds: {round_1: {players: {bob: {keepCount: 1}}}}}, 'host', true);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions', 'PUT', {roll_1: 'apply', roll_2: 'pass'}, 'bob', true);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions/roll_1', 'PUT', 'pass', 'bob', false);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions/roll_2', 'PUT', 'apply', 'bob', false);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions', 'DELETE', undefined, 'bob', false);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions', 'PUT', {roll_1: 'apply', roll_2: 'pass'}, 'alice', false);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions/extra', 'PUT', 'pass', 'bob', false);
+console.log(`PASS: ${checks} emulator rule checks for community reads, creation, ownership, immutability, bounds and existing multiplayer decision security.`);

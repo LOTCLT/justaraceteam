@@ -1,0 +1,45 @@
+.importer-app { width: min(1000px, 94%); padding-top: 28px; }
+.importer-header { margin-bottom: 28px; }
+.importer-header h1 { font-size: clamp(30px, 6vw, 48px); margin: 10px 0; }
+.importer-app a { color: #8bc9ff; }
+.importer-section { margin: 18px 0; padding: clamp(18px, 4vw, 32px); }
+.importer-app h2 { margin-top: 0; font-size: 23px; }
+.importer-app p { line-height: 1.6; color: #bbb; }
+.importer-app label { display: block; font-size: 14px; line-height: 1.5; }
+.importer-app input:not([type=checkbox]), .importer-app select, .importer-app textarea {
+    display: block; width: 100%; max-width: 100%; margin: 7px 0 14px; padding: 12px;
+    border: 1px solid #555; border-radius: 7px; background: #222; color: #fff; font: inherit;
+}
+.importer-app textarea { min-height: 100px; resize: vertical; }
+.importer-app input[type=checkbox] { width: 20px; height: 20px; accent-color: #ff4d30; flex-shrink: 0; }
+.importer-app :focus-visible { outline: 3px solid #8bc9ff; outline-offset: 3px; }
+.importer-app button { width: auto; max-width: 100%; font-size: 14px; padding: 11px 15px; min-height: 44px; }
+.importer-app button:hover { transform: none; }
+.importer-app button:disabled { cursor: not-allowed; }
+.importer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin: 12px 0; }
+.importer-inline { display: flex; align-items: start; gap: 8px; }
+.importer-inline button { flex-shrink: 0; margin-top: 7px; }
+.importer-app .importer-hint { color: #aaa; font-size: 13px; }
+.importer-app .importer-context { color: #9bd1ff; font-weight: bold; }
+.importer-app .importer-check { display: flex; gap: 10px; align-items: center; min-height: 44px; }
+.importer-options { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 8px 30px; }
+.importer-options label { display: flex; align-items: center; gap: 7px; min-height: 44px; }
+.importer-mod { padding: 8px 0; border-bottom: 1px solid #333; }
+.importer-custom, .importer-row { margin: 14px 0; border: 1px solid #444; border-radius: 8px; padding: 14px; }
+.importer-app summary { cursor: pointer; padding: 6px 0; overflow-wrap: anywhere; line-height: 1.5; }
+.importer-row[open] summary { margin-bottom: 14px; }
+.importer-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+.importer-tier { display: inline-block; padding: 5px 8px; margin: 3px; background: #252f38; border-radius: 5px; font-size: 13px; }
+.importer-app .importer-error { color: #ffb3a5; }
+.importer-app .importer-warning { color: #f0cc87; }
+.importer-app .importer-success { color: #9ed7a5; }
+.importer-app ul { padding-left: 22px; line-height: 1.6; overflow-wrap: anywhere; }
+.importer-dependency { padding: 12px; background: #202020; border-radius: 8px; margin: 10px 0; }
+.importer-remove { background: #41251f; color: #ffb3a5; }
+.importer-option-note { margin-left: 30px; }
+@media (max-width: 600px) {
+    .importer-grid { grid-template-columns: 1fr; gap: 0; }
+    .importer-app button { white-space: normal; }
+    .importer-inline input { min-width: 0; }
+    .importer-options { margin-left: 0; }
+}

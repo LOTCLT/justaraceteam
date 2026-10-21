@@ -1,19 +1,23 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import { loadModule } from './load-module.mjs';
+const community = await loadModule('community-data.js');
+const importer = await loadModule('car-import.js');
 const source = fs.readFileSync('script.js', 'utf8');
 const html = fs.readFileSync('index.html', 'utf8');
 const data = await import('data:text/javascript;base64,' + Buffer.from(fs.readFileSync('game-data.js')).toString('base64'));
 const elements = new Map();
 function element() {
     return {children: [], handlers: {}, style: {}, dataset: {}, value: '', classList: {add(){},remove(){},toggle(){}},
+        set innerHTML(value){this.children=[];}, get innerHTML(){return '';},
         append(...nodes){this.children.push(...nodes);}, appendChild(node){this.children.push(node);},
         replaceChildren(...nodes){this.children=nodes;}, addEventListener(event, fn){this.handlers[event]=fn;},
         querySelectorAll(){return [];}, scrollIntoView(){}, setAttribute(){}};
 }
 for (const [,id] of html.matchAll(/id="([^"]+)"/g)) { assert(!elements.has(id), `Duplicate ID ${id}`); elements.set(id, element()); }
 let storedRoom;
-const context = vm.createContext({...data, console, alert(message){throw Error(message);},
+const context = vm.createContext({...data, ...community, firebaseConfig: {}, console, alert(message){throw Error(message);},
     document: {getElementById(id){assert(elements.has(id), `Missing DOM ID: ${id}`);return elements.get(id);},createElement:element},
     window:{scrollTo(){},addEventListener(){}},localStorage:{getItem(){return null;},setItem(){}},
     initializeApp(){},getAuth(){return {};},getDatabase(){},ref(db,path){return path;},
@@ -244,4 +248,36 @@ assert(buildRows.some(row => row.children[0].textContent === 'Single Turbo · 3.
 assert(!buildRows.some(row => row.children[0].textContent === 'Intake · 5.0L V10'));
 assert(buildRows.some(row => row.children[0].textContent === 'Brakes' && row.children[2].textContent === 'Race'));
 console.log('PASS: BMW selector, all engine/aspiration branches, dependency reachability, eligible rewards, implicit bases, engine/aspiration pruning, no downgrade, 2/3/4-player rewards, apply/undo/reapply, Build Comparison (DOM/Firebase mocked).');
+
+// Guests resolve the exact community definition saved in the room, without a catalog fetch.
+const sharedDraft = importer.draftFromCar(bmw);
+sharedDraft.name = '1988 Community BMW';
+const sharedDefinition = community.communityDefinition(sharedDraft);
+context.sharedCar = community.communityCarFromDefinition(sharedDefinition, 'shared-test');
+run('communityCars.set("shared-test", sharedCar); populateCarSelect();');
+assert(elements.get('carSelect').children.some(option => option.value === 'community:shared-test' && option.textContent.includes('Community')));
+elements.get('carSelect').value = 'community:shared-test';
+run('populateCarSelect()');
+assert.equal(elements.get('carSelect').value, 'community:shared-test');
+const snapshot = run('carSummary(sharedCar)');
+assert.equal(snapshot.definition, sharedDefinition);
+context.sharedRoom = {selectedCar: snapshot};
+run('communityCars.clear()');
+assert.equal(run('getSelectedCarDefinition(sharedRoom).name'), sharedDraft.name);
+assert.equal(run('getSelectedCarDefinition(sharedRoom).upgrades.length'), 91);
+snapshot.name = 'Wrong name';
+assert.equal(run('getSelectedCarDefinition(sharedRoom)'), null);
+snapshot.name = sharedDraft.name;
+snapshot.definition = '{broken';
+assert.equal(run('getSelectedCarDefinition(sharedRoom)'), null);
+assert.equal(data.CAR_LIBRARY.length, 4, 'Community cars must not enter the reviewed random pool');
+install({uid: 'u', name: 'Community driver', keepCount: 1, rolls: [bmwRaceIntake], decisions: {roll_1: 'apply'}});
+storedRoom.selectedCar = {name: sharedDraft.name, startingPI: sharedDraft.startingPI, communityId: 'shared-test', definition: sharedDefinition};
+storedRoom.garages = {u: {}};
+context.room = storedRoom;
+run('currentRoomData = room');
+await elements.get('applyUpgradesBtn').handlers.click();
+assert.equal(storedRoom.garages.u[bmwIntake.id].option, 'Race');
+assert.equal(storedRoom.selectedCar.definition, sharedDefinition);
+console.log('PASS: community selector labels, exact room definition, guest/reconnect resolution without catalog, invalid snapshots rejected, reviewed random pool unchanged.');
 
