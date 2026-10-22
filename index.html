@@ -18,7 +18,7 @@
 
     <link
         rel="stylesheet"
-        href="style.css?v=11"
+        href="style.css?v=12"
     >
 </head>
 
@@ -183,6 +183,7 @@
                 </div>
 
                 <h3>Players</h3>
+                <button id="editLobbyRosterBtn" class="small-button hidden" type="button">Edit Roster</button>
 
                 <div
                     id="playerList"
@@ -287,6 +288,7 @@
                 <div id="raceNightView">
 
                 <h3>Players</h3>
+                <button id="editGameRosterBtn" class="small-button hidden" type="button">Edit Roster</button>
 
                 <div
                     id="gamePlayerList"
@@ -840,9 +842,17 @@
 
     </main>
 
+    <dialog id="rosterDialog" class="roster-dialog" aria-labelledby="rosterTitle">
+        <h2 id="rosterTitle">Edit Roster</h2>
+        <p>Remove players who are done for the night. Past results stay saved, and everyone else can keep playing.</p>
+        <div id="rosterPlayerList" class="player-list"></div>
+        <p id="rosterStatus" role="status" aria-live="polite"></p>
+        <button id="closeRosterBtn" class="dark-button" type="button">Done</button>
+    </dialog>
+
     <script
         type="module"
-        src="script.js?v=10"
+        src="script.js?v=11"
     ></script>
 
 </body>

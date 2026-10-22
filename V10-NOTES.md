@@ -1,6 +1,10 @@
-# V10 — Guided car importer (development)
+# V10 — Guided car importer and roster controls
 
-This work is on `feature/car-importer`. It is not deployed. The reviewed lineup remains the four existing cars.
+## Lobby roster update
+
+The host can open **Edit Roster** in the lobby or during an active race night to remove guests with confirmation. The host cannot remove themselves. The room and all completed results/garages remain intact. Removed guests are archived under `departedPlayers` during play and cannot rejoin a started room; lobby removals may rejoin deliberately with the code. The current upgrade package is marked withdrawn, so it no longer blocks readiness or receives upgrades. Undo keeps that withdrawal. Generating upgrades after removal includes only active players, without changing the saved finishing order or points. Results submission rejects a stale roster. Removal and upgrade application recheck live room state atomically. Retained players keep their reconnect behavior. Existing Firebase host permissions support this; no rule deployment is needed.
+
+The reviewed lineup remains the four existing cars. The importer and subsequent styling updates were pushed to `main`; the roster update adds host controls without changing Firebase rules.
 
 ## Guided entry
 
@@ -41,6 +45,8 @@ For rules verification, use Firebase CLI and Java 21 with a **demo** project:
 firebase emulators:exec --only database --project demo-justaraceteam --config firebase.emulators.json 'node tests/community-rules.mjs'
 ```
 
-The emulator test checks community creation/read bounds, ownership, immutable records, denied invalid writes and the existing host/player decision protections. After network access was enabled, all 26 checks passed. The test explicitly targets the demo project's `-default-rtdb` namespace where Firebase CLI installs the rules; using the project ID alone would test a different database.
+The emulator test checks community creation/read bounds, ownership, immutable records, denied invalid writes and the existing host/player decision protections. All 33 checks passed, including lobby/in-game host removal and blocked guest removal/rejoining. The test explicitly targets the demo project's `-default-rtdb` namespace where Firebase CLI installs the rules; using the project ID alone would test a different database.
+
+`tests/roster-browser.mjs` uses the same external Playwright/Chromium setup. Serve on port 8012, or set `ROSTER_TEST_URL`. It exercises the real dialog and client module with mocked Firebase: host/guest controls, phone layout, confirmed removal, preserved history, removed-client exit and lobby controls.
 
 Before release: pass the emulator tests, review the rules diff, deliberately deploy the rules, publish the website files, then use isolated browser sessions to verify a real community submission, host selection, guest upgrade decisions and reconnect. Firebase rules have not been deployed and no production data was changed during development. Saving environment configuration is separate from code publication or Firebase deployment.

@@ -11,6 +11,7 @@ const elements = new Map();
 function element() {
     return {children: [], handlers: {}, style: {}, dataset: {}, value: '', classList: {add(){},remove(){},toggle(){}},
         set innerHTML(value){this.children=[];}, get innerHTML(){return '';},
+        open:false, showModal(){this.open=true;}, close(){this.open=false;},
         append(...nodes){this.children.push(...nodes);}, appendChild(node){this.children.push(node);},
         replaceChildren(...nodes){this.children=nodes;}, addEventListener(event, fn){this.handlers[event]=fn;},
         querySelectorAll(){return [];}, scrollIntoView(){}, setAttribute(){}};
@@ -280,4 +281,123 @@ await elements.get('applyUpgradesBtn').handlers.click();
 assert.equal(storedRoom.garages.u[bmwIntake.id].option, 'Race');
 assert.equal(storedRoom.selectedCar.definition, sharedDefinition);
 console.log('PASS: community selector labels, exact room definition, guest/reconnect resolution without catalog, invalid snapshots rejected, reviewed random pool unchanged.');
+
+// Host-only roster management is restricted to the pre-game lobby.
+let confirmations = 0;
+context.window.confirm = () => { confirmations++; return true; };
+function lobby(count = 3) {
+    storedRoom = {hostUid: 'u', status: 'lobby', players: Object.fromEntries(
+        Array.from({length: count}, (_, i) => [i ? 'guest' + i : 'u', {name: i ? 'Guest ' + i : 'Host', isHost: i === 0}]))};
+    context.room = structuredClone(storedRoom);
+    run('currentUserUid="u"; currentRoomCode="ABCDE"; currentPlayerIsHost=true; currentRoomData=room;');
+}
+const removeButtons = id => elements.get(id).children.flatMap(row => row.children.filter(child => child.textContent === 'Remove'));
+lobby();
+run('renderPlayers(document.getElementById("rosterPlayerList"), room.players, true); renderPlayers(gamePlayerList, room.players);');
+assert.equal(removeButtons('rosterPlayerList').length, 2);
+assert.equal(removeButtons('gamePlayerList').length, 0);
+assert.equal(elements.get('rosterPlayerList').children[0].children.some(child => child.textContent === 'Remove'), false);
+await removeButtons('rosterPlayerList')[0].handlers.click();
+assert.equal(storedRoom.players.guest1, undefined);
+assert(storedRoom.players.u && storedRoom.players.guest2);
+assert.equal(storedRoom.status, 'lobby');
+for (const count of [2, 4]) {
+    lobby(count); await run('removeRosterPlayer("guest1")');
+    assert.equal(Object.keys(storedRoom.players).length, count - 1);
+    assert(storedRoom.players.u);
+}
+lobby();
+context.window.confirm = () => false;
+await run('removeRosterPlayer("guest1")');
+assert(storedRoom.players.guest1);
+context.window.confirm = () => { confirmations++; return true; };
+const beforeSelf = confirmations;
+await run('removeRosterPlayer("u")');
+assert.equal(confirmations, beforeSelf);
+assert(storedRoom.players.u);
+run('currentPlayerIsHost=false; renderPlayers(playerList, room.players);');
+assert.equal(removeButtons('playerList').length, 0);
+await run('removeRosterPlayer("guest1")');
+assert(storedRoom.players.guest1);
+lobby();
+storedRoom.status = 'playing'; // Host's rendered lobby is stale; transaction sees Start Game.
+await run('removeRosterPlayer("guest1")');
+assert(storedRoom.players.guest1);
+assert.match(elements.get('rosterStatus').textContent, /room changed/);
+context.room = storedRoom;
+run('currentRoomData=room; renderPlayers(playerList, room.players);');
+assert.equal(removeButtons('playerList').length, 0);
+lobby(); storedRoom.hostUid = 'different-host';
+await run('removeRosterPlayer("guest1")');
+assert(storedRoom.players.guest1, 'Transaction must verify the live host UID');
+
+let roomListener, stopped = 0;
+context.onValue = (path, callback) => { roomListener = callback; return () => { stopped++; }; };
+lobby();
+run('currentUserUid="guest1"; currentPlayerIsHost=false; listenToRoom("ABCDE");');
+const removed = structuredClone(storedRoom); delete removed.players.guest1;
+roomListener({exists: () => true, val: () => removed});
+assert.equal(run('currentRoomCode'), null);
+assert.equal(stopped, 1);
+assert.match(elements.get('homeMessage').textContent, /no longer on this room/);
+// An already queued callback cannot restore the lobby after the listener is cleared.
+roomListener({exists: () => true, val: () => storedRoom});
+assert.equal(run('currentRoomCode'), null);
+console.log('PASS: host-only roster controls, confirmation/cancel, 2/3/4-player removal, host protection, lobby/start race guard, live host check, removed-guest exit and stale-listener guard.');
+
+lobby();
+storedRoom.status = 'playing'; storedRoom.gamePhase = 'upgrades'; storedRoom.currentRound = 1;
+storedRoom.selectedCar = {name: bmw.name}; storedRoom.queuedRace = structuredClone(queued);
+storedRoom.garages = {guest1: {savedPart: {option: 'Sport'}}};
+storedRoom.raceHistory = {round_1: {finishOrder: {1: {uid: 'u', name: 'Host'}, 2: {uid: 'guest1', name: 'Guest 1'}, 3: {uid: 'guest2', name: 'Guest 2'}}}};
+storedRoom.upgradeRounds = {round_1: {players: {
+    u: {uid: 'u', name: 'Host', rolls: [], keepCount: 0},
+    guest1: {uid: 'guest1', name: 'Guest 1', rolls: [bmwRaceIntake], keepCount: 1},
+    guest2: {uid: 'guest2', name: 'Guest 2', rolls: [], keepCount: 0}
+}}};
+const savedHistory = structuredClone(storedRoom.raceHistory);
+const savedGarages = structuredClone(storedRoom.garages);
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+assert.equal(run('allUpgradeDecisionsReady(room.upgradeRounds.round_1)'), false);
+await elements.get('editGameRosterBtn').handlers.click();
+assert.equal(elements.get('rosterDialog').open, true);
+assert.equal(removeButtons('rosterPlayerList').length, 2);
+await run('removeRosterPlayer("guest1")');
+assert.equal(storedRoom.players.guest1, undefined);
+assert.equal(storedRoom.departedPlayers.guest1.name, 'Guest 1');
+assert.equal(storedRoom.upgradeRounds.round_1.players.guest1.withdrawn, true);
+assert.deepEqual(storedRoom.raceHistory, savedHistory);
+assert.deepEqual(storedRoom.garages, savedGarages);
+assert.deepEqual(storedRoom.queuedRace, queued);
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+assert(run('allUpgradeDecisionsReady(room.upgradeRounds.round_1)'));
+await elements.get('applyUpgradesBtn').handlers.click();
+assert.equal(storedRoom.gamePhase, 'upgradeComplete');
+assert.deepEqual(storedRoom.garages.guest1, savedGarages.guest1, 'Departed player must not receive a pending roll');
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await elements.get('undoUpgradesBtn').handlers.click();
+assert.equal(storedRoom.upgradeRounds.round_1.players.guest1.withdrawn, true);
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+assert(run('allUpgradeDecisionsReady(room.upgradeRounds.round_1)'));
+await elements.get('applyUpgradesBtn').handlers.click();
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await elements.get('nextRoundBtn').handlers.click();
+assert.equal(storedRoom.currentRound, 2);
+assert.deepEqual(storedRoom.currentRace, queued);
+assert.deepEqual(storedRoom.raceHistory, savedHistory);
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await run('removeRosterPlayer("guest2")');
+assert.deepEqual(Object.keys(storedRoom.players), ['u'], 'Host stays in the same room even if everyone else leaves');
+
+// Leaving after results are saved does not erase or rescore the completed race.
+lobby();
+Object.assign(storedRoom, {status: 'playing', gamePhase: 'results', currentRound: 1, selectedCar: {name: bmw.name}, raceHistory: structuredClone(savedHistory)});
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await run('removeRosterPlayer("guest1")');
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await elements.get('goToUpgradesBtn').handlers.click();
+assert.deepEqual(Object.keys(storedRoom.upgradeRounds.round_1.players).sort(), ['guest2', 'u']);
+assert.deepEqual(storedRoom.raceHistory, savedHistory);
+assert.equal(run('calculateStandings(room.players, room.raceHistory).find(p=>p.uid==="guest1").points'), 3);
+console.log('PASS: in-game Edit Roster, archived departures, waiting-player withdrawal, history/garage/queue preservation, apply/undo/reapply/next round, host-only remainder, post-results removal with active-only rewards.');
 

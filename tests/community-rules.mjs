@@ -33,6 +33,10 @@ await request('communityCars', 'GET', undefined, 'alice', true, {orderBy: '"crea
 const room = {hostUid: 'host', status: 'lobby', players: {host: {name: 'Host', isHost: true, joinedAt: 1}}};
 await request('rooms/TEST1', 'PUT', room, 'host', true);
 await request('rooms/TEST1/players/bob', 'PUT', {name: 'Guest', isHost: false, joinedAt: 1}, 'bob', true);
+await request('rooms/TEST1/players/alice', 'PUT', {name: 'Other guest', isHost: false, joinedAt: 1}, 'alice', true);
+await request('rooms/TEST1/players/alice', 'DELETE', undefined, 'bob', false);
+await request('rooms/TEST1/players/host', 'DELETE', undefined, 'bob', false);
+await request('rooms/TEST1/players/alice', 'DELETE', undefined, 'host', true);
 await request('rooms/TEST1/status', 'PUT', 'playing', 'bob', false);
 await request('rooms/TEST1', 'PATCH', {status: 'playing', gamePhase: 'upgrades', currentRound: 1, upgradeRounds: {round_1: {players: {bob: {keepCount: 1}}}}}, 'host', true);
 await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions', 'PUT', {roll_1: 'apply', roll_2: 'pass'}, 'bob', true);
@@ -41,4 +45,7 @@ await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions/roll_2', 
 await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions', 'DELETE', undefined, 'bob', false);
 await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions', 'PUT', {roll_1: 'apply', roll_2: 'pass'}, 'alice', false);
 await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions/extra', 'PUT', 'pass', 'bob', false);
+await request('rooms/TEST1', 'PATCH', {'players/bob': null, 'departedPlayers/bob': {name: 'Guest', isHost: false, leftAt: 1, leftRound: 1}, 'upgradeRounds/round_1/players/bob/withdrawn': true}, 'host', true);
+await request('rooms/TEST1/players/bob', 'PUT', {name: 'Guest', isHost: false, joinedAt: 1}, 'bob', false);
+await request('rooms/TEST1/upgradeRounds/round_1/players/bob/decisions/roll_1', 'PUT', 'apply', 'bob', false);
 console.log(`PASS: ${checks} emulator rule checks for community reads, creation, ownership, immutability, bounds and existing multiplayer decision security.`);

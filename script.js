@@ -1515,7 +1515,8 @@ function normalizeRolls(rolls) {
 
 function renderPlayers(
     targetElement,
-    players
+    players,
+    allowRemoval = false
 ) {
 
     targetElement.innerHTML =
@@ -1580,6 +1581,24 @@ function renderPlayers(
 
             }
 
+            if (
+                allowRemoval && currentPlayerIsHost &&
+                ["lobby", "playing"].includes(currentRoomData?.status) &&
+                currentRoomData.hostUid === currentUserUid &&
+                uid !== currentUserUid && !player.isHost
+            ) {
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "small-button remove-player-button";
+                removeButton.textContent = "Remove";
+                removeButton.setAttribute("aria-label", "Remove " + player.name + " from the roster");
+                removeButton.addEventListener("click", async () => {
+                    removeButton.disabled = true;
+                    try { await removeRosterPlayer(uid); }
+                    finally { removeButton.disabled = false; }
+                });
+                row.appendChild(removeButton);
+            }
 
             targetElement.appendChild(
                 row
@@ -1592,6 +1611,55 @@ function renderPlayers(
     return sortedPlayers.length;
 
 }
+
+async function removeRosterPlayer(uid) {
+    if (!currentPlayerIsHost || !["lobby", "playing"].includes(currentRoomData?.status) ||
+        currentRoomData.hostUid !== currentUserUid || uid === currentUserUid) return;
+    const player = currentRoomData.players?.[uid];
+    if (!player || player.isHost) return;
+    const playing = currentRoomData.status === "playing";
+    const detail = playing
+        ? "Their past results stay saved and pending upgrades are withdrawn. They cannot rejoin this race night. Everyone else can keep playing."
+        : "They can rejoin with the room code if needed.";
+    if (!window.confirm("Remove " + player.name + " from the roster? " + detail)) return;
+
+    const result = await hostTransaction(room => {
+        // Do not let a lobby confirmation silently become an in-game removal.
+        if (room.status !== (playing ? "playing" : "lobby") || uid === room.hostUid ||
+            !room.players?.[uid] || room.players[uid].isHost) return;
+        if (playing) {
+            room.departedPlayers ||= {};
+            room.departedPlayers[uid] = {...room.players[uid], leftAt: Date.now(), leftRound: room.currentRound || 1};
+            const pack = room.upgradeRounds?.[getRoundKey(room.currentRound || 1)]?.players?.[uid];
+            // Keep the original rolls/applied history. Undo retains withdrawal,
+            // so it cannot reopen decisions for someone who has gone home.
+            if (pack) pack.withdrawn = true;
+        }
+        delete room.players[uid];
+        return room;
+    });
+    document.getElementById("rosterStatus").textContent = result?.committed
+        ? player.name + " was removed."
+        : "That player could not be removed. The room changed; check the roster and try again.";
+}
+
+function renderRosterControls(room) {
+    const canEdit = currentPlayerIsHost && room?.hostUid === currentUserUid && ["lobby", "playing"].includes(room.status);
+    for (const id of ["editLobbyRosterBtn", "editGameRosterBtn"]) document.getElementById(id).classList.toggle("hidden", !canEdit);
+    const dialog = document.getElementById("rosterDialog");
+    if (!canEdit) { if (dialog.open) dialog.close(); return; }
+    if (dialog.open) renderPlayers(document.getElementById("rosterPlayerList"), room.players, true);
+}
+for (const id of ["editLobbyRosterBtn", "editGameRosterBtn"]) {
+    document.getElementById(id).addEventListener("click", () => {
+        if (!currentPlayerIsHost || currentRoomData?.hostUid !== currentUserUid || !["lobby", "playing"].includes(currentRoomData.status)) return;
+        const dialog = document.getElementById("rosterDialog");
+        document.getElementById("rosterStatus").textContent = "";
+        renderPlayers(document.getElementById("rosterPlayerList"), currentRoomData.players, true);
+        if (!dialog.open) dialog.showModal();
+    });
+}
+document.getElementById("closeRosterBtn").addEventListener("click", () => document.getElementById("rosterDialog").close());
 
 
 /* =========================================================
@@ -2487,6 +2555,7 @@ function getAppliedRollIndices(
 function packageDecisionsReady(
     packageData
 ) {
+    if (packageData.withdrawn) return true;
 
     const rolls =
         normalizeRolls(
@@ -3659,6 +3728,7 @@ function renderUpgradePanel(
             upgradeRound.players ||
             {}
         )
+        .filter(pack => !pack.withdrawn)
         .sort(
             (a, b) =>
                 a.place -
@@ -4379,6 +4449,8 @@ function listenToRoom(
             roomReference,
             function (snapshot) {
 
+                if (currentRoomCode !== roomCode) return;
+
                 if (
                     !snapshot.exists()
                 ) {
@@ -4404,6 +4476,10 @@ function listenToRoom(
                 const roomData =
                     snapshot.val();
 
+                if (!roomData.players?.[currentUserUid]) {
+                    returnToHome("You are no longer on this room’s roster. Your past results remain saved.", "error");
+                    return;
+                }
 
                 currentRoomData =
                     roomData;
@@ -4660,7 +4736,8 @@ function returnToHome(
 ) {
 
     clearRoomListener();
-
+    const rosterDialog = document.getElementById("rosterDialog");
+    if (rosterDialog.open) rosterDialog.close();
 
     currentRoomCode =
         null;
@@ -5541,6 +5618,10 @@ submitResultsButton.addEventListener(
         }
 
 
+        if (JSON.stringify(Object.keys(currentRoomData.players || {}).sort()) !== JSON.stringify([...selectedUids].sort())) {
+            resultEntryMessage.textContent = "The roster changed. Reopen Enter Results to use the remaining players.";
+            return;
+        }
         const finishOrder =
             {};
 
@@ -5645,6 +5726,7 @@ submitResultsButton.addEventListener(
             if ((room.currentRound || 1) !== round) return;
             if (room.upgradeRounds?.[roundKey] || !["racing", "results"].includes(room.gamePhase)) return;
             if (room.raceHistory?.[roundKey] && !editingResults) return;
+            if (JSON.stringify(Object.keys(room.players || {}).sort()) !== JSON.stringify([...selectedUids].sort())) return;
             return applyRoomUpdates(room, updates);
         });
         if (submission?.committed) {
@@ -5789,7 +5871,9 @@ goToUpgradesButton.addEventListener(
             if ((room.currentRound || 1) !== round) return;
             if (room.gamePhase !== "results" || room.upgradeRounds?.[roundKey]) return;
             if (JSON.stringify(room.raceHistory?.[roundKey]?.finishOrder) !== JSON.stringify(race.finishOrder)) return;
-            return applyRoomUpdates(room, updates);
+            const path = "upgradeRounds/" + roundKey;
+            const activePackages = Object.fromEntries(Object.entries(playerPackages).filter(([uid]) => room.players?.[uid]));
+            return applyRoomUpdates(room, {...updates, [path]: {...updates[path], players: activePackages}});
         });
 
     }
@@ -5915,6 +5999,7 @@ applyUpgradesButton.addEventListener(
         )
         .forEach(
             function ([uid, packageData]) {
+                if (packageData.withdrawn) return;
 
                 const playerGarage =
                     cloneObject(
@@ -6066,6 +6151,7 @@ applyUpgradesButton.addEventListener(
             if (room.gamePhase !== "upgrades" || !allUpgradeDecisionsReady(room.upgradeRounds?.[roundKey])) return;
             const latestPackages = room.upgradeRounds[roundKey].players || {};
             if (Object.entries(upgradeRound.players || {}).some(([uid, pack]) =>
+                !!pack.withdrawn !== !!latestPackages[uid]?.withdrawn ||
                 normalizeRolls(pack.rolls).some((roll, index) =>
                     getRollDecision(pack, index) !== getRollDecision(latestPackages[uid] || {}, index)))) return;
             return applyRoomUpdates(room, updates);
@@ -6360,10 +6446,11 @@ function readLastRoom() {
     try { return localStorage.getItem("jart:lastRoom"); } catch { return null; }
 }
 function renderV9(room) {
+    renderRosterControls(room);
     const round = room.currentRound || 1;
     const phase = room.gamePhase;
     const upgradeRound = room.upgradeRounds?.[getRoundKey(round)];
-    const packs = Object.values(upgradeRound?.players || {});
+    const packs = Object.values(upgradeRound?.players || {}).filter(pack => !pack.withdrawn);
     const waiting = packs.filter(pack => !packageDecisionsReady(pack)).map(pack => pack.name);
     document.getElementById("decisionStatus").textContent = packs.map(pack =>
         (packageDecisionsReady(pack) ? "✓ " : "… ") + pack.name).join(" · ") +
