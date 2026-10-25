@@ -2,7 +2,7 @@ import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/12.17
 import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js';
 import { getDatabase, ref, push, set, get, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js';
 import { firebaseConfig } from './firebase-config.js?v=1';
-import { communityDefinition } from './community-data.js?v=1';
+import { communityDefinition } from './community-data.js?v=2';
 
 // One submission gets one stable ID. Retrying a failed request cannot duplicate it.
 export async function submitCommunityCar(draft, previousId) {

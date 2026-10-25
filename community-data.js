@@ -1,5 +1,5 @@
-import { CAR_LIBRARY } from './game-data.js?v=10';
-import { readCarFile, validateCar, exportCar } from './car-import.js?v=1';
+import { CAR_LIBRARY } from './game-data.js?v=11';
+import { readCarFile, validateCar, exportCar } from './car-import.js?v=2';
 
 export const MAX_CAR_BYTES = 96000;
 export function communityCarFromDefinition(definition, id) {
@@ -16,7 +16,8 @@ export function communityCarFromRecord(id, record) {
     return car;
 }
 export function communityDefinition(draft) {
-    const definition = exportCar(draft);
+    // Storage limits apply to the car data, not indentation in a human-readable backup.
+    const definition = JSON.stringify(JSON.parse(exportCar(draft)));
     communityCarFromDefinition(definition, 'new');
     return definition;
 }

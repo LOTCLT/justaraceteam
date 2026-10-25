@@ -6,7 +6,7 @@ const community = await loadModule('community-data.js');
 const importer = await loadModule('car-import.js');
 const source = fs.readFileSync('script.js', 'utf8');
 const html = fs.readFileSync('index.html', 'utf8');
-const data = await import('data:text/javascript;base64,' + Buffer.from(fs.readFileSync('game-data.js')).toString('base64'));
+const data = await loadModule('game-data.js');
 const elements = new Map();
 function element() {
     return {children: [], handlers: {}, style: {}, dataset: {}, value: '', classList: {add(){},remove(){},toggle(){}},
@@ -271,7 +271,7 @@ assert.equal(run('getSelectedCarDefinition(sharedRoom)'), null);
 snapshot.name = sharedDraft.name;
 snapshot.definition = '{broken';
 assert.equal(run('getSelectedCarDefinition(sharedRoom)'), null);
-assert.equal(data.CAR_LIBRARY.length, 4, 'Community cars must not enter the reviewed random pool');
+assert.equal(data.CAR_LIBRARY.length, 5, 'Community cars must not enter the reviewed random pool');
 install({uid: 'u', name: 'Community driver', keepCount: 1, rolls: [bmwRaceIntake], decisions: {roll_1: 'apply'}});
 storedRoom.selectedCar = {name: sharedDraft.name, startingPI: sharedDraft.startingPI, communityId: 'shared-test', definition: sharedDefinition};
 storedRoom.garages = {u: {}};
@@ -400,4 +400,22 @@ assert.deepEqual(Object.keys(storedRoom.upgradeRounds.round_1.players).sort(), [
 assert.deepEqual(storedRoom.raceHistory, savedHistory);
 assert.equal(run('calculateStandings(room.players, room.raceHistory).find(p=>p.uid==="guest1").points'), 3);
 console.log('PASS: in-game Edit Roster, archived departures, waiting-player withdrawal, history/garage/queue preservation, apply/undo/reapply/next round, host-only remainder, post-results removal with active-only rewards.');
+
+const corvette = data.getCarByName('2020 Chevrolet Corvette Stingray Coupe');
+assert(elements.get('carSelect').children.some(option => option.value === corvette.name));
+const corvetteIntake = corvette.upgrades.find(row => row.mod === 'Intake' && row.variant === 'Stock Engine');
+const corvetteAspiration = corvette.upgrades.find(row => row.mod === 'Aspiration' && row.variant === 'Stock Engine');
+const aspirationRoll = {category: corvetteAspiration.category, mod: corvetteAspiration.mod, modId: corvetteAspiration.id, option: 'Twin Turbo', tier: 1, outcome: 'UPGRADE'};
+install({uid: 'u', name: 'Corvette driver', keepCount: 1, rolls: [aspirationRoll], decisions: {roll_1: 'apply'}});
+storedRoom.selectedCar = {name: corvette.name};
+storedRoom.garages = {u: {[corvetteIntake.id]: {option: 'Race', tier: 3}}};
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await elements.get('applyUpgradesBtn').handlers.click();
+assert.equal(storedRoom.garages.u[corvetteIntake.id].option, 'Race');
+assert.equal(storedRoom.garages.u[corvetteAspiration.id].option, 'Twin Turbo');
+context.room = structuredClone(storedRoom); run('currentRoomData=room');
+await elements.get('undoUpgradesBtn').handlers.click();
+assert.equal(storedRoom.garages.u[corvetteAspiration.id], undefined);
+assert.equal(storedRoom.garages.u[corvetteIntake.id].option, 'Race');
+console.log('PASS: Corvette selector and real host apply/undo with retained shared engine upgrades.');
 

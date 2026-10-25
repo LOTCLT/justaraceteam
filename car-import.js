@@ -1,4 +1,4 @@
-import { buildCar, CAR_LIBRARY } from './game-data.js?v=10';
+import { buildCar, CAR_LIBRARY } from './game-data.js?v=11';
 
 export const CATEGORIES = ['Engine', 'Platform and Handling', 'Drivetrain', 'Tires and Rims', 'Aero and Appearance', 'Body Kits and Conversions'];
 export const emptyUpgrade = () => ({category: 'Engine', mod: '', variant: '', options: ['Stock', 'Street', 'Sport', 'Race'], requires: []});
@@ -7,6 +7,34 @@ const text = value => String(value ?? '').trim();
 const same = (a, b) => text(a).toLowerCase() === text(b).toLowerCase();
 const key = row => [row.category, row.mod, row.variant || ''].filter(Boolean).join('__').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 const list = value => text(value).split('|').map(text).filter(value => value && value !== '-');
+
+// Two trees for the same physical mod may coexist only if their prerequisites
+// cannot be satisfied together. Shared parts should have one persistent ID.
+export function findUpgradeOverlaps(draft) {
+    const rows = new Map(draft.upgrades.map(row => [key(row), row]));
+    function constraints(row, result = new Map(), seen = new Set()) {
+        if (seen.has(key(row))) return result;
+        seen.add(key(row));
+        for (const req of row.requires || []) {
+            const id = key(req), allowed = req.options.map(option => option.toLowerCase());
+            const previous = result.get(id);
+            result.set(id, previous ? previous.filter(option => allowed.includes(option)) : allowed);
+            if (rows.has(id)) constraints(rows.get(id), result, seen);
+        }
+        return result;
+    }
+    const scopes = draft.upgrades.map(row => constraints(row));
+    const overlaps = [];
+    for (let i = 0; i < draft.upgrades.length; i++) {
+        for (let j = i + 1; j < draft.upgrades.length; j++) {
+            const a = draft.upgrades[i], b = draft.upgrades[j];
+            if (!same(a.category, b.category) || !same(a.mod, b.mod) || key(a) === key(b)) continue;
+            const exclusive = [...scopes[i]].some(([id, options]) => scopes[j].has(id) && !options.some(option => scopes[j].get(id).includes(option)));
+            if (!exclusive) overlaps.push({first: i, second: j, mod: a.mod});
+        }
+    }
+    return overlaps;
+}
 
 // Export raw definitions so imports continue using the game's tier/dependency rules.
 export function draftFromCar(car) {
@@ -112,6 +140,9 @@ export function validateCar(draft) {
             requireOptions(row);
             if ([...constraints.values()].some(options => !options.length)) errors.push(`${row.mod} / ${row.variant || 'no variant'} has conflicting prerequisites and cannot become available.`);
         }
+    }
+    for (const overlap of findUpgradeOverlaps(draft)) {
+        errors.push(`Rows ${overlap.first + 1} and ${overlap.second + 1} (${overlap.mod}) can be active together. Keep unchanged parts shared, or make their prerequisites mutually exclusive.`);
     }
     return {errors: [...new Set(errors)], warnings: [...new Set(warnings)], car: built};
 }

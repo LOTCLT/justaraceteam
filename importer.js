@@ -1,7 +1,7 @@
-import { CAR_LIBRARY } from './game-data.js?v=10';
-import { CATEGORIES, emptyCar, emptyUpgrade, draftFromCar, readCarFile, validateCar, exportCar, parseDelimited, draftFromSheets, CSV_TEMPLATE } from './car-import.js?v=1';
+import { CAR_LIBRARY } from './game-data.js?v=11';
+import { CATEGORIES, emptyCar, emptyUpgrade, draftFromCar, readCarFile, validateCar, exportCar, parseDelimited, draftFromSheets, CSV_TEMPLATE } from './car-import.js?v=2';
 import { readWorkbook } from './spreadsheet.js?v=1';
-import { communityDefinition } from './community-data.js?v=1';
+import { communityDefinition } from './community-data.js?v=2';
 
 const $ = id => document.getElementById(id);
 const conversion = 'Body Kits and Conversions';
@@ -83,11 +83,21 @@ function matchRow(category, mod) {
         if (category !== 'Engine') return true;
         if (rowMotor(row) !== activeMotor()) return false;
         const aspiration = row.requires?.find(req => req.mod === 'Aspiration');
-        return $('aspirationOnly').checked ? aspiration?.options.includes($('importAspiration').value) : !aspiration;
+        return $('aspirationOnly').checked ? aspiration?.options.includes($('importAspiration').value) :
+            !aspiration || ($('importAspiration').value === aspirationRow()?.options[0] && aspiration.options.includes($('importAspiration').value));
     });
 }
+function sharedRow(category, mod) {
+    if (category !== 'Engine') return null;
+    return draft.upgrades.find(row => row.category === category && row.mod === mod && rowMotor(row) === activeMotor() && !row.requires.some(req => req.mod === 'Aspiration'));
+}
+function excludeCurrentConversion(row) {
+    const parent = ensureAspiration();
+    row.requires.push({category: conversion, mod: 'Aspiration', variant: parent.variant,
+        options: parent.options.filter(option => option !== $('importAspiration').value)});
+}
 function addUpgrade(category, mod) {
-    const row = {...emptyUpgrade(), category, mod, options: /Width/.test(mod) ? [] : choices(mod).slice(0, 1)};
+    const row = {...emptyUpgrade(), category, mod, options: /Width/.test(mod) || mod === 'Drivetrain Swap' ? [] : choices(mod).slice(0, 1)};
     if (category === 'Engine') {
         row.variant = motorVariant();
         if (engineRow()) row.requires.push(engineRequirement());
@@ -130,24 +140,49 @@ function renderChecklist() {
         group.open = firstRender ? category === 'Engine' : expanded.includes(category);
         group.append(node('summary', category));
         for (const mod of mods) {
-            const row = matchRow(category, mod), wrap = node('div', undefined, 'importer-mod');
+            const direct = matchRow(category, mod);
+            const inherited = !direct && $('aspirationOnly').checked ? sharedRow(category, mod) : null;
+            const row = direct || inherited, wrap = node('div', undefined, 'importer-mod');
             wrap.dataset.mod = mod;
             wrap.append(checkbox(mod, !!row, checked => {
                 if (checked) addUpgrade(category, mod);
                 else draft.upgrades.splice(draft.upgrades.indexOf(row), 1);
                 changed(); renderChecklist(); renderRows();
             }));
+            if (inherited) {
+                wrap.querySelector('input').disabled = true;
+                wrap.append(node('p', 'Already included as a shared motor part. You do not need to enter it again.', 'importer-hint'));
+                for (const value of row.options) wrap.append(node('span', value, 'importer-tier'));
+                const actions = node('div', undefined, 'importer-actions');
+                actions.append(button('Edit shared part', () => { $('aspirationOnly').checked = false; renderChecklist(); }));
+                if ($('importAspiration').value !== aspirationRow()?.options[0]) {
+                    actions.append(button('Not available with this conversion', () => { excludeCurrentConversion(row); changed(); renderChecklist(); renderRows(); }));
+                    actions.append(button('Different options with this conversion', () => {
+                        excludeCurrentConversion(row);
+                        const replacement = addUpgrade(category, mod);
+                        replacement.options = [...row.options];
+                        if (row.implicitBase) replacement.implicitBase = row.implicitBase;
+                        changed(); renderChecklist(); renderRows();
+                    }));
+                }
+                wrap.append(actions); group.append(wrap); continue;
+            }
             if (row) {
                 const options = node('div', undefined, 'importer-options');
                 const values = [...new Set([...choices(mod), ...row.options])];
                 for (const value of values) options.append(checkbox(value, row.options.includes(value), checked => {
                     const selected = new Set(row.options);
                     if (checked) selected.add(value); else selected.delete(value);
+                    const previousBase = row.options[0];
                     row.options = values.filter(value => selected.has(value));
-                    changed(); renderRows();
+                    if (previousBase && selected.has(previousBase)) row.options = [previousBase, ...row.options.filter(value => value !== previousBase)];
+                    if (value === 'Stock' && checked) delete row.implicitBase;
+                    else if (value === 'Stock' && !checked && /^(Street|Sport|Race)(\b|:)/i.test(row.options[0] || '')) row.implicitBase = `Base ${mod}`;
+                    else if (!row.options.includes('Stock') && /^(Street|Sport|Race)(\b|:)/i.test(row.options[0] || '') && !row.implicitBase) row.implicitBase = `Base ${mod}`;
+                    changed(); renderChecklist(); renderRows();
                 }));
                 wrap.append(options);
-                if (row.options.length) wrap.append(select('Base option already on the car', row.options.map(value => [value, value]), row.options[0], value => {
+                if (row.options.length && !row.implicitBase) wrap.append(select('Base option already on the car', row.options.map(value => [value, value]), row.options[0], value => {
                     row.options = [value, ...row.options.filter(option => option !== value)]; changed(); renderRows();
                 }));
                 wrap.append(checkbox('No visible Stock/base option in Forza', !!row.implicitBase, checked => {
@@ -296,7 +331,7 @@ for (const name of CATEGORIES) { const option = node('option', name); option.val
 $('addCustomUpgrade').addEventListener('click', () => {
     const mod = $('customMod').value.trim();
     if (!mod) { $('customMod').focus(); return; }
-    if (!matchRow($('customCategory').value, mod)) addUpgrade($('customCategory').value, mod);
+    if (!matchRow($('customCategory').value, mod) && !sharedRow($('customCategory').value, mod)) addUpgrade($('customCategory').value, mod);
     $('customMod').value = ''; changed(); renderChecklist(); renderRows(); $('importRows').lastElementChild.open = true;
 });
 $('downloadCar').addEventListener('click', () => {
@@ -315,7 +350,7 @@ $('publishCar').addEventListener('click', async () => {
     $('publishStatus').textContent = 'Saving your car…';
     try {
         // Lazy loading leaves the guided form usable even if Firebase is unavailable.
-        const {submitCommunityCar} = await import('./community-api.js?v=1');
+        const {submitCommunityCar} = await import('./community-api.js?v=2');
         submissionId = await submitCommunityCar(structuredClone(draft), submissionId);
         published = true; dirty = false;
         saveLocalDraft();

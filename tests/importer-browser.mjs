@@ -17,6 +17,17 @@ try {
     await intake.getByLabel('Sport', {exact: true}).check();
     await intake.getByLabel('Race', {exact: true}).check();
     assert.match(await page.locator('#importStatus').textContent(), /Ready to download/);
+    await page.locator('#upgradeChecklist').getByLabel('Exhaust', {exact: true}).check();
+    await page.locator('#upgradeChecklist [data-mod="Exhaust"]').getByLabel('Race', {exact: true}).check();
+    await page.locator('#newAspiration').fill('Single Turbo');
+    await page.locator('#addAspiration').click();
+    assert(await intake.getByLabel('Intake', {exact: true}).isChecked());
+    assert(await intake.getByLabel('Intake', {exact: true}).isDisabled());
+    await intake.getByRole('button', {name: 'Different options with this conversion'}).click();
+    await intake.getByLabel('Sport', {exact: true}).uncheck();
+    await page.locator('#upgradeChecklist [data-mod="Exhaust"]').getByRole('button', {name: 'Not available with this conversion'}).click();
+    assert(!(await page.locator('#upgradeChecklist').getByLabel('Exhaust', {exact: true}).isChecked()));
+    assert.match(await page.locator('#importStatus').textContent(), /Ready to download/);
     await page.locator('#newEngine').fill('6.2L V8');
     await page.locator('#addEngine').click();
     assert.equal(await page.locator('#upgradeChecklist').getByLabel('Intake', {exact: true}).isChecked(), false);
@@ -25,8 +36,9 @@ try {
     assert.equal(await page.locator('#aspirationOnly').isChecked(), true);
     await page.locator('#upgradeChecklist').getByLabel('Twin Turbos', {exact: true}).check();
     const turbo = page.locator('#upgradeChecklist [data-mod="Twin Turbos"]');
-    await turbo.getByLabel('No visible Stock/base option in Forza', {exact: true}).check();
+    await turbo.getByLabel('Stock', {exact: true}).uncheck();
     await turbo.getByLabel('Street', {exact: true}).check();
+    assert(await turbo.getByLabel('No visible Stock/base option in Forza', {exact: true}).isChecked());
     await turbo.getByLabel('Race', {exact: true}).check();
     await page.locator('#importEngine').selectOption('Stock');
     assert.equal(await page.locator('#upgradeChecklist').getByLabel('Intake', {exact: true}).isChecked(), true);
@@ -53,7 +65,7 @@ try {
     assert(boost.requires.some(req => req.mod === 'Engine Swap' && req.options.includes('6.2L V8')));
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     // Test submission UI without touching Firebase or production data.
-    await page.route('**/community-api.js?v=1', route => route.fulfill({contentType: 'text/javascript', body: 'let calls = 0; export async function submitCommunityCar(draft, previousId) { if (draft.name !== "2024 Guided Test") throw Error("Wrong draft"); if (calls++ === 0) { const error = Error("Simulated connection loss"); error.submissionId = "test-submission"; throw error; } if (previousId !== "test-submission") throw Error("Retry lost submission ID"); return "test-submission"; }'}));
+    await page.route('**/community-api.js?v=2', route => route.fulfill({contentType: 'text/javascript', body: 'let calls = 0; export async function submitCommunityCar(draft, previousId) { if (draft.name !== "2024 Guided Test") throw Error("Wrong draft"); if (calls++ === 0) { const error = Error("Simulated connection loss"); error.submissionId = "test-submission"; throw error; } if (previousId !== "test-submission") throw Error("Retry lost submission ID"); return "test-submission"; }'}));
     await page.locator('#publishCar').click();
     await page.getByText(/Could not confirm the save/).waitFor();
     assert.equal(await page.locator('#importCarName').inputValue(), '2024 Guided Test');

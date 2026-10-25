@@ -8,7 +8,7 @@ for (const car of CAR_LIBRARY) {
     assert.deepEqual(validateCar(draft).errors, [], car.name);
     assert.deepEqual(validateCar(readCarFile(exportCar(draft))).car, car);
 }
-const car = draftFromCar(CAR_LIBRARY.at(-1));
+const car = draftFromCar(CAR_LIBRARY.find(car => car.name === '1988 BMW M3'));
 car.name = '1988 BMW M3 Test';
 const definition = communityDefinition(car);
 const shared = communityCarFromRecord('test-id', {name: car.name, startingPI: car.startingPI, ownerUid: 'test-user', createdAt: 123, status: 'community', definition});
@@ -36,6 +36,13 @@ assert.throws(() => readCarFile('{"schemaVersion":1,"name":"Bad","startingPI":"C
 assert.throws(() => communityCarFromDefinition('x'.repeat(96001), 'bad'));
 assert.throws(() => communityCarFromDefinition(exportCar(draftFromCar(CAR_LIBRARY[0])), 'collision'));
 assert.throws(() => communityCarFromRecord('bad', {...shared, status: 'community', name: 'Different', ownerUid: 'test', createdAt: 123}));
+const overlapping = structuredClone(car);
+overlapping.upgrades.push({...structuredClone(overlapping.upgrades[0]), variant: 'Overlapping tree'});
+assert(validateCar(overlapping).errors.some(message => message.includes('can be active together')));
+// A large but valid tree must fit the existing storage limit after whitespace is removed.
+const large = {schemaVersion: 1, name: '2024 Large Test', startingPI: 'C474', upgrades: Array.from({length: 400}, (_, index) => ({category: 'Engine', mod: `Test part ${index}`, variant: '', options: ['Stock', 'Street', 'Sport', 'Race'], requires: []}))};
+assert(Buffer.byteLength(JSON.stringify(large, null, 4)) > 96000);
+assert(Buffer.byteLength(communityDefinition(large)) < 96000);
 const csv = draftFromSheets([{name: 'Template', rows: parseDelimited(CSV_TEMPLATE)}]);
 assert.deepEqual(validateCar(csv.draft).errors, []);
 assert.deepEqual(parseDelimited('Category,Mod,Option 1,Option 2\r\nEngine,"Intake, special",Stock,"Race ""special"""'),
@@ -48,4 +55,4 @@ const incomplete = draftFromSheets([{name: 'Legacy', rows: [
 ]}]);
 assert(incomplete.warnings.some(warning => warning.includes('implicit base')));
 assert(validateCar(incomplete.draft).errors.some(message => message.includes('missing')));
-console.log('PASS: four-car export/import round trips, 1,000 shared-car rewards, invalid/duplicate/cyclic/conflicting prerequisites, tier/base guards, name protection, file bounds, CSV/TSV quoting and template, missing legacy conversions.');
+console.log('PASS: all reviewed-car export/import round trips, 1,000 shared-car rewards, invalid/duplicate/cyclic/conflicting prerequisites, tier/base guards, name protection, file bounds, CSV/TSV quoting and template, missing legacy conversions.');

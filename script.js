@@ -39,11 +39,11 @@ import {
     RACE_MAP_SOURCE_URL,
     getRaceMapMeta
 }
-    from "./game-data.js?v=10";
+    from "./game-data.js?v=11";
 
 
 import { firebaseConfig } from "./firebase-config.js?v=1";
-import { communityCarFromDefinition, communityCarFromRecord } from "./community-data.js?v=1";
+import { communityCarFromDefinition, communityCarFromRecord } from "./community-data.js?v=2";
 
 /* =========================================================
    FIREBASE

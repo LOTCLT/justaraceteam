@@ -40,15 +40,16 @@
             <div><label for="newAspiration">Add an aspiration conversion for this motor</label><div class="importer-inline"><input id="newAspiration" maxlength="100" placeholder="Single Turbo"><button id="addAspiration" type="button">Add conversion</button></div></div>
         </div>
         <label>Aspiration you are entering<select id="importAspiration"></select></label>
-        <p class="importer-hint">A motor can already have a turbo. Enter that as its base aspiration. Additional conversions unlock their own turbo/supercharger upgrades.</p>
+        <p class="importer-hint">A motor swap can already have a turbo or supercharger. Enter that as its base aspiration instead of NA. Additional conversions unlock their own turbo/supercharger upgrades. A different motor needs its own tree; unchanged parts on the same motor stay shared across aspiration conversions.</p>
     </section>
 
     <section class="game-card importer-section" aria-labelledby="upgradeHeading">
         <h2 id="upgradeHeading">3. Check the available upgrades</h2>
         <p id="engineContext" class="importer-context"></p>
-        <p>Check a mod, then check only the options shown in Forza. Other motor trees stay saved when you switch motors.</p>
+        <p>Enter a motor's normal upgrades once. When you select an aspiration conversion, add only new or changed parts. Unchanged parts are shared automatically; other motor trees stay saved when you switch motors.</p>
         <label class="importer-check"><input id="aspirationOnly" type="checkbox">Engine upgrades entered now require the selected aspiration</label>
         <p class="importer-hint">Use this for turbo/supercharger upgrades unlocked by a conversion. Leave it off for parts that work with every aspiration on this motor.</p>
+        <p class="importer-hint">Keep Stock checked when Forza shows it: Stock is the base state and never rolls as a reward. Uncheck it only when the actual upgrade menu starts at Street, Sport or Race. For a part removed by a conversion, choose “Not available with this conversion.”</p>
         <div id="upgradeChecklist"></div>
         <details class="importer-custom"><summary>Add an upgrade not listed above</summary>
             <div class="importer-grid">
@@ -89,6 +90,6 @@
         <p id="fileStatus" role="status" aria-live="polite"></p>
     </section>
 </main>
-<script type="module" src="importer.js?v=1"></script>
+<script type="module" src="importer.js?v=2"></script>
 </body>
 </html>

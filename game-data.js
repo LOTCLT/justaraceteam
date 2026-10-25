@@ -1,3 +1,5 @@
+import { CORVETTE } from "./corvette-data.js?v=1";
+
 /* =========================================================
    JUST A RACE TEAM — GAME DATA
    Version 10
@@ -1851,7 +1853,9 @@ export const CAR_LIBRARY = [
                 ]
             }
         ]
-    )
+    ),
+
+    buildCar(CORVETTE.name, CORVETTE.startingPI, CORVETTE.upgrades)
 
 
 ];
