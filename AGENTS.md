@@ -339,3 +339,4 @@ Never assume a local desktop copy is newer than GitHub.
 3. Preserve existing working behavior unless the user explicitly requests a change.
 4. If a request affects Firebase rules, deployment, random odds, scoring, or dependency semantics, call that out before implementation.
 5. Update `V9-NOTES.md` or create a successor release note when behavior materially changes.
+6. When adding or correcting a car, update `MOTOR-SWAPS.md` with its engine swaps and car associations. Track recurring motors for a future dropdown; preserve distinct variants and car-specific options/dependencies until equivalence is verified.
