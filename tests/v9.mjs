@@ -419,3 +419,113 @@ assert.equal(storedRoom.garages.u[corvetteAspiration.id], undefined);
 assert.equal(storedRoom.garages.u[corvetteIntake.id].option, 'Race');
 console.log('PASS: Corvette selector and real host apply/undo with retained shared engine upgrades.');
 
+// Saving failures and stale round state must be visible, without changing history.
+function resultsFixture() {
+    storedRoom = {hostUid: 'u', status: 'playing', currentRound: 11, gamePhase: 'racing',
+        players: {u: {name: 'Host', isHost: true}, g: {name: 'Guest', isHost: false}},
+        selectedCar: {name: corvette.name, startingPI: corvette.startingPI}, currentRace: data.RACE_POOL[0]};
+    context.room = structuredClone(storedRoom);
+    run('currentUserUid="u";currentPlayerIsHost=true;currentRoomCode="RESULTS";currentRoomData=room;editingResults=false;');
+    elements.get('finishOrderInputs').querySelectorAll = () => [{value: 'u'}, {value: 'g'}];
+    context.get = async () => ({exists: () => false});
+}
+resultsFixture();
+context.get = async () => { throw Error('Network unavailable'); };
+await elements.get('submitResultsBtn').handlers.click();
+assert.match(elements.get('resultEntryMessage').textContent, /Could not save results.*Network unavailable/);
+assert.equal(elements.get('submitResultsBtn').disabled, false);
+assert.equal(storedRoom.raceHistory, undefined);
+resultsFixture(); storedRoom.currentRound = 12;
+await elements.get('submitResultsBtn').handlers.click();
+assert.match(elements.get('resultEntryMessage').textContent, /moved to round 12/);
+assert.equal(storedRoom.raceHistory, undefined);
+resultsFixture(); storedRoom.gamePhase = 'upgrades';
+await elements.get('submitResultsBtn').handlers.click();
+assert.match(elements.get('resultEntryMessage').textContent, /not accepting results yet/);
+resultsFixture(); storedRoom.hostUid = 'other-host';
+await elements.get('submitResultsBtn').handlers.click();
+assert.match(elements.get('resultEntryMessage').textContent, /no longer the host/);
+resultsFixture(); context.room.upgradeRounds = {round_11: {players: {}}};
+run('currentRoomData=room');
+await elements.get('submitResultsBtn').handlers.click();
+assert.match(elements.get('resultEntryMessage').textContent, /Upgrade rolls for round 11 already exist/);
+resultsFixture();
+let releaseRead, readCount = 0;
+context.get = () => { readCount++; return new Promise(resolve => { releaseRead = resolve; }); };
+const saving = elements.get('submitResultsBtn').handlers.click();
+await elements.get('submitResultsBtn').handlers.click();
+assert.equal(readCount, 1);
+assert.equal(elements.get('submitResultsBtn').disabled, true);
+releaseRead({exists: () => false});
+await saving;
+assert.equal(storedRoom.raceHistory.round_11.round, 11);
+assert.match(elements.get('resultEntryMessage').textContent, /Results saved for round 11/);
+assert.equal(elements.get('submitResultsBtn').disabled, false);
+console.log('PASS: round-11 save, read failures, changed round/phase/host, existing upgrades, visible rejection messages and duplicate-click protection.');
+
+// Invoked by long-night.mjs with the actual Firebase SDK and local emulator.
+export async function testLongNight(sdk, sdkApp) {
+    for (const count of [2, 4]) {
+        const uids = ['u', ...Array.from({length: count - 1}, (_, i) => 'guest' + i)];
+        const apps = uids.map(uid => sdkApp.initializeApp({projectId: 'demo-justaraceteam', databaseURL: 'https://demo-justaraceteam-default-rtdb.firebaseio.com'}, `long-${count}-${uid}`));
+        const databases = new Map(apps.map((app, i) => {
+            const database = sdk.getDatabase(app);
+            sdk.connectDatabaseEmulator(database, '127.0.0.1', 9000, {mockUserToken: {sub: uids[i]}});
+            return [uids[i], database];
+        }));
+        let activeDatabase = databases.get('u');
+        context.ref = (_, path) => sdk.ref(activeDatabase, path);
+        context.get = sdk.get; context.runTransaction = sdk.runTransaction; context.serverTimestamp = sdk.serverTimestamp;
+        const code = 'LONG' + count;
+        const reference = sdk.ref(activeDatabase, 'rooms/' + code);
+        let unsubscribe = () => {};
+        try {
+            await sdk.set(reference, {hostUid: 'u', status: 'lobby', currentRound: 1,
+                players: Object.fromEntries(uids.map(uid => [uid, {name: uid === 'u' ? 'Host' : 'Player ' + uid, isHost: uid === 'u', joinedAt: 1}])),
+                selectedCar: {name: corvette.name, startingPI: corvette.startingPI}, currentRace: data.RACE_POOL[0]});
+            await sdk.update(reference, {status: 'playing', gamePhase: 'racing'});
+            unsubscribe = sdk.onValue(reference, () => {});
+            const sync = async () => {
+                activeDatabase = databases.get('u');
+                context.room = (await sdk.get(reference)).val();
+                context.code = code;
+                run('currentUserUid="u";currentPlayerIsHost=true;currentRoomCode=code;currentRoomData=room;editingResults=false;');
+            };
+            for (let round = 1; round <= 15; round++) {
+                await sync();
+                if (count === 4 && round === 11) {
+                    await run('removeRosterPlayer("guest2")');
+                    await sync();
+                    assert.equal(Object.keys(context.room.players).length, 3);
+                }
+                const order = Object.keys(context.room.players);
+                order.push(...order.splice(0, round % order.length));
+                elements.get('finishOrderInputs').querySelectorAll = () => order.map(value => ({value}));
+                await elements.get('submitResultsBtn').handlers.click();
+                await sync(); assert.equal(context.room.gamePhase, 'results', `Round ${round}: submit results`);
+                await elements.get('goToUpgradesBtn').handlers.click();
+                await sync(); assert.equal(context.room.gamePhase, 'upgrades', `Round ${round}: generate upgrades`);
+                for (const [uid, pack] of Object.entries(context.room.upgradeRounds['round_' + round].players)) {
+                    activeDatabase = databases.get(uid); context.uid = uid; run('currentUserUid=uid;');
+                    for (let index = 0; index < normalizeTestRolls(pack.rolls).length; index++) await run(`saveUpgradeDecision(${index}, "apply")`);
+                }
+                await sync();
+                // Host's subscribed cache must receive guest writes before its Apply button enables.
+                for (let i = 0; i < 200 && !run('allUpgradeDecisionsReady(currentRoomData.upgradeRounds[getRoundKey(currentRoomData.currentRound)])'); i++) {
+                    await new Promise(resolve => setTimeout(resolve, 10)); await sync();
+                }
+                await elements.get('applyUpgradesBtn').handlers.click();
+                await sync(); assert.equal(context.room.gamePhase, 'upgradeComplete', `Round ${round}: apply upgrades`);
+                await elements.get('nextRoundBtn').handlers.click();
+                await sync(); assert.equal(context.room.currentRound, round + 1, `Round ${round}: advance`);
+            }
+            assert.equal(Object.keys(context.room.raceHistory).length, 15);
+            console.log(`PASS: real Firebase SDK/emulator ${count}-player night through round 16${count === 4 ? ', including round-11 roster removal' : ''}.`);
+        } finally {
+            unsubscribe();
+            for (const app of apps) await sdkApp.deleteApp(app);
+        }
+    }
+}
+function normalizeTestRolls(rolls) { return Array.isArray(rolls) ? rolls : Object.values(rolls || {}); }
+

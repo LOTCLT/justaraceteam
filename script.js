@@ -5504,236 +5504,263 @@ cancelResultsButton.addEventListener(
    SUBMIT RESULTS
    ========================================================= */
 
+let resultSubmissionPending = false;
 submitResultsButton.addEventListener(
     "click",
     async function () {
 
-        if (
-            !currentPlayerIsHost ||
-            !currentRoomData
-        ) {
-
-            return;
-
-        }
-
-
-        const selects =
-            Array.from(
-                finishOrderInputs
-                    .querySelectorAll(
-                        "select"
-                    )
-            );
-
-
-        const selectedUids =
-            selects.map(
-                select =>
-                    select.value
-            );
-
-
-        if (
-            selectedUids.some(
-                uid =>
-                    !uid
-            )
-        ) {
-
-            resultEntryMessage.textContent =
-                "Assign every finishing position.";
-
-
-            resultEntryMessage.className =
-                "message center-message error";
-
-
-            return;
-
-        }
-
-
-        if (
-            new Set(
-                selectedUids
-            ).size !==
-            selectedUids.length
-        ) {
-
-            resultEntryMessage.textContent =
-                "A player cannot finish in two positions.";
-
-
-            resultEntryMessage.className =
-                "message center-message error";
-
-
-            return;
-
-        }
-
-
-        const round =
-            currentRoomData.currentRound ||
-            1;
-
-
-        const roundKey =
-            getRoundKey(
-                round
-            );
-
-
-        const historyReference =
-            ref(
-                database,
-                "rooms/" +
-                currentRoomCode +
-                "/raceHistory/" +
-                roundKey
-            );
-
-
-        const existingResult =
-            await get(
-                historyReference
-            );
-
-
-        if (
-            existingResult.exists() && !editingResults
-        ) {
-
-            resultEntryMessage.textContent =
-                "Results for this round were already submitted.";
-
-
-            resultEntryMessage.className =
-                "message center-message error";
-
-
-            return;
-
-        }
-
-
-        if (JSON.stringify(Object.keys(currentRoomData.players || {}).sort()) !== JSON.stringify([...selectedUids].sort())) {
-            resultEntryMessage.textContent = "The roster changed. Reopen Enter Results to use the remaining players.";
+        if (resultSubmissionPending) return;
+        if (!currentPlayerIsHost || !currentRoomData) {
+            resultEntryMessage.textContent = "Only the connected host can save results. Reconnect to the room and try again.";
             return;
         }
-        const finishOrder =
-            {};
+        resultSubmissionPending = true;
+        const originalLabel = submitResultsButton.textContent;
+        submitResultsButton.disabled = true;
+        submitResultsButton.textContent = "Saving results…";
+        resultEntryMessage.textContent = "Saving results…";
+        resultEntryMessage.className = "message center-message";
+        const submittedRoom = currentRoomData;
+        const submittedRoomCode = currentRoomCode;
+        try {
 
 
-        selects.forEach(
-            function (select, index) {
-
-                const place =
-                    index + 1;
-
-
-                const uid =
-                    select.value;
+            const selects =
+                Array.from(
+                    finishOrderInputs
+                        .querySelectorAll(
+                            "select"
+                        )
+                );
 
 
-                const player =
-                    currentRoomData.players[
-                        uid
-                    ];
+            const selectedUids =
+                selects.map(
+                    select =>
+                        select.value
+                );
 
 
-                const reward =
-                    REWARDS_BY_PLACE[
-                        place
-                    ] || {
-                        rolls: 0,
-                        keep: 0,
-                        text: "No upgrade"
-                    };
+            if (
+                selectedUids.some(
+                    uid =>
+                        !uid
+                )
+            ) {
+
+                resultEntryMessage.textContent =
+                    "Assign every finishing position.";
 
 
-                finishOrder[
-                    place
-                ] = {
+                resultEntryMessage.className =
+                    "message center-message error";
 
-                    uid:
-                        uid,
 
-                    name:
-                        player.name,
-
-                    points:
-                        POINTS_BY_PLACE[
-                            place
-                        ] || 0,
-
-                    upgradeRolls:
-                        reward.rolls,
-
-                    upgradesKept:
-                        reward.keep,
-
-                    rewardText:
-                        reward.text
-
-                };
+                return;
 
             }
-        );
 
 
-        const raceResult = {
+            if (
+                new Set(
+                    selectedUids
+                ).size !==
+                selectedUids.length
+            ) {
 
-            round:
-                round,
-
-            car:
-                {
-                    name: currentRoomData.selectedCar.name,
-                    startingPI: currentRoomData.selectedCar.startingPI,
-                    ...(currentRoomData.selectedCar.communityId ? {communityId: currentRoomData.selectedCar.communityId} : {})
-                },
-
-            race:
-                currentRoomData.currentRace,
-
-            finishOrder:
-                finishOrder,
-
-            completedAt:
-                Date.now()
-
-        };
+                resultEntryMessage.textContent =
+                    "A player cannot finish in two positions.";
 
 
-        const updates =
-            {};
+                resultEntryMessage.className =
+                    "message center-message error";
 
 
-        updates[
-            "raceHistory/" +
-            roundKey
-        ] =
-            raceResult;
+                return;
+
+            }
 
 
-        updates.gamePhase = "results";
-        if (currentRoomData.upgradeRounds?.[roundKey]) return;
+            const round =
+                submittedRoom.currentRound ||
+                1;
 
 
-        const submission = await hostTransaction(room => {
-            if ((room.currentRound || 1) !== round) return;
-            if (room.upgradeRounds?.[roundKey] || !["racing", "results"].includes(room.gamePhase)) return;
-            if (room.raceHistory?.[roundKey] && !editingResults) return;
-            if (JSON.stringify(Object.keys(room.players || {}).sort()) !== JSON.stringify([...selectedUids].sort())) return;
-            return applyRoomUpdates(room, updates);
-        });
-        if (submission?.committed) {
-            editingResults = false;
-            resultsEntryPanel.classList.add("hidden");
+            const roundKey =
+                getRoundKey(
+                    round
+                );
+
+
+            const historyReference =
+                ref(
+                    database,
+                    "rooms/" +
+                    currentRoomCode +
+                    "/raceHistory/" +
+                    roundKey
+                );
+
+
+            const existingResult =
+                await get(
+                    historyReference
+                );
+
+
+            if (
+                existingResult.exists() && !editingResults
+            ) {
+
+                resultEntryMessage.textContent =
+                    "Results for this round were already submitted.";
+
+
+                resultEntryMessage.className =
+                    "message center-message error";
+
+
+                return;
+
+            }
+
+
+            if (JSON.stringify(Object.keys(submittedRoom.players || {}).sort()) !== JSON.stringify([...selectedUids].sort())) {
+                resultEntryMessage.textContent = "The roster changed. Reopen Enter Results to use the remaining players.";
+                return;
+            }
+            const finishOrder =
+                {};
+
+
+            selects.forEach(
+                function (select, index) {
+
+                    const place =
+                        index + 1;
+
+
+                    const uid =
+                        select.value;
+
+
+                    const player =
+                        submittedRoom.players[
+                            uid
+                        ];
+
+
+                    const reward =
+                        REWARDS_BY_PLACE[
+                            place
+                        ] || {
+                            rolls: 0,
+                            keep: 0,
+                            text: "No upgrade"
+                        };
+
+
+                    finishOrder[
+                        place
+                    ] = {
+
+                        uid:
+                            uid,
+
+                        name:
+                            player.name,
+
+                        points:
+                            POINTS_BY_PLACE[
+                                place
+                            ] || 0,
+
+                        upgradeRolls:
+                            reward.rolls,
+
+                        upgradesKept:
+                            reward.keep,
+
+                        rewardText:
+                            reward.text
+
+                    };
+
+                }
+            );
+
+
+            const raceResult = {
+
+                round:
+                    round,
+
+                car:
+                    {
+                        name: submittedRoom.selectedCar.name,
+                        startingPI: submittedRoom.selectedCar.startingPI,
+                        ...(submittedRoom.selectedCar.communityId ? {communityId: submittedRoom.selectedCar.communityId} : {})
+                    },
+
+                race:
+                    submittedRoom.currentRace,
+
+                finishOrder:
+                    finishOrder,
+
+                completedAt:
+                    Date.now()
+
+            };
+
+
+            const updates =
+                {};
+
+
+            updates[
+                "raceHistory/" +
+                roundKey
+            ] =
+                raceResult;
+
+
+            updates.gamePhase = "results";
+            if (submittedRoom.upgradeRounds?.[roundKey]) {
+                resultEntryMessage.textContent = "Upgrade rolls for round " + round + " already exist. Refresh and resume the room to continue without replacing them.";
+                return;
+            }
+            if (currentRoomCode !== submittedRoomCode) {
+                resultEntryMessage.textContent = "The room changed while saving. Reconnect to the correct room and try again.";
+                return;
+            }
+            let rejection = "The room changed or this browser is no longer the host. Refresh and resume the room, then try again.";
+
+
+            const submission = await hostTransaction(room => {
+                if ((room.currentRound || 1) !== round) { rejection = "The room moved to round " + room.currentRound + ". Refresh and resume to enter that round's results."; return; }
+                if (room.upgradeRounds?.[roundKey]) { rejection = "Round " + round + " already has upgrade rolls. Refresh and resume to continue them."; return; }
+                if (!["racing", "results"].includes(room.gamePhase)) { rejection = "Round " + round + " is not accepting results yet. Finish the current setup or upgrade step, then try again."; return; }
+                if (room.raceHistory?.[roundKey] && !editingResults) { rejection = "Round " + round + " results are already saved. Refresh and resume to load them."; return; }
+                if (JSON.stringify(Object.keys(room.players || {}).sort()) !== JSON.stringify([...selectedUids].sort())) { rejection = "The roster changed. Reopen Enter Results to use the remaining players."; return; }
+                return applyRoomUpdates(room, updates);
+            });
+            if (submission?.committed) {
+                editingResults = false;
+                resultsEntryPanel.classList.add("hidden");
+                resultEntryMessage.textContent = "Results saved for round " + round + ".";
+            } else {
+                resultEntryMessage.textContent = rejection;
+                resultEntryMessage.className = "message center-message error";
+            }
+        } catch (error) {
+            resultEntryMessage.textContent = "Could not save results. Your finishing order is still here; try again. " + error.message;
+            resultEntryMessage.className = "message center-message error";
+        } finally {
+            resultSubmissionPending = false;
+            submitResultsButton.disabled = false;
+            submitResultsButton.textContent = originalLabel;
         }
-
     }
 );
 
